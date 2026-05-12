@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Target } from "lucide-react";
+import smydLogo from "@/assets/smyd-logo.png";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -20,13 +20,8 @@ function Login() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col px-6 py-10">
         <div className="flex flex-col items-center mb-10 animate-fade-in-up">
-          <div className="size-14 rounded-2xl bg-gradient-neon grid place-items-center ring-neon mb-4">
-            <Target className="size-7 text-background" strokeWidth={2.5} />
-          </div>
-          <h1 className="font-display text-3xl font-bold uppercase tracking-tight">
-            <span className="text-gradient-neon">SMYD</span>
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">Real-money GranBoard darts</p>
+          <img src={smydLogo} alt="SMYD — Show Me Your Darts" className="w-44 h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.45)]" />
+          <p className="mt-3 text-sm text-muted-foreground tracking-wide">Real-money GranBoard darts</p>
         </div>
 
         <div className="flex rounded-xl bg-surface p-1 ring-1 ring-border mb-6">
