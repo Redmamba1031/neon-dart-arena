@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { Home, Swords, Trophy, User, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
+import smydLogo from "@/assets/smyd-logo.png";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [balance] = useState(1240.5);
@@ -23,12 +24,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 function Header({ balance }: { balance: number }) {
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border/60 bg-background/80 px-5 py-4 backdrop-blur-xl">
-      <Link to="/profile" className="size-10 rounded-full bg-surface ring-1 ring-border overflow-hidden grid place-items-center font-display font-bold text-primary">
+      <Link to="/profile" className="size-10 rounded-full bg-surface ring-1 ring-primary/50 overflow-hidden grid place-items-center font-display font-bold text-primary">
         VX
       </Link>
-      <Link to="/" className="flex flex-col items-center">
-        <span className="font-display text-lg font-semibold uppercase tracking-tight">SMYD</span>
-        <div className="h-0.5 w-8 bg-gradient-neon" />
+      <Link to="/" className="flex items-center gap-2">
+        <img src={smydLogo} alt="SMYD — Show Me Your Darts" className="h-10 w-auto drop-shadow-[0_0_12px_rgba(220,38,38,0.5)]" />
       </Link>
       <Link
         to="/wallet"

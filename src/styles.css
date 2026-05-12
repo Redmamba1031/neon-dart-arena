@@ -41,37 +41,37 @@
 
 :root {
   --radius: 0.75rem;
-  /* Neon Tactical Arena — dark only */
-  --background: oklch(0.145 0.015 270);
-  --foreground: oklch(0.98 0.005 250);
-  --surface: oklch(0.21 0.02 270);
-  --card: oklch(0.21 0.02 270);
-  --card-foreground: oklch(0.98 0.005 250);
-  --popover: oklch(0.21 0.02 270);
-  --popover-foreground: oklch(0.98 0.005 250);
-  --primary: oklch(0.82 0.16 215);          /* neon cyan #22d3ee */
-  --primary-foreground: oklch(0.145 0.015 270);
-  --secondary: oklch(0.27 0.03 270);
-  --secondary-foreground: oklch(0.98 0.005 250);
-  --muted: oklch(0.27 0.03 270);
-  --muted-foreground: oklch(0.62 0.02 265);
-  --accent: oklch(0.65 0.27 305);           /* electric purple #a855f7 */
-  --accent-foreground: oklch(0.98 0.005 250);
-  --destructive: oklch(0.65 0.22 27);
-  --destructive-foreground: oklch(0.98 0.005 250);
-  --danger: oklch(0.65 0.22 27);
-  --success: oklch(0.78 0.18 145);
-  --border: oklch(0.27 0.03 270 / 60%);
-  --input: oklch(0.27 0.03 270);
-  --ring: oklch(0.82 0.16 215);
-  --neon: oklch(0.82 0.16 215);
-  --purple-glow: oklch(0.65 0.27 305);
+  /* SMYD — dartboard arena. Pure black, blood red, board white, sisal green */
+  --background: oklch(0.08 0 0);
+  --foreground: oklch(0.98 0 0);
+  --surface: oklch(0.16 0.005 20);
+  --card: oklch(0.16 0.005 20);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.16 0.005 20);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.62 0.24 25);           /* blood red */
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.22 0.01 20);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.22 0.01 20);
+  --muted-foreground: oklch(0.62 0.01 20);
+  --accent: oklch(0.72 0.18 145);           /* dartboard green */
+  --accent-foreground: oklch(0.08 0 0);
+  --destructive: oklch(0.62 0.24 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --danger: oklch(0.62 0.24 25);
+  --success: oklch(0.72 0.18 145);
+  --border: oklch(0.25 0.01 20 / 70%);
+  --input: oklch(0.22 0.01 20);
+  --ring: oklch(0.62 0.24 25);
+  --neon: oklch(0.62 0.24 25);              /* red glow */
+  --purple-glow: oklch(0.72 0.18 145);      /* green glow (kept var name for compat) */
   --discord: oklch(0.62 0.18 270);
 
-  --gradient-neon: linear-gradient(90deg, var(--neon), var(--purple-glow));
-  --gradient-card: linear-gradient(135deg, color-mix(in oklab, var(--neon) 8%, transparent), color-mix(in oklab, var(--purple-glow) 8%, transparent));
-  --shadow-neon: 0 0 20px -2px color-mix(in oklab, var(--neon) 60%, transparent);
-  --shadow-purple: 0 0 24px -4px color-mix(in oklab, var(--purple-glow) 60%, transparent);
+  --gradient-neon: linear-gradient(90deg, var(--neon), oklch(0.72 0.22 30));
+  --gradient-card: linear-gradient(135deg, color-mix(in oklab, var(--neon) 10%, transparent), color-mix(in oklab, var(--foreground) 4%, transparent));
+  --shadow-neon: 0 0 20px -2px color-mix(in oklab, var(--neon) 70%, transparent);
+  --shadow-purple: 0 0 24px -4px color-mix(in oklab, var(--accent) 60%, transparent);
 }
 
 .dark {
