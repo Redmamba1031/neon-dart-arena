@@ -13,7 +13,7 @@ export const Route = createFileRoute("/create-match")({
   component: CreateMatch,
 });
 
-type Mode = "501" | "Cricket";
+type Mode = "501" | "Cricket" | "Medley";
 type FinishRule = "double" | "master" | "both";
 
 function CreateMatch() {
