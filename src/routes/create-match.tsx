@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Target, Crosshair } from "lucide-react";
+import { Target, Crosshair, Shuffle } from "lucide-react";
 
 export const Route = createFileRoute("/create-match")({
   head: () => ({
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/create-match")({
   component: CreateMatch,
 });
 
-type Mode = "501" | "Cricket";
+type Mode = "501" | "Cricket" | "Medley";
 type FinishRule = "double" | "master" | "both";
 
 function CreateMatch() {
@@ -33,9 +33,10 @@ function CreateMatch() {
         </div>
 
         {/* Mode selector */}
-        <div className="grid grid-cols-2 gap-3">
-          <ModeButton active={mode === "501"} onClick={() => setMode("501")} icon={Target} label="501" sub="Classic countdown" />
+        <div className="grid grid-cols-3 gap-3">
+          <ModeButton active={mode === "501"} onClick={() => setMode("501")} icon={Target} label="501" sub="Countdown" />
           <ModeButton active={mode === "Cricket"} onClick={() => setMode("Cricket")} icon={Crosshair} label="Cricket" sub="20–15 + bull" />
+          <ModeButton active={mode === "Medley"} onClick={() => { setMode("Medley"); if (bestOf === 1) setBestOf(3); }} icon={Shuffle} label="Medley" sub="501 + Cricket" />
         </div>
 
         {/* 501 rules */}
@@ -69,6 +70,22 @@ function CreateMatch() {
           </Panel>
         )}
 
+        {mode === "Medley" && (
+          <Panel title="Medley Rules">
+            <p className="text-xs text-muted-foreground">
+              Alternates 501 and Cricket legs. Bo3 plays 501 → Cricket → 501. Bo5 plays 501 → Cricket → 501 → Cricket → 501.
+            </p>
+            <div className="pt-2">
+              <p className="text-xs font-medium mb-2">501 Finish</p>
+              <div className="grid grid-cols-3 gap-2">
+                <FinishOpt active={finishRule === "double"} onClick={() => setFinishRule("double")} label="Double Out" />
+                <FinishOpt active={finishRule === "master"} onClick={() => setFinishRule("master")} label="Master Out" />
+                <FinishOpt active={finishRule === "both"} onClick={() => setFinishRule("both")} label="Both" />
+              </div>
+            </div>
+          </Panel>
+        )}
+
         {/* Stake */}
         <Panel title="Stake">
           <div className="flex items-baseline gap-2">
@@ -98,8 +115,8 @@ function CreateMatch() {
 
         {/* Best of */}
         <Panel title="Best Of">
-          <div className="grid grid-cols-3 gap-2">
-            {[1, 3, 5].map((v) => (
+          <div className={`grid gap-2 ${mode === "Medley" ? "grid-cols-2" : "grid-cols-3"}`}>
+            {(mode === "Medley" ? [3, 5] : [1, 3, 5]).map((v) => (
               <button
                 key={v}
                 onClick={() => setBestOf(v)}
