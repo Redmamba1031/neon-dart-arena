@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Target, Crosshair } from "lucide-react";
+import { Target, Crosshair, Shuffle } from "lucide-react";
 
 export const Route = createFileRoute("/create-match")({
   head: () => ({
