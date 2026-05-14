@@ -50,12 +50,14 @@ function CreateMatch() {
             />
             <div className="pt-2">
               <p className="text-xs font-medium mb-2">Finish</p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <FinishOpt active={finishRule === "straight"} onClick={() => setFinishRule("straight")} label="Straight Out" />
                 <FinishOpt active={finishRule === "double"} onClick={() => setFinishRule("double")} label="Double Out" />
                 <FinishOpt active={finishRule === "master"} onClick={() => setFinishRule("master")} label="Master Out" />
                 <FinishOpt active={finishRule === "both"} onClick={() => setFinishRule("both")} label="Both" />
               </div>
               <p className="mt-2 text-[10px] text-muted-foreground">
+                {finishRule === "straight" && "Finish on any segment — no double required."}
                 {finishRule === "double" && "Finish on a double only."}
                 {finishRule === "master" && "Finish on any double or triple."}
                 {finishRule === "both" && "Open with a double and finish on a double."}
