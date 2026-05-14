@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { MessageSquare, Settings, LogOut, Award, Target } from "lucide-react";
+import { MessageSquare, Settings, LogOut, Award, Target, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
