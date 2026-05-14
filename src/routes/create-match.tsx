@@ -33,9 +33,10 @@ function CreateMatch() {
         </div>
 
         {/* Mode selector */}
-        <div className="grid grid-cols-2 gap-3">
-          <ModeButton active={mode === "501"} onClick={() => setMode("501")} icon={Target} label="501" sub="Classic countdown" />
+        <div className="grid grid-cols-3 gap-3">
+          <ModeButton active={mode === "501"} onClick={() => setMode("501")} icon={Target} label="501" sub="Countdown" />
           <ModeButton active={mode === "Cricket"} onClick={() => setMode("Cricket")} icon={Crosshair} label="Cricket" sub="20–15 + bull" />
+          <ModeButton active={mode === "Medley"} onClick={() => { setMode("Medley"); if (bestOf === 1) setBestOf(3); }} icon={Shuffle} label="Medley" sub="501 + Cricket" />
         </div>
 
         {/* 501 rules */}
@@ -66,6 +67,22 @@ function CreateMatch() {
         {mode === "Cricket" && (
           <Panel title="Cricket Rules">
             <p className="text-xs text-muted-foreground">Standard point-call cricket. Close 20–15 plus bull, score on closed numbers.</p>
+          </Panel>
+        )}
+
+        {mode === "Medley" && (
+          <Panel title="Medley Rules">
+            <p className="text-xs text-muted-foreground">
+              Alternates 501 and Cricket legs. Bo3 plays 501 → Cricket → 501. Bo5 plays 501 → Cricket → 501 → Cricket → 501.
+            </p>
+            <div className="pt-2">
+              <p className="text-xs font-medium mb-2">501 Finish</p>
+              <div className="grid grid-cols-3 gap-2">
+                <FinishOpt active={finishRule === "double"} onClick={() => setFinishRule("double")} label="Double Out" />
+                <FinishOpt active={finishRule === "master"} onClick={() => setFinishRule("master")} label="Master Out" />
+                <FinishOpt active={finishRule === "both"} onClick={() => setFinishRule("both")} label="Both" />
+              </div>
+            </div>
           </Panel>
         )}
 
