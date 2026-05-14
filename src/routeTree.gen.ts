@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as JoinMatchRouteImport } from './routes/join-match'
@@ -26,6 +27,11 @@ const WalletRoute = WalletRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/join-match': typeof JoinMatchRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
   '/wallet': typeof WalletRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/join-match': typeof JoinMatchRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
   '/wallet': typeof WalletRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/join-match': typeof JoinMatchRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
   '/wallet': typeof WalletRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/join-match'
     | '/leaderboard'
     | '/login'
+    | '/messages'
     | '/profile'
     | '/wallet'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/join-match'
     | '/leaderboard'
     | '/login'
+    | '/messages'
     | '/profile'
     | '/wallet'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/join-match'
     | '/leaderboard'
     | '/login'
+    | '/messages'
     | '/profile'
     | '/wallet'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   JoinMatchRoute: typeof JoinMatchRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
+  MessagesRoute: typeof MessagesRoute
   ProfileRoute: typeof ProfileRoute
   WalletRoute: typeof WalletRoute
 }
@@ -148,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   JoinMatchRoute: JoinMatchRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
+  MessagesRoute: MessagesRoute,
   ProfileRoute: ProfileRoute,
   WalletRoute: WalletRoute,
 }

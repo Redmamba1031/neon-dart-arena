@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { MessageSquare, Settings, LogOut, Award, Target } from "lucide-react";
+import { MessageSquare, Settings, LogOut, Award, Target, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -38,24 +38,22 @@ function Profile() {
           </div>
         </div>
 
-        {/* Discord */}
-        <div className="rounded-xl bg-surface ring-1 ring-border p-4 flex items-center gap-3">
-          <div className="size-10 rounded-lg bg-discord/15 grid place-items-center text-discord">
-            <MessageSquare className="size-5" />
+        {/* Messages */}
+        <Link
+          to="/messages"
+          className="block rounded-xl bg-surface ring-1 ring-border p-4 hover:ring-primary/40 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-lg bg-primary/15 grid place-items-center text-primary">
+              <MessageSquare className="size-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">Messages</p>
+              <p className="text-[11px] text-muted-foreground">3 unread • Chat with players</p>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground" />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold">Discord</p>
-            <p className="text-[11px] text-muted-foreground">Linked as Viper_X#0420</p>
-          </div>
-          <a
-            href="https://discord.gg/lovable-dev"
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-lg bg-discord px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white"
-          >
-            Open
-          </a>
-        </div>
+        </Link>
 
         {/* Game prefs */}
         <Section title="Favorite Modes">
