@@ -73,8 +73,10 @@ function CreateMatch() {
         {mode === "Medley" && (
           <Panel title="Medley Rules">
             <p className="text-xs text-muted-foreground">
-              Alternates 501 and Cricket legs. Bo3 plays 501 → Cricket → 501. Bo5 plays 501 → Cricket → 501 → Cricket → 501.
+              Mixed format. <span className="text-foreground font-semibold">Bo3:</span> 501 → Cricket → Choice.{" "}
+              <span className="text-foreground font-semibold">Bo5:</span> 501 → Cricket → Cricket → 501 → Choice.
             </p>
+            <p className="text-[10px] text-muted-foreground">Final "Choice" leg: winner of the previous leg picks the mode.</p>
             <div className="pt-2">
               <p className="text-xs font-medium mb-2">501 Finish</p>
               <div className="grid grid-cols-3 gap-2">
