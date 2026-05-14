@@ -115,8 +115,8 @@ function CreateMatch() {
 
         {/* Best of */}
         <Panel title="Best Of">
-          <div className="grid grid-cols-3 gap-2">
-            {[1, 3, 5].map((v) => (
+          <div className={`grid gap-2 ${mode === "Medley" ? "grid-cols-2" : "grid-cols-3"}`}>
+            {(mode === "Medley" ? [3, 5] : [1, 3, 5]).map((v) => (
               <button
                 key={v}
                 onClick={() => setBestOf(v)}
