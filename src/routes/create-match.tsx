@@ -14,7 +14,7 @@ export const Route = createFileRoute("/create-match")({
 });
 
 type Mode = "501" | "Cricket" | "Medley";
-type FinishRule = "double" | "master" | "both";
+type FinishRule = "straight" | "double" | "master" | "both";
 
 function CreateMatch() {
   const [mode, setMode] = useState<Mode>("501");
