@@ -156,7 +156,7 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
       <div className="grid grid-cols-2 gap-3">
         <Field label="Mode">
           <select value={mode} onChange={(e) => setMode(e.target.value as any)} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm">
-            <option value="501">501</option><option value="Cricket">Cricket</option><option value="Piddle">Piddle</option>
+            <option value="501">501</option><option value="Cricket">Cricket</option>
           </select>
         </Field>
         <Field label="Best of">
