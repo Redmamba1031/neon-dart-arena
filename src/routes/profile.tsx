@@ -88,8 +88,8 @@ function Profile() {
           </div>
         </Link>
 
-        <Section title="Favorite Mode">
-          <Pref icon={Target} label="501" sub={`${mode501Wins} wins`} />
+        <Section title="Tournaments">
+          <Pref icon={Target} label="Cups Won" sub={`${wins} wins`} />
         </Section>
 
         <div className="space-y-2">
