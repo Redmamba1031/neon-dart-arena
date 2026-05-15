@@ -2,20 +2,20 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
-import { Target, Crosshair, Shuffle } from "lucide-react";
+import { Target } from "lucide-react";
 import { formatUsd, toCents, useCreateMatch, useWallet } from "@/lib/api";
 
 export const Route = createFileRoute("/create-match")({
   head: () => ({
     meta: [
       { title: "Create Match — SMYD" },
-      { name: "description", content: "Set up a 501 or Cricket darts match with custom stakes and rules." },
+      { name: "description", content: "Set up a 501 darts match with custom stakes and rules." },
     ],
   }),
   component: CreateMatch,
 });
 
-type Mode = "501" | "Cricket" | "Medley";
+type Mode = "501";
 type FinishRule = "straight" | "double" | "master" | "both";
 
 function CreateMatch() {
@@ -42,8 +42,8 @@ function CreateMatch() {
         mode,
         best_of: bestOf,
         stake_cents: toCents(stake),
-        double_in: mode !== "Cricket" ? doubleIn : false,
-        finish_rule: mode !== "Cricket" ? finishRule : "double",
+        double_in: doubleIn,
+        finish_rule: finishRule,
       });
       toast.success("Match created — waiting for an opponent.");
       navigate({ to: "/" });
