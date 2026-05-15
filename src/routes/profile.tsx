@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { MessageSquare, Settings, LogOut, Award, Target, ChevronRight } from "lucide-react";
+import { MessageSquare, Settings, LogOut, Target, ChevronRight } from "lucide-react";
 import { useMyProfile, useMatchHistory, useLeaderboard, formatUsd } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
