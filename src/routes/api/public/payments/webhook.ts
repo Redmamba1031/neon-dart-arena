@@ -30,7 +30,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     return;
   }
 
-  const { error } = await getSupabase().rpc("credit_wallet_from_deposit", {
+  const { error } = await (getSupabase().rpc as any)("credit_wallet_from_deposit", {
     _user_id: userId,
     _session_id: session.id,
     _payment_intent: session.payment_intent ?? null,
