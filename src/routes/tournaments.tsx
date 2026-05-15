@@ -120,7 +120,7 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
   const [name, setName] = useState("");
   const mode = "501" as const;
   const [bestOf, setBestOf] = useState<1 | 3 | 5>(3);
-  const [size, setSize] = useState<4 | 8>(4);
+  const [size, setSize] = useState<4 | 8 | 16 | 32>(4);
   const [entry, setEntry] = useState(10);
 
   const submit = async (e: React.FormEvent) => {
@@ -164,7 +164,7 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
         </Field>
         <Field label="Size">
           <select value={size} onChange={(e) => setSize(Number(e.target.value) as any)} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm">
-            <option value={4}>4 players</option><option value={8}>8 players</option>
+            <option value={4}>4 players</option><option value={8}>8 players</option><option value={16}>16 players</option><option value={32}>32 players</option>
           </select>
         </Field>
         <Field label="Entry ($)">

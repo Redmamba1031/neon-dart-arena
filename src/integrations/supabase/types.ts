@@ -389,6 +389,10 @@ export type Database = {
         Args: { _seeds: string[]; _tid: string }
         Returns: undefined
       }
+      _build_bracket_se: {
+        Args: { _seeds: string[]; _tid: string }
+        Returns: undefined
+      }
       _credit_wallet: {
         Args: {
           _amount_cents: number

@@ -342,7 +342,7 @@ type CreateTournamentArgs = {
   name: string;
   mode: "501" | "Cricket" | "Medley";
   best_of: 1 | 3 | 5;
-  size: 4 | 8;
+  size: 4 | 8 | 16 | 32;
   entry_cents: number;
   double_in?: boolean;
   finish_rule?: "straight" | "double" | "master" | "both";
