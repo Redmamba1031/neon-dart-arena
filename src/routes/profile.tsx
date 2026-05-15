@@ -22,10 +22,9 @@ function Profile() {
 
   const me = leaderboard.find((l) => l.user_id === profile?.id);
   const wins = me?.wins ?? 0;
-  const total = me?.played ?? 0;
+  const total = me?.games_played ?? 0;
   const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
   const rank = profile ? leaderboard.findIndex((l) => l.user_id === profile.id) + 1 : 0;
-  const tournamentWins = wins;
 
   const name = profile?.display_name || profile?.username || "Player";
   const initials = name
