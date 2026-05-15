@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Target, Crosshair, Shuffle } from "lucide-react";
+import { formatUsd, toCents, useCreateMatch, useWallet } from "@/lib/api";
 
 export const Route = createFileRoute("/create-match")({
   head: () => ({
@@ -21,8 +23,34 @@ function CreateMatch() {
   const [doubleIn, setDoubleIn] = useState(false);
   const [finishRule, setFinishRule] = useState<FinishRule>("double");
   const [stake, setStake] = useState(25);
-  const [bestOf, setBestOf] = useState(3);
+  const [bestOf, setBestOf] = useState<1 | 3 | 5>(3);
   const navigate = useNavigate();
+  const { data: wallet } = useWallet();
+  const createMatch = useCreateMatch();
+
+  const insufficient = (wallet?.balance_cents ?? 0) < toCents(stake);
+
+  const handleCreate = async () => {
+    if (createMatch.isPending) return;
+    if (insufficient) {
+      toast.error("Not enough balance — top up your wallet.");
+      navigate({ to: "/wallet" });
+      return;
+    }
+    try {
+      await createMatch.mutateAsync({
+        mode,
+        best_of: bestOf,
+        stake_cents: toCents(stake),
+        double_in: mode !== "Cricket" ? doubleIn : false,
+        finish_rule: mode !== "Cricket" ? finishRule : "double",
+      });
+      toast.success("Match created — waiting for an opponent.");
+      navigate({ to: "/" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't create match");
+    }
+  };
 
   return (
     <AppShell>
@@ -36,18 +64,19 @@ function CreateMatch() {
         <div className="grid grid-cols-3 gap-3">
           <ModeButton active={mode === "501"} onClick={() => setMode("501")} icon={Target} label="501" sub="Countdown" />
           <ModeButton active={mode === "Cricket"} onClick={() => setMode("Cricket")} icon={Crosshair} label="Cricket" sub="20–15 + bull" />
-          <ModeButton active={mode === "Medley"} onClick={() => { setMode("Medley"); if (bestOf === 1) setBestOf(3); }} icon={Shuffle} label="Medley" sub="501 + Cricket" />
+          <ModeButton
+            active={mode === "Medley"}
+            onClick={() => { setMode("Medley"); if (bestOf === 1) setBestOf(3); }}
+            icon={Shuffle}
+            label="Medley"
+            sub="501 + Cricket"
+          />
         </div>
 
         {/* 501 rules */}
         {mode === "501" && (
           <Panel title="501 Rules">
-            <Toggle
-              label="Double In"
-              desc="Must start with a double"
-              checked={doubleIn}
-              onChange={setDoubleIn}
-            />
+            <Toggle label="Double In" desc="Must start with a double" checked={doubleIn} onChange={setDoubleIn} />
             <div className="pt-2">
               <p className="text-xs font-medium mb-2">Finish</p>
               <div className="grid grid-cols-2 gap-2">
@@ -68,7 +97,9 @@ function CreateMatch() {
 
         {mode === "Cricket" && (
           <Panel title="Cricket Rules">
-            <p className="text-xs text-muted-foreground">Standard point-call cricket. Close 20–15 plus bull, score on closed numbers.</p>
+            <p className="text-xs text-muted-foreground">
+              Standard point-call cricket. Close 20–15 plus bull, score on closed numbers.
+            </p>
           </Panel>
         )}
 
@@ -78,13 +109,10 @@ function CreateMatch() {
               Mixed format. <span className="text-foreground font-semibold">Bo3:</span> 501 → Cricket → Choice.{" "}
               <span className="text-foreground font-semibold">Bo5:</span> 501 → Cricket → Cricket → 501 → Choice.
             </p>
-            <p className="text-[10px] text-muted-foreground">Final "Choice" leg: the winner of the middle (piddle) leg picks the mode.</p>
-            <Toggle
-              label="Double In"
-              desc="501 legs must start with a double"
-              checked={doubleIn}
-              onChange={setDoubleIn}
-            />
+            <p className="text-[10px] text-muted-foreground">
+              Final "Choice" leg: the winner of the middle (piddle) leg picks the mode.
+            </p>
+            <Toggle label="Double In" desc="501 legs must start with a double" checked={doubleIn} onChange={setDoubleIn} />
             <div className="pt-2">
               <p className="text-xs font-medium mb-2">501 Finish</p>
               <div className="grid grid-cols-2 gap-2">
@@ -122,12 +150,16 @@ function CreateMatch() {
             Winner takes <span className="text-success font-bold">${(stake * 1.9).toFixed(2)}</span>
             <span className="ml-1">(5% rake)</span>
           </p>
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            Balance: <span className="text-foreground">{formatUsd(wallet?.balance_cents)}</span>
+            {insufficient && <span className="text-destructive ml-2">Insufficient funds</span>}
+          </p>
         </Panel>
 
         {/* Best of */}
         <Panel title="Best Of">
           <div className={`grid gap-2 ${mode === "Medley" ? "grid-cols-2" : "grid-cols-3"}`}>
-            {(mode === "Medley" ? [3, 5] : [1, 3, 5]).map((v) => (
+            {(mode === "Medley" ? ([3, 5] as const) : ([1, 3, 5] as const)).map((v) => (
               <button
                 key={v}
                 onClick={() => setBestOf(v)}
@@ -144,10 +176,11 @@ function CreateMatch() {
         </Panel>
 
         <button
-          onClick={() => navigate({ to: "/" })}
-          className="w-full rounded-xl bg-gradient-neon py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-background transition-transform active:scale-[0.98] ring-neon"
+          onClick={handleCreate}
+          disabled={createMatch.isPending}
+          className="w-full rounded-xl bg-gradient-neon py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-background transition-transform active:scale-[0.98] ring-neon disabled:opacity-60"
         >
-          Create Match • ${stake}
+          {createMatch.isPending ? "Creating…" : `Create Match • $${stake}`}
         </button>
       </div>
     </AppShell>
@@ -161,9 +194,7 @@ function ModeButton({
     <button
       onClick={onClick}
       className={`relative rounded-xl p-4 text-left transition-all ${
-        active
-          ? "bg-gradient-neon text-background ring-neon"
-          : "bg-surface ring-1 ring-border text-foreground hover:ring-primary/40"
+        active ? "bg-gradient-neon text-background ring-neon" : "bg-surface ring-1 ring-border text-foreground hover:ring-primary/40"
       }`}
     >
       <Icon className="size-5 mb-2" />
