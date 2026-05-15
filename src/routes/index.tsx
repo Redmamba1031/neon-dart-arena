@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Trophy, Flame, MessageSquare, Award, Users, Plus } from "lucide-react";
-import { formatUsd, useMyProfile, useTournaments } from "@/lib/api";
+import { formatUsd, useMyProfile, useTournaments, useIsOwner } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/")({
 function Dashboard() {
   const { data: tournaments = [] } = useTournaments();
   const { data: me } = useMyProfile();
+  const { data: isOwner = false } = useIsOwner();
 
   const open = tournaments.filter((t) => t.status === "open").slice(0, 6);
 
@@ -69,20 +70,22 @@ function Dashboard() {
         )}
       </section>
 
-      <section className="px-5 mb-6 animate-fade-in-up">
-        <Link to="/tournaments" className="block w-full rounded-2xl bg-gradient-neon p-[1px] ring-purple">
-          <div className="rounded-2xl bg-background/80 p-5 flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Step up</p>
-              <p className="font-display text-2xl font-semibold leading-tight">Create a Tournament</p>
-              <p className="text-xs text-muted-foreground mt-1">Double-elimination • 4 or 8 players</p>
+      {isOwner && (
+        <section className="px-5 mb-6 animate-fade-in-up">
+          <Link to="/tournaments" className="block w-full rounded-2xl bg-gradient-neon p-[1px] ring-purple">
+            <div className="rounded-2xl bg-background/80 p-5 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Step up</p>
+                <p className="font-display text-2xl font-semibold leading-tight">Create a Tournament</p>
+                <p className="text-xs text-muted-foreground mt-1">Double-elimination • 4 or 8 players</p>
+              </div>
+              <div className="size-12 rounded-xl bg-gradient-neon grid place-items-center text-background ring-neon">
+                <Plus className="size-6" strokeWidth={2.5} />
+              </div>
             </div>
-            <div className="size-12 rounded-xl bg-gradient-neon grid place-items-center text-background ring-neon">
-              <Plus className="size-6" strokeWidth={2.5} />
-            </div>
-          </div>
-        </Link>
-      </section>
+          </Link>
+        </section>
+      )}
 
       <section className="px-5 grid grid-cols-2 gap-3 mb-6">
         <QuickAction to="/tournaments" icon={Users} label="Tournaments" tint="primary" />

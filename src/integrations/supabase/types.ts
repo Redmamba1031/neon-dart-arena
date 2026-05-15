@@ -293,6 +293,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       wallet_transactions: {
         Row: {
           amount_cents: number
@@ -420,6 +441,13 @@ export type Database = {
         Returns: string
       }
       dev_top_up: { Args: { _amount_cents: number }; Returns: number }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       join_match: { Args: { _match_id: string }; Returns: undefined }
       join_tournament: { Args: { _tournament_id: string }; Returns: undefined }
       report_tournament_match: {
@@ -432,6 +460,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "owner"
       bracket_side: "winners" | "losers" | "grand_final"
       finish_rule: "straight" | "double" | "master" | "both"
       match_mode: "501" | "Cricket" | "Medley"
@@ -571,6 +600,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["owner"],
       bracket_side: ["winners", "losers", "grand_final"],
       finish_rule: ["straight", "double", "master", "both"],
       match_mode: ["501", "Cricket", "Medley"],

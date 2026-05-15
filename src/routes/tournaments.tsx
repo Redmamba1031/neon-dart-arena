@@ -7,6 +7,7 @@ import {
   useCreateTournament,
   useJoinTournament,
   useMyProfile,
+  useIsOwner,
   formatUsd,
   toCents,
 } from "@/lib/api";
@@ -26,6 +27,7 @@ function Tournaments() {
   const navigate = useNavigate();
   const { data: me } = useMyProfile();
   const { data: tournaments = [], isLoading } = useTournaments();
+  const { data: isOwner = false } = useIsOwner();
   const join = useJoinTournament();
   const [showCreate, setShowCreate] = useState(false);
 
@@ -47,15 +49,17 @@ function Tournaments() {
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Compete</p>
             <h1 className="font-display text-3xl font-bold mt-1">Tournaments</h1>
           </div>
-          <button
-            onClick={() => setShowCreate((v) => !v)}
-            className="rounded-xl bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-primary-foreground flex items-center gap-2"
-          >
-            <Plus className="size-4" /> {showCreate ? "Close" : "New"}
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowCreate((v) => !v)}
+              className="rounded-xl bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-primary-foreground flex items-center gap-2"
+            >
+              <Plus className="size-4" /> {showCreate ? "Close" : "New"}
+            </button>
+          )}
         </div>
 
-        {showCreate && <CreateForm onCreated={(id) => { setShowCreate(false); navigate({ to: "/tournaments/$id", params: { id } }); }} />}
+        {isOwner && showCreate && <CreateForm onCreated={(id) => { setShowCreate(false); navigate({ to: "/tournaments/$id", params: { id } }); }} />}
 
         {isLoading ? (
           <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">Loading…</div>

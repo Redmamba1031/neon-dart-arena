@@ -419,3 +419,21 @@ export function useReportTournamentMatch() {
   });
 }
 
+
+export function useIsOwner() {
+  return useQuery({
+    queryKey: ["is-owner"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "owner")
+        .maybeSingle();
+      if (error) throw error;
+      return !!data;
+    },
+  });
+}
