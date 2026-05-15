@@ -60,70 +60,32 @@ function CreateMatch() {
           <h1 className="font-display text-3xl font-bold mt-1">Create Match</h1>
         </div>
 
-        {/* Mode selector */}
-        <div className="grid grid-cols-3 gap-3">
-          <ModeButton active={mode === "501"} onClick={() => setMode("501")} icon={Target} label="501" sub="Countdown" />
-          <ModeButton active={mode === "Cricket"} onClick={() => setMode("Cricket")} icon={Crosshair} label="Cricket" sub="20–15 + bull" />
-          <ModeButton
-            active={mode === "Medley"}
-            onClick={() => { setMode("Medley"); if (bestOf === 1) setBestOf(3); }}
-            icon={Shuffle}
-            label="Medley"
-            sub="501 + Cricket"
-          />
-        </div>
-
         {/* 501 rules */}
-        {mode === "501" && (
-          <Panel title="501 Rules">
-            <Toggle label="Double In" desc="Must start with a double" checked={doubleIn} onChange={setDoubleIn} />
-            <div className="pt-2">
-              <p className="text-xs font-medium mb-2">Finish</p>
-              <div className="grid grid-cols-2 gap-2">
-                <FinishOpt active={finishRule === "straight"} onClick={() => setFinishRule("straight")} label="Straight Out" />
-                <FinishOpt active={finishRule === "double"} onClick={() => setFinishRule("double")} label="Double Out" />
-                <FinishOpt active={finishRule === "master"} onClick={() => setFinishRule("master")} label="Master Out" />
-                <FinishOpt active={finishRule === "both"} onClick={() => setFinishRule("both")} label="Both" />
-              </div>
-              <p className="mt-2 text-[10px] text-muted-foreground">
-                {finishRule === "straight" && "Finish on any segment — no double required."}
-                {finishRule === "double" && "Finish on a double only."}
-                {finishRule === "master" && "Finish on any double or triple."}
-                {finishRule === "both" && "Open with a double and finish on a double."}
-              </p>
+        <Panel title="501 Rules">
+          <div className="flex items-center gap-3">
+            <Target className="size-5 text-primary" />
+            <div>
+              <p className="font-display text-lg font-bold leading-none">501</p>
+              <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">Countdown</p>
             </div>
-          </Panel>
-        )}
-
-        {mode === "Cricket" && (
-          <Panel title="Cricket Rules">
-            <p className="text-xs text-muted-foreground">
-              Standard point-call cricket. Close 20–15 plus bull, score on closed numbers.
-            </p>
-          </Panel>
-        )}
-
-        {mode === "Medley" && (
-          <Panel title="Medley Rules">
-            <p className="text-xs text-muted-foreground">
-              Mixed format. <span className="text-foreground font-semibold">Bo3:</span> 501 → Cricket → Choice.{" "}
-              <span className="text-foreground font-semibold">Bo5:</span> 501 → Cricket → Cricket → 501 → Choice.
-            </p>
-            <p className="text-[10px] text-muted-foreground">
-              Final "Choice" leg: the winner of the middle (piddle) leg picks the mode.
-            </p>
-            <Toggle label="Double In" desc="501 legs must start with a double" checked={doubleIn} onChange={setDoubleIn} />
-            <div className="pt-2">
-              <p className="text-xs font-medium mb-2">501 Finish</p>
-              <div className="grid grid-cols-2 gap-2">
-                <FinishOpt active={finishRule === "straight"} onClick={() => setFinishRule("straight")} label="Straight Out" />
-                <FinishOpt active={finishRule === "double"} onClick={() => setFinishRule("double")} label="Double Out" />
-                <FinishOpt active={finishRule === "master"} onClick={() => setFinishRule("master")} label="Master Out" />
-                <FinishOpt active={finishRule === "both"} onClick={() => setFinishRule("both")} label="Both" />
-              </div>
+          </div>
+          <Toggle label="Double In" desc="Must start with a double" checked={doubleIn} onChange={setDoubleIn} />
+          <div className="pt-2">
+            <p className="text-xs font-medium mb-2">Finish</p>
+            <div className="grid grid-cols-2 gap-2">
+              <FinishOpt active={finishRule === "straight"} onClick={() => setFinishRule("straight")} label="Straight Out" />
+              <FinishOpt active={finishRule === "double"} onClick={() => setFinishRule("double")} label="Double Out" />
+              <FinishOpt active={finishRule === "master"} onClick={() => setFinishRule("master")} label="Master Out" />
+              <FinishOpt active={finishRule === "both"} onClick={() => setFinishRule("both")} label="Both" />
             </div>
-          </Panel>
-        )}
+            <p className="mt-2 text-[10px] text-muted-foreground">
+              {finishRule === "straight" && "Finish on any segment — no double required."}
+              {finishRule === "double" && "Finish on a double only."}
+              {finishRule === "master" && "Finish on any double or triple."}
+              {finishRule === "both" && "Open with a double and finish on a double."}
+            </p>
+          </div>
+        </Panel>
 
         {/* Stake */}
         <Panel title="Stake">
@@ -158,8 +120,8 @@ function CreateMatch() {
 
         {/* Best of */}
         <Panel title="Best Of">
-          <div className={`grid gap-2 ${mode === "Medley" ? "grid-cols-2" : "grid-cols-3"}`}>
-            {(mode === "Medley" ? ([3, 5] as const) : ([1, 3, 5] as const)).map((v) => (
+          <div className="grid gap-2 grid-cols-3">
+            {([1, 3, 5] as const).map((v) => (
               <button
                 key={v}
                 onClick={() => setBestOf(v)}
