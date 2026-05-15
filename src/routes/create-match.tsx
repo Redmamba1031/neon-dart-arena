@@ -149,24 +149,6 @@ function CreateMatch() {
   );
 }
 
-function ModeButton({
-  active, onClick, icon: Icon, label, sub,
-}: { active: boolean; onClick: () => void; icon: React.ElementType; label: string; sub: string }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`relative rounded-xl p-4 text-left transition-all ${
-        active ? "bg-gradient-neon text-background ring-neon" : "bg-surface ring-1 ring-border text-foreground hover:ring-primary/40"
-      }`}
-    >
-      <Icon className="size-5 mb-2" />
-      <p className="font-display text-lg font-bold leading-none">{label}</p>
-      <p className={`mt-1 text-[10px] uppercase tracking-wider ${active ? "text-background/70" : "text-muted-foreground"}`}>
-        {sub}
-      </p>
-    </button>
-  );
-}
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
