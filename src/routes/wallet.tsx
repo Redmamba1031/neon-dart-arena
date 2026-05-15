@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { ArrowDownLeft, ArrowUpRight, Plus, Wallet as WalletIcon, Loader2 } from "lucide-react";
-import { useWallet, useTransactions, useDevTopUp, formatUsd, type WalletTxn } from "@/lib/api";
+import { ArrowDownLeft, ArrowUpRight, Plus, Wallet as WalletIcon, X } from "lucide-react";
+import { useWallet, useTransactions, formatUsd, toCents, type WalletTxn } from "@/lib/api";
 import { toast } from "sonner";
+import { StripeDepositCheckout } from "@/components/StripeEmbeddedCheckout";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 export const Route = createFileRoute("/wallet")({
   head: () => ({
