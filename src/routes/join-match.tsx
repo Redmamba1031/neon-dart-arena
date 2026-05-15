@@ -17,7 +17,6 @@ export const Route = createFileRoute("/join-match")({
 });
 
 function JoinMatch() {
-  const [filter, setFilter] = useState<"all" | "501" | "Cricket" | "Medley">("all");
   const [me, setMe] = useState<string | null>(null);
   const { data: matches = [] } = useOpenMatches();
   const { data: wallet } = useWallet();
@@ -28,7 +27,7 @@ function JoinMatch() {
     supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null));
   }, []);
 
-  const filtered = matches.filter((m) => filter === "all" || m.mode === filter);
+  const filtered = matches.filter((m) => m.mode === "501");
 
   const handleJoin = async (id: string, stake: number) => {
     if ((wallet?.balance_cents ?? 0) < stake) {
@@ -51,20 +50,6 @@ function JoinMatch() {
           <h1 className="font-display text-3xl font-bold mt-1">Join Match</h1>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
-          {(["all", "501", "Cricket", "Medley"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${
-                filter === f ? "bg-gradient-neon text-background ring-neon" : "bg-surface ring-1 ring-border text-muted-foreground"
-              }`}
-            >
-              {f === "all" ? "All" : f}
-            </button>
-          ))}
-        </div>
-
         {filtered.length === 0 ? (
           <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">
             No open matches in this category.
@@ -83,8 +68,7 @@ function JoinMatch() {
                   <div className="h-10 w-px bg-border" />
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm truncate">
-                      {m.mode}
-                      {m.mode !== "Cricket" && ` • ${labelForFinish(m.finish_rule)}`}
+                      {m.mode} • {labelForFinish(m.finish_rule)}
                     </p>
                     <p className="text-[11px] text-muted-foreground truncate">
                       {host?.display_name || host?.username || "Player"} • Bo{m.best_of}

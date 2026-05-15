@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { MessageSquare, Settings, LogOut, Award, Target, ChevronRight } from "lucide-react";
+import { MessageSquare, Settings, LogOut, Target, ChevronRight } from "lucide-react";
 import { useMyProfile, useMatchHistory, useLeaderboard, formatUsd } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -26,7 +26,6 @@ function Profile() {
   const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
   const rank = profile ? leaderboard.findIndex((l) => l.user_id === profile.id) + 1 : 0;
   const mode501Wins = matches.filter((m) => m.winner_id === profile?.id && m.mode === "501").length;
-  const cricketWins = matches.filter((m) => m.winner_id === profile?.id && m.mode === "Cricket").length;
 
   const name = profile?.display_name || profile?.username || "Player";
   const initials = name
@@ -90,11 +89,8 @@ function Profile() {
           </div>
         </Link>
 
-        <Section title="Favorite Modes">
-          <div className="grid grid-cols-2 gap-3">
-            <Pref icon={Target} label="501" sub={`${mode501Wins} wins`} />
-            <Pref icon={Award} label="Cricket" sub={`${cricketWins} wins`} />
-          </div>
+        <Section title="Favorite Mode">
+          <Pref icon={Target} label="501" sub={`${mode501Wins} wins`} />
         </Section>
 
         <div className="space-y-2">
