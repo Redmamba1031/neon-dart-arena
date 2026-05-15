@@ -118,8 +118,8 @@ function Tournaments() {
 function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
   const create = useCreateTournament();
   const [name, setName] = useState("");
-  const [mode, setMode] = useState<"501" | "Cricket">("501");
-  const [bestOf, setBestOf] = useState<1 | 3 | 5>(3);
+  const mode = "Medley" as const;
+  const bestOf = 3 as const;
   const [size, setSize] = useState<4 | 8 | 16 | 32>(4);
   const [entry, setEntry] = useState(10);
 
@@ -153,17 +153,10 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
           placeholder="Friday Night Cup"
         />
       </Field>
+      <div className="rounded-lg bg-background ring-1 ring-border px-3 py-2 text-[11px] text-muted-foreground">
+        <span className="font-bold uppercase tracking-widest text-foreground">Format</span> · Best of 3 · Game 1: 501 → Game 2: Cricket → Game 3: Player's choice
+      </div>
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Mode">
-          <select value={mode} onChange={(e) => setMode(e.target.value as any)} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm">
-            <option value="501">501</option><option value="Cricket">Cricket</option>
-          </select>
-        </Field>
-        <Field label="Best of">
-          <select value={bestOf} onChange={(e) => setBestOf(Number(e.target.value) as any)} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm">
-            <option value={1}>1</option><option value={3}>3</option><option value={5}>5</option>
-          </select>
-        </Field>
         <Field label="Size">
           <select value={size} onChange={(e) => setSize(Number(e.target.value) as any)} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm">
             <option value={4}>4 players</option><option value={8}>8 players</option><option value={16}>16 players</option><option value={32}>32 players</option>
