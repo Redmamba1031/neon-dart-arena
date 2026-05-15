@@ -7,6 +7,9 @@ export type Match = Database["public"]["Tables"]["matches"]["Row"];
 export type WalletTxn = Database["public"]["Tables"]["wallet_transactions"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type LeaderboardRow = Database["public"]["Views"]["leaderboard_view"]["Row"];
+export type Tournament = Database["public"]["Tables"]["tournaments"]["Row"];
+export type TournamentParticipant = Database["public"]["Tables"]["tournament_participants"]["Row"];
+export type TournamentMatch = Database["public"]["Tables"]["tournament_matches"]["Row"];
 
 export const formatUsd = (cents: number | null | undefined) =>
   `$${((cents ?? 0) / 100).toFixed(2)}`;
