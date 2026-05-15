@@ -118,7 +118,7 @@ function Tournaments() {
 function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
   const create = useCreateTournament();
   const [name, setName] = useState("");
-  const [mode, setMode] = useState<"501" | "Cricket" | "Piddle">("501");
+  const [mode, setMode] = useState<"501" | "Cricket">("501");
   const [bestOf, setBestOf] = useState<1 | 3 | 5>(3);
   const [size, setSize] = useState<4 | 8 | 16 | 32>(4);
   const [entry, setEntry] = useState(10);
