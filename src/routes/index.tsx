@@ -78,7 +78,7 @@ function Dashboard() {
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Step up</p>
               <p className="font-display text-2xl font-semibold leading-tight">Create a Match</p>
-              <p className="text-xs text-muted-foreground mt-1">501, Cricket or Medley • Set your stake</p>
+              <p className="text-xs text-muted-foreground mt-1">501 • Set your stake</p>
             </div>
             <div className="size-12 rounded-xl bg-gradient-neon grid place-items-center text-background ring-neon">
               <Plus className="size-6" strokeWidth={2.5} />
