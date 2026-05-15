@@ -467,7 +467,7 @@ export type Database = {
       app_role: "owner"
       bracket_side: "winners" | "losers" | "grand_final"
       finish_rule: "straight" | "double" | "master" | "both"
-      match_mode: "501" | "Cricket" | "Medley"
+      match_mode: "501" | "Cricket" | "Medley" | "Piddle"
       match_status: "open" | "live" | "completed" | "cancelled"
       tournament_status: "open" | "live" | "completed" | "cancelled"
       txn_kind:
@@ -607,7 +607,7 @@ export const Constants = {
       app_role: ["owner"],
       bracket_side: ["winners", "losers", "grand_final"],
       finish_rule: ["straight", "double", "master", "both"],
-      match_mode: ["501", "Cricket", "Medley"],
+      match_mode: ["501", "Cricket", "Medley", "Piddle"],
       match_status: ["open", "live", "completed", "cancelled"],
       tournament_status: ["open", "live", "completed", "cancelled"],
       txn_kind: [
