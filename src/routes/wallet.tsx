@@ -37,7 +37,9 @@ function timeAgo(iso: string) {
 function Wallet() {
   const { data: wallet, isLoading } = useWallet();
   const { data: txns = [] } = useTransactions(25);
-  const topUp = useDevTopUp();
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [amount, setAmount] = useState("25");
+  const [checkoutAmount, setCheckoutAmount] = useState<number | null>(null);
 
   const weekNet = txns
     .filter((t) => Date.now() - new Date(t.created_at).getTime() < 7 * 86400000)
@@ -46,17 +48,27 @@ function Wallet() {
     .filter((t) => t.kind === "match_payout")
     .reduce((s, t) => s + Number(t.amount_cents), 0);
 
-  const handleTopUp = async () => {
-    try {
-      await topUp.mutateAsync(50);
-      toast.success("Added $50.00 to your wallet");
-    } catch (e: any) {
-      toast.error(e.message ?? "Top-up failed");
+  const startCheckout = () => {
+    const dollars = Number(amount);
+    if (!Number.isFinite(dollars) || dollars < 5) {
+      toast.error("Minimum deposit is $5");
+      return;
     }
+    if (dollars > 100000) {
+      toast.error("Maximum deposit is $100,000");
+      return;
+    }
+    setCheckoutAmount(toCents(dollars));
+  };
+
+  const closeAll = () => {
+    setCheckoutAmount(null);
+    setDepositOpen(false);
   };
 
   return (
     <AppShell>
+      <PaymentTestModeBanner />
       <div className="px-5 py-6 space-y-6 animate-fade-in-up">
         <div className="relative rounded-2xl bg-gradient-neon p-[1px] ring-purple">
           <div className="rounded-2xl bg-background/85 p-6 relative overflow-hidden">
@@ -71,15 +83,14 @@ function Wallet() {
             <p className="mt-1 text-xs text-muted-foreground">Available to play</p>
             <div className="mt-6 grid grid-cols-2 gap-3">
               <button
-                onClick={handleTopUp}
-                disabled={topUp.isPending}
-                className="rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 transition-transform active:scale-[0.97] disabled:opacity-60"
+                onClick={() => setDepositOpen(true)}
+                className="rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 transition-transform active:scale-[0.97]"
               >
-                {topUp.isPending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
-                Add $50 (test)
+                <Plus className="size-4" />
+                Deposit
               </button>
               <button
-                onClick={() => toast.info("Withdrawals coming soon")}
+                onClick={() => toast.info("Payouts via Stripe Connect — coming next")}
                 className="rounded-xl bg-surface ring-1 ring-border py-3 text-sm font-bold uppercase tracking-wider transition-transform active:scale-[0.97]"
               >
                 Withdraw
@@ -87,6 +98,60 @@ function Wallet() {
             </div>
           </div>
         </div>
+
+        {depositOpen && (
+          <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur overflow-y-auto">
+            <div className="max-w-md mx-auto p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display text-2xl font-bold">Add funds</h2>
+                <button onClick={closeAll} className="p-2 rounded-lg hover:bg-surface" aria-label="Close">
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {!checkoutAmount ? (
+                <div className="space-y-4">
+                  <label className="block text-xs uppercase tracking-wider text-muted-foreground">
+                    Amount (USD)
+                  </label>
+                  <div className="flex items-center gap-2 rounded-xl bg-surface ring-1 ring-border px-4 py-3">
+                    <span className="text-2xl font-bold text-muted-foreground">$</span>
+                    <input
+                      type="number"
+                      min={5}
+                      step={1}
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="flex-1 bg-transparent text-2xl font-bold outline-none"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[10, 25, 50, 100].map((v) => (
+                      <button
+                        key={v}
+                        onClick={() => setAmount(String(v))}
+                        className="rounded-lg bg-surface ring-1 ring-border py-2 text-sm font-bold"
+                      >
+                        ${v}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={startCheckout}
+                    className="w-full rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground"
+                  >
+                    Continue to payment
+                  </button>
+                </div>
+              ) : (
+                <StripeDepositCheckout
+                  amountCents={checkoutAmount}
+                  returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+                />
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-3">
           <Mini label="Lifetime" value={formatUsd(lifetimePayouts)} tint="text-success" />
