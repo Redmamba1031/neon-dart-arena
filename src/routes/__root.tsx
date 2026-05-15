@@ -1,14 +1,22 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+
+// Public routes accessible without auth. Everything else requires sign-in.
+const PUBLIC_ROUTES = new Set<string>(["/login"]);
 
 function NotFoundComponent() {
   return (
@@ -102,7 +110,47 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AuthGate>
+        <Outlet />
+      </AuthGate>
     </QueryClientProvider>
   );
+}
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      router.invalidate();
+      queryClient.invalidateQueries();
+    });
+    return () => subscription.unsubscribe();
+  }, [router, queryClient]);
+
+  const isPublic = PUBLIC_ROUTES.has(location.pathname);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user && !isPublic) {
+      navigate({ to: "/login", replace: true });
+    } else if (user && location.pathname === "/login") {
+      navigate({ to: "/", replace: true });
+    }
+  }, [loading, user, isPublic, location.pathname, navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground text-sm uppercase tracking-widest">Loading…</div>
+      </div>
+    );
+  }
+
+  if (!user && !isPublic) return null;
+  return <>{children}</>;
 }
