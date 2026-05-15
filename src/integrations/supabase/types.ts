@@ -130,6 +130,169 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_matches: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          is_final: boolean
+          loser_id: string | null
+          next_loser_match_id: string | null
+          next_loser_slot: number | null
+          next_winner_match_id: string | null
+          next_winner_slot: number | null
+          player1_id: string | null
+          player2_id: string | null
+          round: number
+          side: Database["public"]["Enums"]["bracket_side"]
+          slot: number
+          tournament_id: string
+          winner_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_final?: boolean
+          loser_id?: string | null
+          next_loser_match_id?: string | null
+          next_loser_slot?: number | null
+          next_winner_match_id?: string | null
+          next_winner_slot?: number | null
+          player1_id?: string | null
+          player2_id?: string | null
+          round: number
+          side: Database["public"]["Enums"]["bracket_side"]
+          slot: number
+          tournament_id: string
+          winner_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_final?: boolean
+          loser_id?: string | null
+          next_loser_match_id?: string | null
+          next_loser_slot?: number | null
+          next_winner_match_id?: string | null
+          next_winner_slot?: number | null
+          player1_id?: string | null
+          player2_id?: string | null
+          round?: number
+          side?: Database["public"]["Enums"]["bracket_side"]
+          slot?: number
+          tournament_id?: string
+          winner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournament_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          placement: number | null
+          seed: number | null
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          placement?: number | null
+          seed?: number | null
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          placement?: number | null
+          seed?: number | null
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_participants_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournaments: {
+        Row: {
+          best_of: number
+          cancelled_at: string | null
+          completed_at: string | null
+          created_at: string
+          creator_id: string
+          double_in: boolean
+          entry_cents: number
+          finish_rule: Database["public"]["Enums"]["finish_rule"]
+          id: string
+          mode: Database["public"]["Enums"]["match_mode"]
+          name: string
+          rake_bps: number
+          runner_up_id: string | null
+          size: number
+          started_at: string | null
+          status: Database["public"]["Enums"]["tournament_status"]
+          third_id: string | null
+          winner_id: string | null
+        }
+        Insert: {
+          best_of: number
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          creator_id: string
+          double_in?: boolean
+          entry_cents: number
+          finish_rule?: Database["public"]["Enums"]["finish_rule"]
+          id?: string
+          mode: Database["public"]["Enums"]["match_mode"]
+          name: string
+          rake_bps?: number
+          runner_up_id?: string | null
+          size: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["tournament_status"]
+          third_id?: string | null
+          winner_id?: string | null
+        }
+        Update: {
+          best_of?: number
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          creator_id?: string
+          double_in?: boolean
+          entry_cents?: number
+          finish_rule?: Database["public"]["Enums"]["finish_rule"]
+          id?: string
+          mode?: Database["public"]["Enums"]["match_mode"]
+          name?: string
+          rake_bps?: number
+          runner_up_id?: string | null
+          size?: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["tournament_status"]
+          third_id?: string | null
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
       wallet_transactions: {
         Row: {
           amount_cents: number
@@ -197,6 +360,14 @@ export type Database = {
       }
     }
     Functions: {
+      _build_bracket_4: {
+        Args: { _seeds: string[]; _tid: string }
+        Returns: undefined
+      }
+      _build_bracket_8: {
+        Args: { _seeds: string[]; _tid: string }
+        Returns: undefined
+      }
       _credit_wallet: {
         Args: {
           _amount_cents: number
@@ -217,7 +388,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      _start_tournament: {
+        Args: { _tournament_id: string }
+        Returns: undefined
+      }
       cancel_match: { Args: { _match_id: string }; Returns: undefined }
+      cancel_tournament: {
+        Args: { _tournament_id: string }
+        Returns: undefined
+      }
       create_match: {
         Args: {
           _best_of: number
@@ -228,17 +407,36 @@ export type Database = {
         }
         Returns: string
       }
+      create_tournament: {
+        Args: {
+          _best_of: number
+          _double_in?: boolean
+          _entry_cents: number
+          _finish_rule?: Database["public"]["Enums"]["finish_rule"]
+          _mode: Database["public"]["Enums"]["match_mode"]
+          _name: string
+          _size: number
+        }
+        Returns: string
+      }
       dev_top_up: { Args: { _amount_cents: number }; Returns: number }
       join_match: { Args: { _match_id: string }; Returns: undefined }
+      join_tournament: { Args: { _tournament_id: string }; Returns: undefined }
+      report_tournament_match: {
+        Args: { _match_id: string; _winner_id: string }
+        Returns: undefined
+      }
       settle_match: {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
       }
     }
     Enums: {
+      bracket_side: "winners" | "losers" | "grand_final"
       finish_rule: "straight" | "double" | "master" | "both"
       match_mode: "501" | "Cricket" | "Medley"
       match_status: "open" | "live" | "completed" | "cancelled"
+      tournament_status: "open" | "live" | "completed" | "cancelled"
       txn_kind:
         | "deposit"
         | "withdrawal"
@@ -373,9 +571,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      bracket_side: ["winners", "losers", "grand_final"],
       finish_rule: ["straight", "double", "master", "both"],
       match_mode: ["501", "Cricket", "Medley"],
       match_status: ["open", "live", "completed", "cancelled"],
+      tournament_status: ["open", "live", "completed", "cancelled"],
       txn_kind: [
         "deposit",
         "withdrawal",
