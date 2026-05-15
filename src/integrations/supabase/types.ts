@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      match_legs: {
+        Row: {
+          completed_at: string
+          id: string
+          leg_mode: Database["public"]["Enums"]["match_mode"]
+          leg_number: number
+          match_id: string
+          winner_id: string | null
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          leg_mode: Database["public"]["Enums"]["match_mode"]
+          leg_number: number
+          match_id: string
+          winner_id?: string | null
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          leg_mode?: Database["public"]["Enums"]["match_mode"]
+          leg_number?: number
+          match_id?: string
+          winner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_legs_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          best_of: number
+          cancelled_at: string | null
+          completed_at: string | null
+          created_at: string
+          creator_id: string
+          double_in: boolean
+          finish_rule: Database["public"]["Enums"]["finish_rule"]
+          id: string
+          mode: Database["public"]["Enums"]["match_mode"]
+          opponent_id: string | null
+          rake_bps: number
+          stake_cents: number
+          started_at: string | null
+          status: Database["public"]["Enums"]["match_status"]
+          winner_id: string | null
+        }
+        Insert: {
+          best_of: number
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          creator_id: string
+          double_in?: boolean
+          finish_rule?: Database["public"]["Enums"]["finish_rule"]
+          id?: string
+          mode: Database["public"]["Enums"]["match_mode"]
+          opponent_id?: string | null
+          rake_bps?: number
+          stake_cents: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["match_status"]
+          winner_id?: string | null
+        }
+        Update: {
+          best_of?: number
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          creator_id?: string
+          double_in?: boolean
+          finish_rule?: Database["public"]["Enums"]["finish_rule"]
+          id?: string
+          mode?: Database["public"]["Enums"]["match_mode"]
+          opponent_id?: string | null
+          rake_bps?: number
+          stake_cents?: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["match_status"]
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -41,15 +130,122 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_transactions: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["txn_kind"]
+          match_id: string | null
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["txn_kind"]
+          match_id?: string | null
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["txn_kind"]
+          match_id?: string | null
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallets: {
+        Row: {
+          balance_cents: number
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance_cents?: number
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance_cents?: number
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_view: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          games_played: number | null
+          total_winnings_cents: number | null
+          user_id: string | null
+          username: string | null
+          wins: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      _credit_wallet: {
+        Args: {
+          _amount_cents: number
+          _kind: Database["public"]["Enums"]["txn_kind"]
+          _match_id: string
+          _note: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      _debit_wallet: {
+        Args: {
+          _amount_cents: number
+          _kind: Database["public"]["Enums"]["txn_kind"]
+          _match_id: string
+          _note: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      cancel_match: { Args: { _match_id: string }; Returns: undefined }
+      create_match: {
+        Args: {
+          _best_of: number
+          _double_in?: boolean
+          _finish_rule?: Database["public"]["Enums"]["finish_rule"]
+          _mode: Database["public"]["Enums"]["match_mode"]
+          _stake_cents: number
+        }
+        Returns: string
+      }
+      dev_top_up: { Args: { _amount_cents: number }; Returns: number }
+      join_match: { Args: { _match_id: string }; Returns: undefined }
+      settle_match: {
+        Args: { _match_id: string; _winner_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      finish_rule: "straight" | "double" | "master" | "both"
+      match_mode: "501" | "Cricket" | "Medley"
+      match_status: "open" | "live" | "completed" | "cancelled"
+      txn_kind:
+        | "deposit"
+        | "withdrawal"
+        | "match_stake"
+        | "match_payout"
+        | "rake"
+        | "refund"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -176,6 +372,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      finish_rule: ["straight", "double", "master", "both"],
+      match_mode: ["501", "Cricket", "Medley"],
+      match_status: ["open", "live", "completed", "cancelled"],
+      txn_kind: [
+        "deposit",
+        "withdrawal",
+        "match_stake",
+        "match_payout",
+        "rake",
+        "refund",
+      ],
+    },
   },
 } as const
