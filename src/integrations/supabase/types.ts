@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      deposits: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          credited_at: string | null
+          environment: string
+          id: string
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          credited_at?: string | null
+          environment?: string
+          id?: string
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          credited_at?: string | null
+          environment?: string
+          id?: string
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       match_legs: {
         Row: {
           completed_at: string
@@ -443,6 +482,16 @@ export type Database = {
           _size: number
         }
         Returns: string
+      }
+      credit_wallet_from_deposit: {
+        Args: {
+          _amount_cents: number
+          _environment: string
+          _payment_intent: string
+          _session_id: string
+          _user_id: string
+        }
+        Returns: undefined
       }
       dev_top_up: { Args: { _amount_cents: number }; Returns: number }
       has_role: {

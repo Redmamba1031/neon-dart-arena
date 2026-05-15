@@ -17,6 +17,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
@@ -58,6 +60,17 @@ const TournamentsIdRoute = TournamentsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => TournamentsRoute,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,7 +80,9 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,7 +92,9 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,7 +105,9 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,7 +119,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/tournaments'
     | '/wallet'
+    | '/checkout/return'
     | '/tournaments/$id'
+    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,7 +131,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/tournaments'
     | '/wallet'
+    | '/checkout/return'
     | '/tournaments/$id'
+    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
@@ -120,7 +143,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/tournaments'
     | '/wallet'
+    | '/checkout/return'
     | '/tournaments/$id'
+    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -131,6 +156,8 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   TournamentsRoute: typeof TournamentsRouteWithChildren
   WalletRoute: typeof WalletRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -191,6 +218,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TournamentsIdRouteImport
       parentRoute: typeof TournamentsRoute
     }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -214,17 +255,9 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   TournamentsRoute: TournamentsRouteWithChildren,
   WalletRoute: WalletRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
