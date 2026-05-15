@@ -15,9 +15,6 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
-import { Route as JoinMatchRouteImport } from './routes/join-match'
-import { Route as HistoryRouteImport } from './routes/history'
-import { Route as CreateMatchRouteImport } from './routes/create-match'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 
@@ -51,21 +48,6 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const JoinMatchRoute = JoinMatchRouteImport.update({
-  id: '/join-match',
-  path: '/join-match',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HistoryRoute = HistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreateMatchRoute = CreateMatchRouteImport.update({
-  id: '/create-match',
-  path: '/create-match',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -79,9 +61,6 @@ const TournamentsIdRoute = TournamentsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/create-match': typeof CreateMatchRoute
-  '/history': typeof HistoryRoute
-  '/join-match': typeof JoinMatchRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
@@ -92,9 +71,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/create-match': typeof CreateMatchRoute
-  '/history': typeof HistoryRoute
-  '/join-match': typeof JoinMatchRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
@@ -106,9 +82,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/create-match': typeof CreateMatchRoute
-  '/history': typeof HistoryRoute
-  '/join-match': typeof JoinMatchRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
@@ -121,9 +94,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/create-match'
-    | '/history'
-    | '/join-match'
     | '/leaderboard'
     | '/login'
     | '/messages'
@@ -134,9 +104,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/create-match'
-    | '/history'
-    | '/join-match'
     | '/leaderboard'
     | '/login'
     | '/messages'
@@ -147,9 +114,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/create-match'
-    | '/history'
-    | '/join-match'
     | '/leaderboard'
     | '/login'
     | '/messages'
@@ -161,9 +125,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CreateMatchRoute: typeof CreateMatchRoute
-  HistoryRoute: typeof HistoryRoute
-  JoinMatchRoute: typeof JoinMatchRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
@@ -216,27 +177,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/join-match': {
-      id: '/join-match'
-      path: '/join-match'
-      fullPath: '/join-match'
-      preLoaderRoute: typeof JoinMatchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/history': {
-      id: '/history'
-      path: '/history'
-      fullPath: '/history'
-      preLoaderRoute: typeof HistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/create-match': {
-      id: '/create-match'
-      path: '/create-match'
-      fullPath: '/create-match'
-      preLoaderRoute: typeof CreateMatchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -268,9 +208,6 @@ const TournamentsRouteWithChildren = TournamentsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CreateMatchRoute: CreateMatchRoute,
-  HistoryRoute: HistoryRoute,
-  JoinMatchRoute: JoinMatchRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
@@ -281,3 +218,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
