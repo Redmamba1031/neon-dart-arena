@@ -1,44 +1,79 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { MessageSquare, Settings, LogOut, Award, Target, ChevronRight } from "lucide-react";
+import { useMyProfile, useMatchHistory, useLeaderboard, formatUsd } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
       { title: "Profile — SMYD" },
-      { name: "description", content: "Your SMYD player profile, stats, and Discord link." },
+      { name: "description", content: "Your SMYD player profile and stats." },
     ],
   }),
   component: Profile,
 });
 
 function Profile() {
+  const navigate = useNavigate();
+  const { data: profile } = useMyProfile();
+  const { data: matches = [] } = useMatchHistory(200);
+  const { data: leaderboard = [] } = useLeaderboard(500);
+
+  const wins = matches.filter((m) => m.winner_id === profile?.id).length;
+  const total = matches.length;
+  const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
+  const rank = profile ? leaderboard.findIndex((l) => l.user_id === profile.id) + 1 : 0;
+  const mode501Wins = matches.filter((m) => m.winner_id === profile?.id && m.mode === "501").length;
+  const cricketWins = matches.filter((m) => m.winner_id === profile?.id && m.mode === "Cricket").length;
+
+  const name = profile?.display_name || profile?.username || "Player";
+  const initials = name
+    .split(" ")
+    .map((s) => s[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    navigate({ to: "/login" });
+  };
+
   return (
     <AppShell>
       <div className="px-5 py-6 space-y-6 animate-fade-in-up">
-        {/* Hero */}
         <div className="relative rounded-2xl bg-gradient-neon p-[1px]">
           <div className="rounded-2xl bg-background/90 p-6 relative overflow-hidden">
             <div className="absolute inset-0 scanline opacity-10 pointer-events-none" />
             <div className="flex items-center gap-4 relative">
-              <div className="size-20 rounded-2xl bg-surface ring-2 ring-primary/60 grid place-items-center font-display text-2xl font-bold text-primary">
-                VX
+              <div className="size-20 rounded-2xl bg-surface ring-2 ring-primary/60 grid place-items-center font-display text-2xl font-bold text-primary overflow-hidden">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt={name} className="size-full object-cover" />
+                ) : (
+                  initials || "P"
+                )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Rank #1,402</p>
-                <h2 className="font-display text-2xl font-bold mt-1 truncate">Viper_X</h2>
-                <p className="text-xs text-muted-foreground">Member since 2025</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  {rank > 0 ? `Rank #${rank}` : "Unranked"}
+                </p>
+                <h2 className="font-display text-2xl font-bold mt-1 truncate">{name}</h2>
+                <p className="text-xs text-muted-foreground">
+                  {profile?.username ? `@${profile.username}` : "Member"}
+                </p>
               </div>
             </div>
             <div className="mt-5 grid grid-cols-3 gap-3 relative">
-              <Stat label="Wins" value="86" />
-              <Stat label="Win %" value="68%" tint="text-primary" />
-              <Stat label="Streak" value="8🔥" tint="text-accent" />
+              <Stat label="Wins" value={String(wins)} />
+              <Stat label="Win %" value={`${winRate}%`} tint="text-primary" />
+              <Stat label="Played" value={String(total)} tint="text-accent" />
             </div>
           </div>
         </div>
 
-        {/* Messages */}
         <Link
           to="/messages"
           className="block rounded-xl bg-surface ring-1 ring-border p-4 hover:ring-primary/40 transition-all"
@@ -49,37 +84,22 @@ function Profile() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold">Messages</p>
-              <p className="text-[11px] text-muted-foreground">3 unread • Chat with players</p>
+              <p className="text-[11px] text-muted-foreground">Chat with players</p>
             </div>
             <ChevronRight className="size-4 text-muted-foreground" />
           </div>
         </Link>
 
-        {/* Game prefs */}
         <Section title="Favorite Modes">
           <div className="grid grid-cols-2 gap-3">
-            <Pref icon={Target} label="501 Master Out" sub="42 wins" />
-            <Pref icon={Award} label="Cricket Pro" sub="28 wins" />
+            <Pref icon={Target} label="501" sub={`${mode501Wins} wins`} />
+            <Pref icon={Award} label="Cricket" sub={`${cricketWins} wins`} />
           </div>
         </Section>
 
-        {/* Achievements */}
-        <Section title="Achievements">
-          <div className="grid grid-cols-4 gap-2">
-            {["First Blood", "10-Win Streak", "$1k Club", "180 Hit"].map((a) => (
-              <div key={a} className="aspect-square rounded-lg bg-surface ring-1 ring-border grid place-items-center text-center p-2">
-                <span className="text-[10px] font-bold uppercase tracking-tight text-primary">{a}</span>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* Actions */}
         <div className="space-y-2">
-          <Action icon={Settings} label="Settings" />
-          <Link to="/login">
-            <Action icon={LogOut} label="Sign Out" danger />
-          </Link>
+          <Action icon={Settings} label="Settings" onClick={() => toast.info("Settings coming soon")} />
+          <Action icon={LogOut} label="Sign Out" danger onClick={handleSignOut} />
         </div>
       </div>
     </AppShell>
@@ -118,13 +138,26 @@ function Pref({ icon: Icon, label, sub }: { icon: React.ElementType; label: stri
   );
 }
 
-function Action({ icon: Icon, label, danger = false }: { icon: React.ElementType; label: string; danger?: boolean }) {
+function Action({
+  icon: Icon,
+  label,
+  danger = false,
+  onClick,
+}: {
+  icon: React.ElementType;
+  label: string;
+  danger?: boolean;
+  onClick?: () => void;
+}) {
   return (
-    <div className={`flex items-center gap-3 rounded-xl bg-surface ring-1 ring-border px-4 py-3 cursor-pointer hover:ring-primary/40 transition-all ${
-      danger ? "text-destructive" : ""
-    }`}>
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 rounded-xl bg-surface ring-1 ring-border px-4 py-3 cursor-pointer hover:ring-primary/40 transition-all text-left ${
+        danger ? "text-destructive" : ""
+      }`}
+    >
       <Icon className="size-4" />
       <span className="text-sm font-medium">{label}</span>
-    </div>
+    </button>
   );
 }
