@@ -187,7 +187,7 @@ export function useMatchHistory(limit = 50) {
 }
 
 type CreateMatchArgs = {
-  mode: "501" | "Cricket" | "Medley";
+  mode: "501" | "Cricket" | "Medley" | "Piddle";
   best_of: 1 | 3 | 5;
   stake_cents: number;
   double_in?: boolean;
@@ -340,7 +340,7 @@ export function useTournamentDetail(id: string | undefined) {
 
 type CreateTournamentArgs = {
   name: string;
-  mode: "501" | "Cricket" | "Medley";
+  mode: "501" | "Cricket" | "Medley" | "Piddle";
   best_of: 1 | 3 | 5;
   size: 4 | 8 | 16 | 32;
   entry_cents: number;
