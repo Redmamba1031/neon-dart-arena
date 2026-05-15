@@ -110,7 +110,47 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AuthGate>
+        <Outlet />
+      </AuthGate>
     </QueryClientProvider>
   );
+}
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      router.invalidate();
+      queryClient.invalidateQueries();
+    });
+    return () => subscription.unsubscribe();
+  }, [router, queryClient]);
+
+  const isPublic = PUBLIC_ROUTES.has(location.pathname);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user && !isPublic) {
+      navigate({ to: "/login", replace: true });
+    } else if (user && location.pathname === "/login") {
+      navigate({ to: "/", replace: true });
+    }
+  }, [loading, user, isPublic, location.pathname, navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground text-sm uppercase tracking-widest">Loading…</div>
+      </div>
+    );
+  }
+
+  if (!user && !isPublic) return null;
+  return <>{children}</>;
 }
