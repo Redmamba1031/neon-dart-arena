@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Trophy, Flame, MessageSquare, Award, Users, Plus } from "lucide-react";
-import { formatUsd, useMyProfile, useTournaments } from "@/lib/api";
+import { formatUsd, useMyProfile, useTournaments, useIsOwner } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/")({
 function Dashboard() {
   const { data: tournaments = [] } = useTournaments();
   const { data: me } = useMyProfile();
+  const { data: isOwner = false } = useIsOwner();
 
   const open = tournaments.filter((t) => t.status === "open").slice(0, 6);
 
