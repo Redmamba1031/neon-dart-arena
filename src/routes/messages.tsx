@@ -216,10 +216,10 @@ function Thread({
           </p>
         </div>
         <Link
-          to="/create-match"
+          to="/tournaments"
           className="rounded-lg bg-primary/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-primary ring-1 ring-primary/30"
         >
-          Challenge
+          Cups
         </Link>
       </div>
 

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { MessageSquare, Settings, LogOut, Target, ChevronRight } from "lucide-react";
-import { useMyProfile, useMatchHistory, useLeaderboard, formatUsd } from "@/lib/api";
+import { useMyProfile, useLeaderboard, formatUsd } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -18,14 +18,13 @@ export const Route = createFileRoute("/profile")({
 function Profile() {
   const navigate = useNavigate();
   const { data: profile } = useMyProfile();
-  const { data: matches = [] } = useMatchHistory(200);
   const { data: leaderboard = [] } = useLeaderboard(500);
 
-  const wins = matches.filter((m) => m.winner_id === profile?.id).length;
-  const total = matches.length;
+  const me = leaderboard.find((l) => l.user_id === profile?.id);
+  const wins = me?.wins ?? 0;
+  const total = me?.games_played ?? 0;
   const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
   const rank = profile ? leaderboard.findIndex((l) => l.user_id === profile.id) + 1 : 0;
-  const mode501Wins = matches.filter((m) => m.winner_id === profile?.id && m.mode === "501").length;
 
   const name = profile?.display_name || profile?.username || "Player";
   const initials = name
@@ -89,8 +88,8 @@ function Profile() {
           </div>
         </Link>
 
-        <Section title="Favorite Mode">
-          <Pref icon={Target} label="501" sub={`${mode501Wins} wins`} />
+        <Section title="Tournaments">
+          <Pref icon={Target} label="Cups Won" sub={`${wins} wins`} />
         </Section>
 
         <div className="space-y-2">

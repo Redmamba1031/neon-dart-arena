@@ -1,84 +1,81 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Plus, Zap, Trophy, History, Flame, MessageSquare, Target } from "lucide-react";
-import { formatUsd, useMyProfile, useOpenMatches, useProfilesByIds } from "@/lib/api";
+import { Trophy, Flame, MessageSquare, Award, Users, Plus } from "lucide-react";
+import { formatUsd, useMyProfile, useTournaments } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Lobby — SMYD" },
-      { name: "description", content: "Your darts arena. Live matches, wallet, and quick play." },
+      { name: "description", content: "Your darts arena. Live tournaments and quick play." },
     ],
   }),
   component: Dashboard,
 });
 
 function Dashboard() {
-  const { data: matches = [] } = useOpenMatches();
-  const { data: profileMap } = useProfilesByIds(matches.map((m) => m.creator_id));
+  const { data: tournaments = [] } = useTournaments();
   const { data: me } = useMyProfile();
+
+  const open = tournaments.filter((t) => t.status === "open").slice(0, 6);
 
   return (
     <AppShell>
       <section className="px-5 py-6 animate-fade-in-up">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Open Lobbies</h2>
-          {matches.length > 0 && (
+          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Open Tournaments</h2>
+          {open.length > 0 && (
             <span className="size-2 animate-pulse rounded-full bg-destructive shadow-[0_0_8px_rgb(239,68,68)]" />
           )}
         </div>
-        {matches.length === 0 ? (
+        {open.length === 0 ? (
           <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">
-            No open matches. Create one below.
+            No open tournaments. Create one below.
           </div>
         ) : (
           <div className="-mx-5 flex gap-4 overflow-x-auto px-5 no-scrollbar snap-x">
-            {matches.map((m) => {
-              const host = profileMap?.get(m.creator_id);
-              return (
-                <Link
-                  key={m.id}
-                  to="/join-match"
-                  className="snap-center w-72 flex-none rounded-xl bg-surface p-4 ring-1 ring-border"
-                >
-                  <div className="mb-6 flex items-start justify-between">
-                    <div>
-                      <span className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-accent">
-                        {m.mode}
-                      </span>
-                      <span className="font-display text-2xl font-semibold tracking-tight">
-                        {formatUsd(m.stake_cents)}
-                      </span>
-                    </div>
-                    <span className="rounded bg-secondary px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                      Bo{m.best_of}
+            {open.map((t) => (
+              <Link
+                key={t.id}
+                to="/tournaments/$id"
+                params={{ id: t.id }}
+                className="snap-center w-72 flex-none rounded-xl bg-surface p-4 ring-1 ring-border"
+              >
+                <div className="mb-6 flex items-start justify-between">
+                  <div>
+                    <span className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-accent">
+                      {t.size} Player Cup
+                    </span>
+                    <span className="font-display text-2xl font-semibold tracking-tight">
+                      {formatUsd(t.entry_cents)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="size-6 rounded-full bg-secondary grid place-items-center">
-                      <Target className="size-3 text-primary" />
-                    </div>
-                    <span className="text-xs font-medium truncate">
-                      {host?.display_name || host?.username || "Player"}
-                    </span>
+                  <span className="rounded bg-secondary px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                    Bo{t.best_of}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="size-6 rounded-full bg-secondary grid place-items-center">
+                    <Trophy className="size-3 text-primary" />
                   </div>
-                  <div className="mt-4 border-t border-border/60 pt-4 text-center">
-                    <span className="text-xs font-semibold text-primary">JOIN CHALLENGE</span>
-                  </div>
-                </Link>
-              );
-            })}
+                  <span className="text-xs font-medium truncate">{t.name}</span>
+                </div>
+                <div className="mt-4 border-t border-border/60 pt-4 text-center">
+                  <span className="text-xs font-semibold text-primary">VIEW BRACKET</span>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </section>
 
       <section className="px-5 mb-6 animate-fade-in-up">
-        <Link to="/create-match" className="block w-full rounded-2xl bg-gradient-neon p-[1px] ring-purple">
+        <Link to="/tournaments" className="block w-full rounded-2xl bg-gradient-neon p-[1px] ring-purple">
           <div className="rounded-2xl bg-background/80 p-5 flex items-center justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Step up</p>
-              <p className="font-display text-2xl font-semibold leading-tight">Create a Match</p>
-              <p className="text-xs text-muted-foreground mt-1">501 • Set your stake</p>
+              <p className="font-display text-2xl font-semibold leading-tight">Create a Tournament</p>
+              <p className="text-xs text-muted-foreground mt-1">Double-elimination • 4 or 8 players</p>
             </div>
             <div className="size-12 rounded-xl bg-gradient-neon grid place-items-center text-background ring-neon">
               <Plus className="size-6" strokeWidth={2.5} />
@@ -88,9 +85,9 @@ function Dashboard() {
       </section>
 
       <section className="px-5 grid grid-cols-2 gap-3 mb-6">
-        <QuickAction to="/join-match" icon={Zap} label="Quick Join" tint="primary" />
-        <QuickAction to="/leaderboard" icon={Trophy} label="Leaderboard" tint="accent" />
-        <QuickAction to="/history" icon={History} label="History" tint="muted" />
+        <QuickAction to="/tournaments" icon={Users} label="Tournaments" tint="primary" />
+        <QuickAction to="/leaderboard" icon={Award} label="Leaderboard" tint="accent" />
+        <QuickAction to="/wallet" icon={Trophy} label="Wallet" tint="muted" />
         <QuickAction to="/messages" icon={MessageSquare} label="Messages" tint="primary" />
       </section>
 
