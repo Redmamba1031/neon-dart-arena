@@ -114,7 +114,7 @@ function Tournaments() {
 function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
   const create = useCreateTournament();
   const [name, setName] = useState("");
-  const [mode, setMode] = useState<"501" | "Cricket" | "Medley">("501");
+  const mode = "501" as const;
   const [bestOf, setBestOf] = useState<1 | 3 | 5>(3);
   const [size, setSize] = useState<4 | 8>(4);
   const [entry, setEntry] = useState(10);
@@ -151,9 +151,7 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
       </Field>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Mode">
-          <select value={mode} onChange={(e) => setMode(e.target.value as any)} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm">
-            <option>501</option><option>Cricket</option><option>Medley</option>
-          </select>
+          <div className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm">501</div>
         </Field>
         <Field label="Best of">
           <select value={bestOf} onChange={(e) => setBestOf(Number(e.target.value) as any)} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm">
