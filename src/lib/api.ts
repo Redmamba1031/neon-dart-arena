@@ -280,3 +280,142 @@ export function useLeaderboard(limit = 50) {
     },
   });
 }
+
+// ---------- Tournaments ----------
+export function useTournaments() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    const channel = supabase
+      .channel("tournaments-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tournaments" }, () => {
+        qc.invalidateQueries({ queryKey: ["tournaments"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "tournament_participants" }, () => {
+        qc.invalidateQueries({ queryKey: ["tournaments"] });
+        qc.invalidateQueries({ queryKey: ["tournament-detail"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "tournament_matches" }, () => {
+        qc.invalidateQueries({ queryKey: ["tournament-detail"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [qc]);
+
+  return useQuery({
+    queryKey: ["tournaments"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tournaments")
+        .select("*")
+        .in("status", ["open", "live"])
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useTournamentDetail(id: string | undefined) {
+  return useQuery({
+    queryKey: ["tournament-detail", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const [t, parts, matches] = await Promise.all([
+        supabase.from("tournaments").select("*").eq("id", id!).maybeSingle(),
+        supabase.from("tournament_participants").select("*").eq("tournament_id", id!).order("seed", { ascending: true, nullsFirst: false }),
+        supabase.from("tournament_matches").select("*").eq("tournament_id", id!).order("round").order("slot"),
+      ]);
+      if (t.error) throw t.error;
+      if (parts.error) throw parts.error;
+      if (matches.error) throw matches.error;
+      return {
+        tournament: t.data,
+        participants: parts.data ?? [],
+        matches: matches.data ?? [],
+      };
+    },
+  });
+}
+
+type CreateTournamentArgs = {
+  name: string;
+  mode: "501" | "Cricket" | "Medley";
+  best_of: 1 | 3 | 5;
+  size: 4 | 8;
+  entry_cents: number;
+  double_in?: boolean;
+  finish_rule?: "straight" | "double" | "master" | "both";
+};
+
+export function useCreateTournament() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: CreateTournamentArgs) => {
+      const { data, error } = await supabase.rpc("create_tournament", {
+        _name: args.name,
+        _mode: args.mode,
+        _best_of: args.best_of,
+        _size: args.size,
+        _entry_cents: args.entry_cents,
+        _double_in: args.double_in ?? false,
+        _finish_rule: args.finish_rule ?? "double",
+      });
+      if (error) throw error;
+      return data as string;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["tournaments"] });
+    },
+  });
+}
+
+export function useJoinTournament() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.rpc("join_tournament", { _tournament_id: id });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["tournaments"] });
+      qc.invalidateQueries({ queryKey: ["tournament-detail"] });
+    },
+  });
+}
+
+export function useCancelTournament() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.rpc("cancel_tournament", { _tournament_id: id });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["tournaments"] });
+      qc.invalidateQueries({ queryKey: ["tournament-detail"] });
+    },
+  });
+}
+
+export function useReportTournamentMatch() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { matchId: string; winnerId: string }) => {
+      const { error } = await supabase.rpc("report_tournament_match", {
+        _match_id: args.matchId,
+        _winner_id: args.winnerId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["tournament-detail"] });
+      qc.invalidateQueries({ queryKey: ["tournaments"] });
+    },
+  });
+}
+
