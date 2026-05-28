@@ -162,9 +162,10 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
             <option value={4}>4 players</option><option value={8}>8 players</option><option value={16}>16 players</option><option value={32}>32 players</option>
           </select>
         </Field>
-        <Field label="Entry ($)">
+        <Field label="Entry (coins)">
           <input type="number" min={1} max={1000000} value={entry} onChange={(e) => setEntry(Number(e.target.value))} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm" />
         </Field>
+
       </div>
       <p className="text-[11px] text-muted-foreground">
         Pool: {formatUsd(toCents(entry) * size)} • Payout 50/30/20 of pool minus 5% rake
