@@ -11,10 +11,16 @@ export type Tournament = Database["public"]["Tables"]["tournaments"]["Row"];
 export type TournamentParticipant = Database["public"]["Tables"]["tournament_participants"]["Row"];
 export type TournamentMatch = Database["public"]["Tables"]["tournament_matches"]["Row"];
 
-export const formatUsd = (cents: number | null | undefined) =>
-  `$${((cents ?? 0) / 100).toFixed(2)}`;
+export const formatCoins = (cents: number | null | undefined) => {
+  const coins = Math.round((cents ?? 0) / 100);
+  return `${coins.toLocaleString()} ${Math.abs(coins) === 1 ? "coin" : "coins"}`;
+};
 
-export const toCents = (dollars: number) => Math.round(dollars * 100);
+// Back-compat alias — all call sites now render coins, not USD.
+export const formatUsd = formatCoins;
+
+export const toCents = (coins: number) => Math.round(coins * 100);
+
 
 // ---------- Profiles ----------
 export function useMyProfile() {
