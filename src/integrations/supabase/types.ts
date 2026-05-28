@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      coin_packs: {
+        Row: {
+          active: boolean
+          coins_granted: number
+          created_at: string
+          display_order: number
+          name: string
+          price_id: string
+          usd_cents: number
+        }
+        Insert: {
+          active?: boolean
+          coins_granted: number
+          created_at?: string
+          display_order?: number
+          name: string
+          price_id: string
+          usd_cents: number
+        }
+        Update: {
+          active?: boolean
+          coins_granted?: number
+          created_at?: string
+          display_order?: number
+          name?: string
+          price_id?: string
+          usd_cents?: number
+        }
+        Relationships: []
+      }
       deposits: {
         Row: {
           amount_cents: number
@@ -52,6 +82,98 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      gift_card_options: {
+        Row: {
+          active: boolean
+          brand: string
+          coins_cost: number
+          created_at: string
+          denomination_usd_cents: number
+          display_order: number
+          id: string
+        }
+        Insert: {
+          active?: boolean
+          brand?: string
+          coins_cost: number
+          created_at?: string
+          denomination_usd_cents: number
+          display_order?: number
+          id: string
+        }
+        Update: {
+          active?: boolean
+          brand?: string
+          coins_cost?: number
+          created_at?: string
+          denomination_usd_cents?: number
+          display_order?: number
+          id?: string
+        }
+        Relationships: []
+      }
+      gift_card_redemptions: {
+        Row: {
+          brand: string
+          coins_spent: number
+          created_at: string
+          delivery_email: string
+          denomination_usd_cents: number
+          failure_reason: string | null
+          fulfilled_at: string | null
+          id: string
+          option_id: string
+          recipient_name: string | null
+          refunded_at: string | null
+          status: string
+          tremendous_order_id: string | null
+          tremendous_reward_id: string | null
+          user_id: string
+        }
+        Insert: {
+          brand: string
+          coins_spent: number
+          created_at?: string
+          delivery_email: string
+          denomination_usd_cents: number
+          failure_reason?: string | null
+          fulfilled_at?: string | null
+          id?: string
+          option_id: string
+          recipient_name?: string | null
+          refunded_at?: string | null
+          status?: string
+          tremendous_order_id?: string | null
+          tremendous_reward_id?: string | null
+          user_id: string
+        }
+        Update: {
+          brand?: string
+          coins_spent?: number
+          created_at?: string
+          delivery_email?: string
+          denomination_usd_cents?: number
+          failure_reason?: string | null
+          fulfilled_at?: string | null
+          id?: string
+          option_id?: string
+          recipient_name?: string | null
+          refunded_at?: string | null
+          status?: string
+          tremendous_order_id?: string | null
+          tremendous_reward_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_card_redemptions_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "gift_card_options"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       match_legs: {
         Row: {
@@ -452,6 +574,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      _mark_redemption_fulfilled: {
+        Args: { _order_id: string; _redemption_id: string; _reward_id: string }
+        Returns: undefined
+      }
+      _refund_redemption: {
+        Args: { _reason: string; _redemption_id: string }
+        Returns: undefined
+      }
       _start_tournament: {
         Args: { _tournament_id: string }
         Returns: undefined
@@ -485,7 +615,7 @@ export type Database = {
       }
       credit_wallet_from_deposit: {
         Args: {
-          _amount_cents: number
+          _coins_granted: number
           _environment: string
           _payment_intent: string
           _session_id: string
@@ -493,7 +623,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      dev_top_up: { Args: { _amount_cents: number }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -503,6 +632,14 @@ export type Database = {
       }
       join_match: { Args: { _match_id: string }; Returns: undefined }
       join_tournament: { Args: { _tournament_id: string }; Returns: undefined }
+      redeem_gift_card: {
+        Args: {
+          _delivery_email: string
+          _option_id: string
+          _recipient_name?: string
+        }
+        Returns: string
+      }
       report_tournament_match: {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
