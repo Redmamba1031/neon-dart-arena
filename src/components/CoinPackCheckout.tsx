@@ -1,17 +1,17 @@
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
-import { createDepositCheckout } from "@/utils/deposits.functions";
+import { createCoinPackCheckout } from "@/lib/coin-packs.functions";
 
-export function StripeDepositCheckout({
-  amountCents,
+export function CoinPackCheckout({
+  priceId,
   returnUrl,
 }: {
-  amountCents: number;
+  priceId: string;
   returnUrl: string;
 }) {
   const fetchClientSecret = async (): Promise<string> => {
-    const secret = await createDepositCheckout({
-      data: { amountCents, returnUrl, environment: getStripeEnvironment() },
+    const secret = await createCoinPackCheckout({
+      data: { priceId, returnUrl, environment: getStripeEnvironment() },
     });
     if (!secret) throw new Error("No client secret returned");
     return secret;

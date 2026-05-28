@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TournamentsRouteImport } from './routes/tournaments'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
@@ -28,6 +29,11 @@ const WalletRoute = WalletRouteImport.update({
 const TournamentsRoute = TournamentsRouteImport.update({
   id: '/tournaments',
   path: '/tournaments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/messages'
     | '/profile'
+    | '/shop'
     | '/tournaments'
     | '/wallet'
     | '/checkout/return'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/messages'
     | '/profile'
+    | '/shop'
     | '/tournaments'
     | '/wallet'
     | '/checkout/return'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/messages'
     | '/profile'
+    | '/shop'
     | '/tournaments'
     | '/wallet'
     | '/checkout/return'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
   ProfileRoute: typeof ProfileRoute
+  ShopRoute: typeof ShopRoute
   TournamentsRoute: typeof TournamentsRouteWithChildren
   WalletRoute: typeof WalletRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/tournaments'
       fullPath: '/tournaments'
       preLoaderRoute: typeof TournamentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -253,6 +273,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
   ProfileRoute: ProfileRoute,
+  ShopRoute: ShopRoute,
   TournamentsRoute: TournamentsRouteWithChildren,
   WalletRoute: WalletRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,

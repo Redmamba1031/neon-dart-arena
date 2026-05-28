@@ -1,6 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
+
+let _admin: ReturnType<typeof createClient> | null = null;
+function admin() {
+  if (!_admin) {
+    _admin = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    );
+  }
+  return _admin;
+}
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
@@ -34,12 +46,10 @@ async function resolveOrCreateCustomer(
   return created.id;
 }
 
-export const createDepositCheckout = createServerFn({ method: "POST" })
+export const createCoinPackCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { amountCents: number; returnUrl: string; environment: StripeEnv }) => {
-    if (!Number.isInteger(data.amountCents) || data.amountCents < 500 || data.amountCents > 100_000_00) {
-      throw new Error("Amount must be between $5 and $100,000");
-    }
+  .inputValidator((data: { priceId: string; returnUrl: string; environment: StripeEnv }) => {
+    if (!/^[a-zA-Z0-9_]+$/.test(data.priceId)) throw new Error("Invalid priceId");
     if (data.environment !== "sandbox" && data.environment !== "live") {
       throw new Error("Invalid environment");
     }
@@ -50,7 +60,25 @@ export const createDepositCheckout = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { userId, claims } = context as { userId: string; claims: { email?: string } };
+
+    // Look up coin pack in catalog (source of truth for coins granted)
+    const { data: packRow, error: packErr } = await admin()
+      .from("coin_packs")
+      .select("price_id, name, usd_cents, coins_granted, active")
+      .eq("price_id", data.priceId)
+      .eq("active", true)
+      .maybeSingle();
+    if (packErr) throw new Error(packErr.message);
+    if (!packRow) throw new Error("Coin pack not available");
+    const pack = packRow as { price_id: string; name: string; coins_granted: number };
+
+
     const stripe = createStripeClient(data.environment);
+
+    // Resolve Stripe price by lookup_key (stable across sandbox/live)
+    const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
+    if (!prices.data.length) throw new Error("Stripe price not found");
+    const stripePrice = prices.data[0];
 
     const customerId = await resolveOrCreateCustomer(stripe, {
       userId,
@@ -58,32 +86,27 @@ export const createDepositCheckout = createServerFn({ method: "POST" })
     });
 
     const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: { name: "SMYD Wallet Deposit" },
-            unit_amount: data.amountCents,
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: stripePrice.id, quantity: 1 }],
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: data.returnUrl,
       customer: customerId,
       metadata: {
         userId,
-        kind: "wallet_deposit",
-        amount_cents: String(data.amountCents),
+        kind: "coin_pack",
+        pack_id: pack.price_id,
+        coins_granted: String(pack.coins_granted),
       },
       payment_intent_data: {
+        description: pack.name,
         metadata: {
           userId,
-          kind: "wallet_deposit",
-          amount_cents: String(data.amountCents),
+          kind: "coin_pack",
+          pack_id: pack.price_id,
+          coins_granted: String(pack.coins_granted),
         },
       },
+
     });
 
     return session.client_secret;
