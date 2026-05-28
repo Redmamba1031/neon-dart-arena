@@ -16,7 +16,11 @@ export const formatCoins = (cents: number | null | undefined) => {
   return `${coins.toLocaleString()} ${Math.abs(coins) === 1 ? "coin" : "coins"}`;
 };
 
+// Back-compat alias used by several routes; renders coins, not USD.
+export const formatUsd = formatCoins;
+
 export const toCents = (coins: number) => Math.round(coins * 100);
+
 
 
 

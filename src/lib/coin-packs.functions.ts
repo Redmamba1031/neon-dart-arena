@@ -62,14 +62,16 @@ export const createCoinPackCheckout = createServerFn({ method: "POST" })
     const { userId, claims } = context as { userId: string; claims: { email?: string } };
 
     // Look up coin pack in catalog (source of truth for coins granted)
-    const { data: pack, error: packErr } = await admin()
+    const { data: packRow, error: packErr } = await admin()
       .from("coin_packs")
       .select("price_id, name, usd_cents, coins_granted, active")
       .eq("price_id", data.priceId)
       .eq("active", true)
       .maybeSingle();
     if (packErr) throw new Error(packErr.message);
-    if (!pack) throw new Error("Coin pack not available");
+    if (!packRow) throw new Error("Coin pack not available");
+    const pack = packRow as { price_id: string; name: string; coins_granted: number };
+
 
     const stripe = createStripeClient(data.environment);
 
@@ -92,18 +94,19 @@ export const createCoinPackCheckout = createServerFn({ method: "POST" })
       metadata: {
         userId,
         kind: "coin_pack",
-        pack_id: pack.price_id as string,
+        pack_id: pack.price_id,
         coins_granted: String(pack.coins_granted),
       },
       payment_intent_data: {
-        description: pack.name as string,
+        description: pack.name,
         metadata: {
           userId,
           kind: "coin_pack",
-          pack_id: pack.price_id as string,
+          pack_id: pack.price_id,
           coins_granted: String(pack.coins_granted),
         },
       },
+
     });
 
     return session.client_secret;

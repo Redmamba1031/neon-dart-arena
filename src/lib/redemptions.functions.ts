@@ -25,13 +25,11 @@ export const redeemGiftCard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => RedeemSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as {
-      supabase: ReturnType<typeof createClient>;
-      userId: string;
-    };
+    const ctx = context as unknown as { supabase: any; userId: string };
+    const supabase = ctx.supabase;
 
     // 1. Debit coins + insert pending redemption row (atomic via RPC, RLS as user)
-    const { data: rid, error: rpcErr } = await (supabase.rpc as any)("redeem_gift_card", {
+    const { data: rid, error: rpcErr } = await supabase.rpc("redeem_gift_card", {
       _option_id: data.optionId,
       _delivery_email: data.deliveryEmail,
       _recipient_name: data.recipientName ?? null,
@@ -40,27 +38,31 @@ export const redeemGiftCard = createServerFn({ method: "POST" })
     const redemptionId = rid as string;
 
     // 2. Look up the row (we need denomination for the order)
-    const { data: row, error: rowErr } = await admin()
+    const { data: rowData, error: rowErr } = await admin()
       .from("gift_card_redemptions")
       .select("denomination_usd_cents, delivery_email, recipient_name")
       .eq("id", redemptionId)
       .single();
-    if (rowErr || !row) {
-      // Best-effort refund
+    if (rowErr || !rowData) {
       await (admin().rpc as any)("_refund_redemption", {
         _redemption_id: redemptionId,
         _reason: "Lookup failed",
       });
       throw new Error("Redemption lookup failed");
     }
+    const row = rowData as {
+      denomination_usd_cents: number;
+      delivery_email: string;
+      recipient_name: string | null;
+    };
 
     // 3. Place Tremendous order
     try {
       const order = await createGiftCardOrder({
         redemptionId,
         amountUsdCents: Number(row.denomination_usd_cents),
-        recipientEmail: row.delivery_email as string,
-        recipientName: (row.recipient_name as string | null) ?? undefined,
+        recipientEmail: row.delivery_email,
+        recipientName: row.recipient_name ?? undefined,
       });
       await (admin().rpc as any)("_mark_redemption_fulfilled", {
         _redemption_id: redemptionId,
@@ -77,3 +79,4 @@ export const redeemGiftCard = createServerFn({ method: "POST" })
       throw new Error(`Gift card provider error: ${reason}. Your coins were refunded.`);
     }
   });
+
