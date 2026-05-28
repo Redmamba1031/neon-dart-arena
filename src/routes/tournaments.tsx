@@ -172,7 +172,8 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
       </p>
       <button type="submit" disabled={create.isPending} className="w-full rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-60">
         {create.isPending && <Loader2 className="size-4 animate-spin" />}
-        Create & Pay Entry
+        Create & Pay Entry (coins)
+
       </button>
     </form>
   );
