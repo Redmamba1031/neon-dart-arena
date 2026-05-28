@@ -16,10 +16,8 @@ export const formatCoins = (cents: number | null | undefined) => {
   return `${coins.toLocaleString()} ${Math.abs(coins) === 1 ? "coin" : "coins"}`;
 };
 
-// Back-compat alias — all call sites now render coins, not USD.
-export const formatUsd = formatCoins;
-
 export const toCents = (coins: number) => Math.round(coins * 100);
+
 
 
 // ---------- Profiles ----------
@@ -107,22 +105,8 @@ export function useTransactions(limit = 20) {
   });
 }
 
-export function useDevTopUp() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (dollars: number) => {
-      const { data, error } = await supabase.rpc("dev_top_up", {
-        _amount_cents: toCents(dollars),
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["wallet"] });
-      qc.invalidateQueries({ queryKey: ["transactions"] });
-    },
-  });
-}
+// dev_top_up removed — coins are earned via gameplay or purchased in the shop.
+
 
 // ---------- Matches ----------
 export function useOpenMatches() {

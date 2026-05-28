@@ -1,8 +1,9 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Award, Home, Trophy, User, Wallet } from "lucide-react";
+import { Award, Home, ShoppingBag, Trophy, User, Wallet } from "lucide-react";
 import { useEffect } from "react";
 import smydLogo from "@/assets/smyd-logo.png";
-import { formatUsd, useMyProfile, useWallet } from "@/lib/api";
+import { formatCoins, useMyProfile, useWallet } from "@/lib/api";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -12,6 +13,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen max-w-[480px] flex-col border-x border-border/60 relative">
+        <PaymentTestModeBanner />
         <Header />
         <main className="flex-1 pb-24">{children}</main>
         <BottomNav />
@@ -48,7 +50,7 @@ function Header() {
       >
         <Wallet className="size-3.5 text-primary" />
         <span className="font-display text-sm font-medium text-primary">
-          {formatUsd(wallet?.balance_cents)}
+          {formatCoins(wallet?.balance_cents)}
         </span>
       </Link>
     </header>
@@ -60,7 +62,7 @@ function BottomNav() {
   const items = [
     { to: "/", label: "Lobby", icon: Home },
     { to: "/tournaments", label: "Cups", icon: Trophy },
-    { to: "/wallet", label: "Wallet", icon: Wallet },
+    { to: "/shop", label: "Shop", icon: ShoppingBag },
     { to: "/leaderboard", label: "Rank", icon: Award },
     { to: "/profile", label: "Profile", icon: User },
   ] as const;

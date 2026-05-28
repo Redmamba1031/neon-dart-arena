@@ -14,8 +14,8 @@ function getSupabase() {
 }
 
 async function handleCheckoutCompleted(session: any, env: StripeEnv) {
-  if (session.metadata?.kind !== "wallet_deposit") {
-    console.log("Skipping non-wallet session", session.id);
+  if (session.metadata?.kind !== "coin_pack") {
+    console.log("Skipping non-coin-pack session", session.id, session.metadata?.kind);
     return;
   }
   if (session.payment_status !== "paid") {
@@ -24,9 +24,9 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   }
 
   const userId = session.metadata.userId;
-  const amountCents = Number(session.metadata.amount_cents) || session.amount_total;
-  if (!userId || !amountCents) {
-    console.error("Missing userId or amount on session", session.id);
+  const coinsGranted = Number(session.metadata.coins_granted);
+  if (!userId || !Number.isFinite(coinsGranted) || coinsGranted <= 0) {
+    console.error("Missing userId or coins_granted on session", session.id);
     return;
   }
 
@@ -34,7 +34,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     _user_id: userId,
     _session_id: session.id,
     _payment_intent: session.payment_intent ?? null,
-    _amount_cents: amountCents,
+    _coins_granted: coinsGranted,
     _environment: env,
   });
   if (error) {
