@@ -19,6 +19,7 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const WalletRoute = WalletRouteImport.update({
@@ -71,6 +72,11 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/wallet': typeof WalletRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/wallet': typeof WalletRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/wallet': typeof WalletRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/checkout/return'
     | '/tournaments/$id'
+    | '/.lovable/oauth/consent'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/checkout/return'
     | '/tournaments/$id'
+    | '/.lovable/oauth/consent'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/checkout/return'
     | '/tournaments/$id'
+    | '/.lovable/oauth/consent'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +182,7 @@ export interface RootRouteChildren {
   TournamentsRoute: typeof TournamentsRouteWithChildren
   WalletRoute: typeof WalletRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -277,6 +297,7 @@ const rootRouteChildren: RootRouteChildren = {
   TournamentsRoute: TournamentsRouteWithChildren,
   WalletRoute: WalletRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport

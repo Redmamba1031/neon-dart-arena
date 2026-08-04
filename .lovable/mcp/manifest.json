@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://wqncodnteqyyhjihalrs.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "smyd",
+      "version": "0.1.0",
+      "title": "SMYD"
+    },
+    "tools": [
+      {
+        "name": "list_tournaments",
+        "title": "List tournaments",
+        "description": "List SMYD darts tournaments, optionally filtered by status (open, live, completed, cancelled).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter by tournament status.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max rows to return (default 20).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_tournament",
+        "title": "Get tournament",
+        "description": "Get one SMYD tournament with its participants and bracket matches.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "tournament_id": {
+              "type": "string",
+              "description": "Tournament UUID."
+            }
+          },
+          "required": [
+            "tournament_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "join_tournament",
+        "title": "Join tournament",
+        "description": "Enter the signed-in player into an open SMYD tournament. Deducts the entry fee in coins.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "tournament_id": {
+              "type": "string",
+              "description": "Tournament UUID to join."
+            }
+          },
+          "required": [
+            "tournament_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_my_wallet",
+        "title": "Get my wallet",
+        "description": "Get the signed-in player's SMYD coin balance and recent wallet transactions.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_my_profile",
+        "title": "Get my profile",
+        "description": "Get the signed-in player's SMYD profile (username, display name, avatar).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_leaderboard",
+        "title": "Get leaderboard",
+        "description": "Get the SMYD player leaderboard ranked by total winnings.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Max rows (default 20).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
