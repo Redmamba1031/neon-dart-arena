@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -39,7 +39,6 @@ function Login() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
-  const navigate = useNavigate();
   const { next } = Route.useSearch();
   const nextPath = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
   const returnUrl = typeof window !== "undefined" ? `${window.location.origin}${nextPath}` : undefined;
