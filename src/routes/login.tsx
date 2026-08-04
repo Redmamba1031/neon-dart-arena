@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -13,6 +13,10 @@ export const Route = createFileRoute("/login")({
       { name: "description", content: "Sign in or create your SMYD darts esports account." },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { next?: string } =>
+    typeof s.next === "string" && s.next.startsWith("/") && !s.next.startsWith("//")
+      ? { next: s.next }
+      : {},
   component: Login,
 });
 
@@ -36,7 +40,9 @@ function Login() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
-  const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const nextPath = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const returnUrl = typeof window !== "undefined" ? `${window.location.origin}${nextPath}` : undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +60,7 @@ function Login() {
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: returnUrl,
             data: { username: parsed.data.username, display_name: parsed.data.username },
           },
         });
@@ -70,7 +76,7 @@ function Login() {
         setBusy(true);
         const { error } = await supabase.auth.signInWithPassword(parsed.data);
         if (error) throw error;
-        navigate({ to: "/", replace: true });
+        window.location.href = nextPath;
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong";
@@ -85,11 +91,11 @@ function Login() {
     setBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: returnUrl,
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
-      navigate({ to: "/", replace: true });
+      window.location.href = nextPath;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Google sign-in failed";
       toast.error(message);

@@ -16,7 +16,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
 // Public routes accessible without auth. Everything else requires sign-in.
-const PUBLIC_ROUTES = new Set<string>(["/login"]);
+// The OAuth consent route runs its own auth check + sign-in redirect (preserving
+// authorization_id), so the gate must not intercept it.
+const PUBLIC_ROUTES = new Set<string>(["/login", "/.lovable/oauth/consent"]);
 
 function NotFoundComponent() {
   return (
