@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Trophy, Flame, MessageSquare, Award, Users, Plus } from "lucide-react";
+import { Trophy, Flame, MessageSquare, Award, Users, Plus, Swords } from "lucide-react";
 import { formatUsd, useMyProfile, useTournaments, useIsOwner } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
@@ -88,7 +88,8 @@ function Dashboard() {
       )}
 
       <section className="px-5 grid grid-cols-2 gap-3 mb-6">
-        <QuickAction to="/tournaments" icon={Users} label="Tournaments" tint="primary" />
+        <QuickAction to="/matches" icon={Swords} label="1v1 Matches" tint="primary" />
+        <QuickAction to="/tournaments" icon={Users} label="Tournaments" tint="accent" />
         <QuickAction to="/leaderboard" icon={Award} label="Leaderboard" tint="accent" />
         <QuickAction to="/wallet" icon={Trophy} label="Wallet" tint="muted" />
         <QuickAction to="/messages" icon={MessageSquare} label="Messages" tint="primary" />
