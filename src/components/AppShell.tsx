@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Award, Home, ShoppingBag, Trophy, User, Wallet } from "lucide-react";
+import { Award, Home, ShoppingBag, Swords, Trophy, User, Wallet } from "lucide-react";
 import { useEffect } from "react";
 import smydLogo from "@/assets/smyd-logo.png";
 import { formatCoins, useMyProfile, useWallet } from "@/lib/api";
@@ -61,6 +61,7 @@ function BottomNav() {
   const { pathname } = useLocation();
   const items = [
     { to: "/", label: "Lobby", icon: Home },
+    { to: "/matches", label: "1v1", icon: Swords },
     { to: "/tournaments", label: "Cups", icon: Trophy },
     { to: "/shop", label: "Shop", icon: ShoppingBag },
     { to: "/leaderboard", label: "Rank", icon: Award },
@@ -69,7 +70,7 @@ function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 border-t border-border/60 bg-background/90 px-6 py-3 backdrop-blur-xl">
-      <div className="flex items-center justify-around">
+      <div className="flex items-center justify-between">
         {items.map(({ to, label, icon: Icon }) => {
           const active = pathname === to;
           return (
