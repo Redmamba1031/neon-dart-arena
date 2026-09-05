@@ -2,22 +2,32 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Coins, Gift, Loader2, X } from "lucide-react";
+import { Banknote, Coins, Gift, Loader2, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CoinPackCheckout } from "@/components/CoinPackCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { redeemGiftCard } from "@/lib/redemptions.functions";
-import { useWallet, formatCoins } from "@/lib/api";
+import {
+  useWallet,
+  formatMoney,
+  useMyWithdrawals,
+  useRequestWithdrawal,
+} from "@/lib/api";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Shop — SMYD" },
-      { name: "description", content: "Buy SMYD coins and redeem them for Amazon gift cards." },
+      { title: "Cashier — SMYD" },
+      { name: "description", content: "Add funds to your SMYD account, cash out to PayPal, Cash App or Venmo, or redeem gift cards." },
+      { property: "og:title", content: "Cashier — SMYD" },
+      { property: "og:description", content: "Add funds, cash out, or redeem gift cards on SMYD." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Shop,
 });
+
 
 type Tab = "buy" | "redeem";
 
