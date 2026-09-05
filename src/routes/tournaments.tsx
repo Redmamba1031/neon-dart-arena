@@ -168,7 +168,7 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
 
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Pool: {formatUsd(toCents(entry) * size)} • Payout 50/30/20 of pool minus 5% rake
+        Pool: {formatUsd(toCents(entry) * size)} • Payout 50/30/20 of pool minus 10% house fee
       </p>
       <button type="submit" disabled={create.isPending} className="w-full rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-60">
         {create.isPending && <Loader2 className="size-4 animate-spin" />}

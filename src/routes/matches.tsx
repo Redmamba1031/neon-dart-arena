@@ -332,7 +332,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       )}
 
       <p className="text-[11px] text-muted-foreground">
-        Pot {formatCoins(toCents(stake) * 2)} • Winner takes the pot minus 5% rake
+        Pot {formatCoins(toCents(stake) * 2)} • Winner takes the pot minus 10% house fee
       </p>
       <p className={`text-[11px] ${notEnough ? "text-primary font-bold" : "text-muted-foreground"}`}>
         Your balance: {walletReady ? formatCoins(balance) : "…"}
