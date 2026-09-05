@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_actions: {
+        Row: {
+          action: string
+          admin_id: string
+          amount_cents: number | null
+          created_at: string
+          id: string
+          note: string | null
+          target_id: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          amount_cents?: number | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          target_id?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          amount_cents?: number | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          target_id?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       challenges: {
         Row: {
           challenged_id: string
@@ -442,6 +475,27 @@ export type Database = {
         }
         Relationships: []
       }
+      player_bans: {
+        Row: {
+          banned_by: string
+          created_at: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          banned_by: string
+          created_at?: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          banned_by?: string
+          created_at?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -805,6 +859,7 @@ export type Database = {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
       }
+      _assert_not_banned: { Args: { _user_id: string }; Returns: undefined }
       _build_bracket_4: {
         Args: { _seeds: string[]; _tid: string }
         Returns: undefined
@@ -837,6 +892,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      _log_admin: {
+        Args: {
+          _action: string
+          _amount: number
+          _note: string
+          _target_id: string
+          _target_user: string
+        }
+        Returns: undefined
+      }
       _mark_redemption_fulfilled: {
         Args: { _order_id: string; _redemption_id: string; _reward_id: string }
         Returns: undefined
@@ -845,6 +910,7 @@ export type Database = {
         Args: { _reason: string; _redemption_id: string }
         Returns: undefined
       }
+      _require_staff: { Args: never; Returns: undefined }
       _settle_match: {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
@@ -853,6 +919,27 @@ export type Database = {
         Args: { _tournament_id: string }
         Returns: undefined
       }
+      admin_adjust_coins: {
+        Args: { _amount_cents: number; _note: string; _user_id: string }
+        Returns: undefined
+      }
+      admin_ban_player: {
+        Args: { _reason: string; _user_id: string }
+        Returns: undefined
+      }
+      admin_refund_redemption: {
+        Args: { _reason: string; _redemption_id: string }
+        Returns: undefined
+      }
+      admin_resolve_dispute: {
+        Args: { _match_id: string; _note?: string; _winner_id: string }
+        Returns: undefined
+      }
+      admin_set_role: {
+        Args: { _grant: boolean; _role: string; _user_id: string }
+        Returns: undefined
+      }
+      admin_unban_player: { Args: { _user_id: string }; Returns: undefined }
       cancel_match: { Args: { _match_id: string }; Returns: undefined }
       cancel_tournament: {
         Args: { _tournament_id: string }
@@ -907,6 +994,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
       join_match: { Args: { _match_id: string }; Returns: undefined }
       join_tournament: { Args: { _tournament_id: string }; Returns: undefined }
       record_dart: {
@@ -959,7 +1047,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "owner"
+      app_role: "owner" | "admin"
       bracket_side: "winners" | "losers" | "grand_final"
       challenge_status: "pending" | "accepted" | "declined" | "cancelled"
       finish_rule: "straight" | "double" | "master" | "both"
@@ -1100,7 +1188,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner"],
+      app_role: ["owner", "admin"],
       bracket_side: ["winners", "losers", "grand_final"],
       challenge_status: ["pending", "accepted", "declined", "cancelled"],
       finish_rule: ["straight", "double", "master", "both"],
