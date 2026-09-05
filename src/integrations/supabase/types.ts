@@ -782,6 +782,48 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_requests: {
+        Row: {
+          admin_id: string | null
+          amount_cents: number
+          created_at: string
+          destination: string
+          id: string
+          method: string
+          note: string | null
+          processed_at: string | null
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          amount_cents: number
+          created_at?: string
+          destination: string
+          id?: string
+          method: string
+          note?: string | null
+          processed_at?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          amount_cents?: number
+          created_at?: string
+          destination?: string
+          id?: string
+          method?: string
+          note?: string | null
+          processed_at?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       coin_transactions: {
@@ -927,8 +969,16 @@ export type Database = {
         Args: { _reason: string; _user_id: string }
         Returns: undefined
       }
+      admin_mark_withdrawal_paid: {
+        Args: { _note?: string; _request_id: string }
+        Returns: undefined
+      }
       admin_refund_redemption: {
         Args: { _reason: string; _redemption_id: string }
+        Returns: undefined
+      }
+      admin_reject_withdrawal: {
+        Args: { _reason: string; _request_id: string }
         Returns: undefined
       }
       admin_resolve_dispute: {
@@ -1030,6 +1080,10 @@ export type Database = {
         Args: { _match_id: string; _winner_id: string }
         Returns: string
       }
+      request_withdrawal: {
+        Args: { _amount_cents: number; _destination: string; _method: string }
+        Returns: string
+      }
       respond_challenge: {
         Args: { _accept: boolean; _challenge_id: string }
         Returns: undefined
@@ -1061,6 +1115,7 @@ export type Database = {
         | "match_payout"
         | "rake"
         | "refund"
+      withdrawal_status: "pending" | "paid" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1203,6 +1258,7 @@ export const Constants = {
         "rake",
         "refund",
       ],
+      withdrawal_status: ["pending", "paid", "rejected"],
     },
   },
 } as const
