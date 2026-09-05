@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Swords, Plus, Loader2, Trophy, X, Play, Search } from "lucide-react";
+import { Swords, Plus, Loader2, Trophy, X, Search } from "lucide-react";
 import {
   useOpenMatches,
   useMyMatches,
@@ -9,7 +9,6 @@ import {
   useCreateMatch,
   useJoinMatch,
   useCancelMatch,
-  useSettleMatch,
   useMyProfile,
   useWallet,
   useProfilesByIds,
@@ -21,6 +20,7 @@ import {
   type Match,
 } from "@/lib/api";
 import { toast } from "sonner";
+import { MatchReportPanel } from "@/components/MatchReportPanel";
 
 export const Route = createFileRoute("/matches")({
   head: () => ({
@@ -126,7 +126,6 @@ function MatchRow({
 }) {
   const join = useJoinMatch();
   const cancel = useCancelMatch();
-  const settle = useSettleMatch();
 
   const isMine = m.creator_id === meId || m.opponent_id === meId;
   const rules = [m.double_in ? "Double In" : "Straight In", finishLabel(m.finish_rule)].join(" • ");
@@ -173,9 +172,9 @@ function MatchRow({
         </div>
       </div>
 
-      {(m.status === "open" || m.status === "live") && (
+      {m.status === "open" && (
         <div className="mt-3 flex gap-2">
-          {m.status === "open" && !isMine && (
+          {!isMine && (
             <button
               onClick={() => act(() => join.mutateAsync(m.id), "Joined match")}
               disabled={join.isPending}
@@ -184,7 +183,7 @@ function MatchRow({
               Join • {formatCoins(m.stake_cents)}
             </button>
           )}
-          {m.status === "open" && m.creator_id === meId && (
+          {m.creator_id === meId && (
             <button
               onClick={() => act(() => cancel.mutateAsync(m.id), "Match cancelled")}
               disabled={cancel.isPending}
@@ -193,33 +192,11 @@ function MatchRow({
               Cancel
             </button>
           )}
-          {m.status === "live" && isMine && (
-            <>
-              <Link
-                to="/play/$id"
-                params={{ id: m.id }}
-                className="flex-1 rounded-lg bg-primary py-2 text-center text-[11px] font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-1.5"
-              >
-                <Play className="size-3.5" /> Play
-              </Link>
-              <button
-                onClick={() => act(() => settle.mutateAsync({ matchId: m.id, winnerId: m.creator_id }), "Result reported")}
-                disabled={settle.isPending}
-                className="flex-1 rounded-lg bg-secondary py-2 text-[11px] font-bold uppercase tracking-wider disabled:opacity-50"
-              >
-                {nameOf(m.creator_id)} won
-              </button>
-              <button
-                onClick={() => m.opponent_id && act(() => settle.mutateAsync({ matchId: m.id, winnerId: m.opponent_id! }), "Result reported")}
-                disabled={settle.isPending}
-                className="flex-1 rounded-lg bg-secondary py-2 text-[11px] font-bold uppercase tracking-wider disabled:opacity-50"
-              >
-                {nameOf(m.opponent_id)} won
-              </button>
-            </>
-          )}
         </div>
       )}
+
+      {m.status === "live" && isMine && <MatchReportPanel match={m} meId={meId} nameOf={nameOf} />}
+
     </div>
   );
 }

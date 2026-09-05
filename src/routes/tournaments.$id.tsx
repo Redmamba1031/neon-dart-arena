@@ -3,7 +3,8 @@ import { AppShell } from "@/components/AppShell";
 import { ArrowLeft, Trophy } from "lucide-react";
 import {
   useTournamentDetail,
-  useReportTournamentMatch,
+  useReportTournamentWinner,
+  useFinalizeTournamentReport,
   useCancelTournament,
   useMyProfile,
   useProfilesByIds,
@@ -11,6 +12,7 @@ import {
   type TournamentMatch,
 } from "@/lib/api";
 import { toast } from "sonner";
+import { CountdownPill } from "@/components/MatchReportPanel";
 
 export const Route = createFileRoute("/tournaments/$id")({
   head: () => ({ meta: [{ title: "Tournament — SMYD" }] }),
@@ -21,7 +23,8 @@ function TournamentDetail() {
   const { id } = Route.useParams();
   const { data, isLoading } = useTournamentDetail(id);
   const { data: me } = useMyProfile();
-  const report = useReportTournamentMatch();
+  const report = useReportTournamentWinner();
+  const finalize = useFinalizeTournamentReport();
   const cancel = useCancelTournament();
 
   const playerIds = [
@@ -44,8 +47,19 @@ function TournamentDetail() {
 
   const handleReport = async (matchId: string, winnerId: string) => {
     try {
-      await report.mutateAsync({ matchId, winnerId });
-      toast.success("Result recorded");
+      const result = await report.mutateAsync({ matchId, winnerId });
+      if (result === "settled") toast.success("Result confirmed — bracket advanced");
+      else if (result === "disputed") toast.error("Results don't match — this match is now disputed");
+      else toast.success("Result posted — waiting for your opponent to confirm");
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed");
+    }
+  };
+
+  const handleFinalize = async (matchId: string) => {
+    try {
+      await finalize.mutateAsync(matchId);
+      toast.success("Result finalised — bracket advanced");
     } catch (e: any) {
       toast.error(e.message ?? "Failed");
     }
@@ -116,9 +130,9 @@ function TournamentDetail() {
 
         {t.status !== "open" && (
           <>
-            <BracketSection title="Winners Bracket" matches={winners} me={me?.id} nameOf={nameOf} onReport={handleReport} pending={report.isPending} />
-            {losers.length > 0 && <BracketSection title="Losers Bracket" matches={losers} me={me?.id} nameOf={nameOf} onReport={handleReport} pending={report.isPending} />}
-            {finals.length > 0 && <BracketSection title="Grand Final" matches={finals} me={me?.id} nameOf={nameOf} onReport={handleReport} pending={report.isPending} />}
+            <BracketSection title="Winners Bracket" matches={winners} me={me?.id} nameOf={nameOf} onReport={handleReport} onFinalize={handleFinalize} pending={report.isPending || finalize.isPending} />
+            {losers.length > 0 && <BracketSection title="Losers Bracket" matches={losers} me={me?.id} nameOf={nameOf} onReport={handleReport} onFinalize={handleFinalize} pending={report.isPending || finalize.isPending} />}
+            {finals.length > 0 && <BracketSection title="Grand Final" matches={finals} me={me?.id} nameOf={nameOf} onReport={handleReport} onFinalize={handleFinalize} pending={report.isPending || finalize.isPending} />}
           </>
         )}
       </div>
@@ -127,13 +141,14 @@ function TournamentDetail() {
 }
 
 function BracketSection({
-  title, matches, me, nameOf, onReport, pending,
+  title, matches, me, nameOf, onReport, onFinalize, pending,
 }: {
   title: string;
   matches: TournamentMatch[];
   me?: string;
   nameOf: (id?: string | null) => string;
   onReport: (matchId: string, winnerId: string) => void;
+  onFinalize: (matchId: string) => void;
   pending: boolean;
 }) {
   const rounds = Array.from(new Set(matches.map((m) => m.round))).sort();
@@ -152,7 +167,26 @@ function BracketSection({
                     <div className="text-[9px] text-center text-muted-foreground my-0.5">vs</div>
                     <PlayerRow name={nameOf(m.player2_id)} winner={m.winner_id === m.player2_id && !!m.completed_at} loser={m.loser_id === m.player2_id && !!m.completed_at} />
                     {canReport && (
-                      <div className="mt-3 grid grid-cols-2 gap-2">
+                      <div className="mt-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Post the winner</p>
+                        <CountdownPill deadline={m.report_deadline} />
+                      </div>
+                      {m.disputed ? (
+                        <p className="text-[11px] text-destructive">Players reported different winners — this match is under review.</p>
+                      ) : (
+                      <>
+                      {m.reported_by && m.reported_by !== me && (
+                        <p className="text-[11px] text-muted-foreground">
+                          {nameOf(m.reported_by)} reported {nameOf(m.reported_winner_id)} as the winner — confirm to advance.
+                        </p>
+                      )}
+                      {m.reported_by === me && (
+                        <p className="text-[11px] text-muted-foreground">
+                          You reported {nameOf(m.reported_winner_id)} — waiting on your opponent.
+                        </p>
+                      )}
+                      <div className="grid grid-cols-2 gap-2">
                         <button
                           onClick={() => onReport(m.id, m.player1_id!)}
                           disabled={pending}
@@ -167,6 +201,18 @@ function BracketSection({
                         >
                           {nameOf(m.player2_id)} won
                         </button>
+                      </div>
+                      {m.reported_by === me && m.report_deadline && new Date(m.report_deadline).getTime() <= Date.now() && (
+                        <button
+                          onClick={() => onFinalize(m.id)}
+                          disabled={pending}
+                          className="w-full rounded-lg bg-secondary py-2 text-[11px] font-bold uppercase tracking-wider disabled:opacity-50"
+                        >
+                          Claim result — opponent never responded
+                        </button>
+                      )}
+                      </>
+                      )}
                       </div>
                     )}
                   </div>
