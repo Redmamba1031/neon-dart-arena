@@ -259,7 +259,7 @@ function RedeemPanel() {
               <p className="mt-2 font-display text-xl font-bold">${Number(o.denomination_usd_cents) / 100}</p>
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Amazon</p>
               <p className="mt-2 text-xs font-semibold text-primary">
-                {Number(o.coins_cost).toLocaleString()} coins
+                {formatMoney(Number(o.coins_cost))}
               </p>
             </button>
           );
@@ -314,7 +314,7 @@ function RedeemPanel() {
                   </p>
                 </div>
                 <span className="text-xs font-semibold text-muted-foreground">
-                  −{Number(r.coins_spent).toLocaleString()}
+                  −{formatMoney(Number(r.coins_spent))}
                 </span>
               </div>
             ))}
@@ -334,5 +334,121 @@ function Field({ label, ...props }: { label: string } & React.InputHTMLAttribute
         className="mt-1.5 w-full rounded-lg bg-background border border-border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/60"
       />
     </label>
+  );
+}
+
+// ---------- Cash out ----------
+
+const METHODS = [
+  { id: "paypal", label: "PayPal", hint: "PayPal email" },
+  { id: "cashapp", label: "Cash App", hint: "$cashtag" },
+  { id: "venmo", label: "Venmo", hint: "@venmo-username" },
+] as const;
+
+function CashOutPanel() {
+  const { data: wallet } = useWallet();
+  const { data: history = [] } = useMyWithdrawals();
+  const request = useRequestWithdrawal();
+
+  const [method, setMethod] = useState<(typeof METHODS)[number]["id"]>("paypal");
+  const [destination, setDestination] = useState("");
+  const [amount, setAmount] = useState(5);
+
+  const balance = Number(wallet?.balance_cents ?? 0);
+  const cents = Math.round(amount * 100);
+  const tooMuch = cents > balance;
+  const active = METHODS.find((m) => m.id === method)!;
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-xl bg-surface ring-1 ring-border p-4">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Available to cash out</p>
+        <p className="mt-1 font-display text-2xl font-bold text-gradient-neon">{formatMoney(balance)}</p>
+        <p className="mt-1 text-[10px] text-muted-foreground">
+          $5.00 minimum. Payouts are reviewed and sent within 1–2 business days.
+        </p>
+      </div>
+
+      <div className="space-y-3 rounded-xl bg-surface ring-1 ring-border p-4">
+        <div className="flex gap-2">
+          {METHODS.map((m) => (
+            <button
+              key={m.id}
+              onClick={() => setMethod(m.id)}
+              className={`flex-1 rounded-lg py-2 text-[10px] font-bold uppercase tracking-widest ring-1 transition-all ${
+                method === m.id ? "bg-primary/10 ring-primary text-primary" : "ring-border text-muted-foreground"
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        <Field
+          label={active.label + " destination"}
+          placeholder={active.hint}
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+        />
+        <Field
+          label="Amount (USD)"
+          type="number"
+          min={5}
+          step={1}
+          value={amount}
+          onChange={(e) => setAmount(Number(e.target.value))}
+        />
+
+        {tooMuch && (
+          <p className="text-[10px] text-destructive">That is more than your balance.</p>
+        )}
+
+        <button
+          onClick={() =>
+            request.mutate(
+              { amountCents: cents, method, destination: destination.trim() },
+              {
+                onSuccess: () => {
+                  toast.success("Payout requested — we will send it shortly.");
+                  setDestination("");
+                  setAmount(5);
+                },
+                onError: (e: Error) => toast.error(e.message),
+              },
+            )
+          }
+          disabled={request.isPending || tooMuch || cents < 500 || destination.trim().length < 3}
+          className="w-full rounded-xl bg-gradient-neon py-3.5 font-display text-sm font-bold uppercase tracking-[0.15em] text-background disabled:opacity-60 flex items-center justify-center gap-2"
+        >
+          {request.isPending && <Loader2 className="size-4 animate-spin" />}
+          Request {formatMoney(cents)}
+        </button>
+      </div>
+
+      <div>
+        <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">Payout history</h3>
+        {history.length === 0 ? (
+          <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">
+            No payouts yet.
+          </div>
+        ) : (
+          <div className="rounded-xl bg-surface ring-1 ring-border divide-y divide-border/60">
+            {history.map((r) => (
+              <div key={r.id} className="flex items-center gap-3 px-4 py-3">
+                <Banknote className="size-4 text-primary shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {formatMoney(Number(r.amount_cents))} → {r.destination}
+                  </p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    {r.method} • {r.status} • {new Date(r.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
