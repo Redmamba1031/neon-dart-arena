@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { AlertTriangle, Ban, Coins, Gift, Shield, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
-  formatCoins,
+  formatMoney,
   useAdminActions,
   useAdminAdjustCoins,
   useAdminBanPlayer,
@@ -25,9 +25,9 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin Control — SMYD" },
-      { name: "description", content: "Staff tools for SMYD: settle disputes, ban cheaters, adjust coins and review gift card orders." },
+      { name: "description", content: "Staff tools for SMYD: settle disputes, ban cheaters, adjust balances and review payouts." },
       { property: "og:title", content: "Admin Control — SMYD" },
-      { property: "og:description", content: "Staff tools for SMYD: settle disputes, ban cheaters, adjust coins and review gift card orders." },
+      { property: "og:description", content: "Staff tools for SMYD: settle disputes, ban cheaters, adjust balances and review payouts." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -158,7 +158,7 @@ function Disputes() {
               {name(m.creator_id)} vs {name(m.opponent_id)}
             </p>
             <p className="text-xs text-muted-foreground">
-              {m.mode} · Bo{m.best_of} · {formatCoins(m.stake_cents)} each
+              {m.mode} · Bo{m.best_of} · {formatMoney(m.stake_cents)} each
             </p>
             <div className="flex gap-2">
               {[m.creator_id, m.opponent_id].filter(Boolean).map((id) => (
@@ -259,13 +259,13 @@ function CoinTool() {
   return (
     <section className={card}>
       <h2 className="flex items-center gap-2 font-display text-lg font-bold">
-        <Coins className="size-4 text-primary" /> Adjust coins
+        <Coins className="size-4 text-primary" /> Adjust balance
       </h2>
       <PlayerPicker value={player} onPick={setPlayer} />
       <input
         className={inputCls}
         type="number"
-        placeholder="Coins (use a minus sign to remove)"
+        placeholder="Amount in USD (use a minus sign to remove)"
         value={amount || ""}
         onChange={(e) => setAmount(Number(e.target.value))}
       />
@@ -278,7 +278,7 @@ function CoinTool() {
             { userId: player!.id, amount, note: note.trim() },
             {
               onSuccess: () => {
-                toast.success(`${amount > 0 ? "Added" : "Removed"} ${formatCoins(Math.abs(amount))}`);
+                toast.success(`${amount > 0 ? "Added" : "Removed"} ${formatMoney(Math.abs(amount))}`);
                 setAmount(0);
                 setNote("");
               },
@@ -324,11 +324,11 @@ function Redemptions() {
                   onClick={() =>
                     refund.mutate(
                       { redemptionId: r.id, reason: "Refunded by staff" },
-                      { onSuccess: () => toast.success("Coins refunded"), onError: err },
+                      { onSuccess: () => toast.success("Refunded"), onError: err },
                     )
                   }
                 >
-                  refund coins
+                  refund
                 </button>
               )}
             </div>
@@ -410,7 +410,7 @@ function ActionLog() {
           {rows.map((a) => (
             <p key={a.id} className="text-xs text-muted-foreground">
               <span className="text-foreground">{a.action.replace(/_/g, " ")}</span>
-              {a.amount_cents ? ` · ${formatCoins(a.amount_cents)}` : ""}
+              {a.amount_cents ? ` · ${formatMoney(a.amount_cents)}` : ""}
               {a.note ? ` · ${a.note}` : ""} · {new Date(a.created_at).toLocaleString()}
             </p>
           ))}
