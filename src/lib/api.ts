@@ -11,16 +11,20 @@ export type Tournament = Database["public"]["Tables"]["tournaments"]["Row"];
 export type TournamentParticipant = Database["public"]["Tables"]["tournament_participants"]["Row"];
 export type TournamentMatch = Database["public"]["Tables"]["tournament_matches"]["Row"];
 
-// Wallet amounts are stored as whole coins (1 stored unit = 1 coin).
-export const formatCoins = (units: number | null | undefined) => {
-  const coins = Math.round(units ?? 0);
-  return `${coins.toLocaleString()} ${Math.abs(coins) === 1 ? "coin" : "coins"}`;
-};
+// Balances are stored in cents (100 stored units = $1.00).
+export const formatMoney = (cents: number | null | undefined) =>
+  (Math.round(cents ?? 0) / 100).toLocaleString(undefined, {
+    style: "currency",
+    currency: "USD",
+  });
 
-// Back-compat alias used by several routes; renders coins, not USD.
-export const formatUsd = formatCoins;
+// Back-compat aliases used across routes — all render real money now.
+export const formatCoins = formatMoney;
+export const formatUsd = formatMoney;
 
-export const toCents = (coins: number) => Math.round(coins);
+// Convert a dollar amount typed by the user into stored cents.
+export const toCents = (dollars: number) => Math.round(dollars * 100);
+
 
 
 
