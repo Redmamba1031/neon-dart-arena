@@ -202,6 +202,9 @@ function BracketSection({
                           {nameOf(m.player2_id)} won
                         </button>
                       </div>
+                      <p className="text-[10px] text-destructive">
+                        Posting a false winner will get your account permanently banned.
+                      </p>
                       {m.reported_by === me && m.report_deadline && new Date(m.report_deadline).getTime() <= Date.now() && (
                         <button
                           onClick={() => onFinalize(m.id)}
