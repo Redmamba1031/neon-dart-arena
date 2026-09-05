@@ -11,6 +11,7 @@ import {
   useCancelMatch,
   useSettleMatch,
   useMyProfile,
+  useWallet,
   useProfilesByIds,
   formatCoins,
   toCents,
@@ -219,6 +220,7 @@ const MODES = ["501", "Cricket", "Medley", "Piddle"] as const;
 
 function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const create = useCreateMatch();
+  const { data: wallet } = useWallet();
   const [mode, setMode] = useState<(typeof MODES)[number]>("501");
   const [bestOf, setBestOf] = useState<1 | 3 | 5>(1);
   const [stake, setStake] = useState(10);
@@ -228,9 +230,15 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const isMedley = mode === "Medley";
   const bestOfOptions: (1 | 3 | 5)[] = isMedley ? [3, 5] : [1, 3, 5];
   const showOhOneRules = mode === "501" || isMedley;
+  const balance = wallet?.balance_cents ?? 0;
+  const notEnough = toCents(stake) > balance;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (notEnough) {
+      toast.error("Not enough coins for this stake — grab a coin pack in the Shop.");
+      return;
+    }
     try {
       await create.mutateAsync({
         mode,
@@ -245,6 +253,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       toast.error(err?.message ?? "Create failed");
     }
   };
+
 
   return (
     <form onSubmit={submit} className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
@@ -329,9 +338,13 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       <p className="text-[11px] text-muted-foreground">
         Pot {formatCoins(toCents(stake) * 2)} • Winner takes the pot minus 5% rake
       </p>
+      <p className={`text-[11px] ${notEnough ? "text-primary font-bold" : "text-muted-foreground"}`}>
+        Your balance: {formatCoins(balance)}
+        {notEnough && " — not enough coins for this stake. Get more in the Shop."}
+      </p>
       <button
         type="submit"
-        disabled={create.isPending}
+        disabled={create.isPending || notEnough}
         className="w-full rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-60"
       >
         {create.isPending && <Loader2 className="size-4 animate-spin" />}
