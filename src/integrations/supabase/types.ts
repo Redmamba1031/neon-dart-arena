@@ -372,6 +372,7 @@ export type Database = {
           created_at: string
           creator_id: string
           creator_legs: number
+          disputed: boolean
           double_in: boolean
           finish_rule: Database["public"]["Enums"]["finish_rule"]
           id: string
@@ -380,6 +381,10 @@ export type Database = {
           opponent_id: string | null
           opponent_legs: number
           rake_bps: number
+          report_deadline: string | null
+          reported_at: string | null
+          reported_by: string | null
+          reported_winner_id: string | null
           stake_cents: number
           started_at: string | null
           status: Database["public"]["Enums"]["match_status"]
@@ -392,6 +397,7 @@ export type Database = {
           created_at?: string
           creator_id: string
           creator_legs?: number
+          disputed?: boolean
           double_in?: boolean
           finish_rule?: Database["public"]["Enums"]["finish_rule"]
           id?: string
@@ -400,6 +406,10 @@ export type Database = {
           opponent_id?: string | null
           opponent_legs?: number
           rake_bps?: number
+          report_deadline?: string | null
+          reported_at?: string | null
+          reported_by?: string | null
+          reported_winner_id?: string | null
           stake_cents: number
           started_at?: string | null
           status?: Database["public"]["Enums"]["match_status"]
@@ -412,6 +422,7 @@ export type Database = {
           created_at?: string
           creator_id?: string
           creator_legs?: number
+          disputed?: boolean
           double_in?: boolean
           finish_rule?: Database["public"]["Enums"]["finish_rule"]
           id?: string
@@ -420,6 +431,10 @@ export type Database = {
           opponent_id?: string | null
           opponent_legs?: number
           rake_bps?: number
+          report_deadline?: string | null
+          reported_at?: string | null
+          reported_by?: string | null
+          reported_winner_id?: string | null
           stake_cents?: number
           started_at?: string | null
           status?: Database["public"]["Enums"]["match_status"]
@@ -467,6 +482,7 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
+          disputed: boolean
           id: string
           is_final: boolean
           loser_id: string | null
@@ -476,6 +492,10 @@ export type Database = {
           next_winner_slot: number | null
           player1_id: string | null
           player2_id: string | null
+          report_deadline: string | null
+          reported_at: string | null
+          reported_by: string | null
+          reported_winner_id: string | null
           round: number
           side: Database["public"]["Enums"]["bracket_side"]
           slot: number
@@ -485,6 +505,7 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string
+          disputed?: boolean
           id?: string
           is_final?: boolean
           loser_id?: string | null
@@ -494,6 +515,10 @@ export type Database = {
           next_winner_slot?: number | null
           player1_id?: string | null
           player2_id?: string | null
+          report_deadline?: string | null
+          reported_at?: string | null
+          reported_by?: string | null
+          reported_winner_id?: string | null
           round: number
           side: Database["public"]["Enums"]["bracket_side"]
           slot: number
@@ -503,6 +528,7 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string
+          disputed?: boolean
           id?: string
           is_final?: boolean
           loser_id?: string | null
@@ -512,6 +538,10 @@ export type Database = {
           next_winner_slot?: number | null
           player1_id?: string | null
           player2_id?: string | null
+          report_deadline?: string | null
+          reported_at?: string | null
+          reported_by?: string | null
+          reported_winner_id?: string | null
           round?: number
           side?: Database["public"]["Enums"]["bracket_side"]
           slot?: number
@@ -771,6 +801,10 @@ export type Database = {
       }
     }
     Functions: {
+      _advance_tournament_match: {
+        Args: { _match_id: string; _winner_id: string }
+        Returns: undefined
+      }
       _build_bracket_4: {
         Args: { _seeds: string[]; _tid: string }
         Returns: undefined
@@ -809,6 +843,10 @@ export type Database = {
       }
       _refund_redemption: {
         Args: { _reason: string; _redemption_id: string }
+        Returns: undefined
+      }
+      _settle_match: {
+        Args: { _match_id: string; _winner_id: string }
         Returns: undefined
       }
       _start_tournament: {
@@ -857,6 +895,11 @@ export type Database = {
         }
         Returns: undefined
       }
+      finalize_match_report: { Args: { _match_id: string }; Returns: undefined }
+      finalize_tournament_match_report: {
+        Args: { _match_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -887,9 +930,17 @@ export type Database = {
         }
         Returns: string
       }
+      report_match_winner: {
+        Args: { _match_id: string; _winner_id: string }
+        Returns: string
+      }
       report_tournament_match: {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
+      }
+      report_tournament_winner: {
+        Args: { _match_id: string; _winner_id: string }
+        Returns: string
       }
       respond_challenge: {
         Args: { _accept: boolean; _challenge_id: string }
