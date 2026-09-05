@@ -1,8 +1,8 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Award, Home, ShoppingBag, Swords, User, Wallet } from "lucide-react";
+import { Award, Home, Shield, ShoppingBag, Swords, User, Wallet } from "lucide-react";
 import { useEffect } from "react";
 import smydLogo from "@/assets/smyd-logo.png";
-import { formatCoins, useMyProfile, useWallet } from "@/lib/api";
+import { formatCoins, useIsStaff, useMyBan, useMyProfile, useWallet } from "@/lib/api";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -14,6 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen max-w-[480px] flex-col border-x border-border/60 relative">
         <PaymentTestModeBanner />
+        <BanBanner />
         <Header />
         <main className="flex-1 pb-24">{children}</main>
         <BottomNav />
@@ -22,8 +23,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function BanBanner() {
+  const { data: ban } = useMyBan();
+  if (!ban) return null;
+  return (
+    <div className="bg-destructive/15 px-5 py-2 text-center text-[11px] font-semibold text-destructive ring-1 ring-destructive/40">
+      Your account is banned from SMYD — {ban.reason}
+    </div>
+  );
+}
+
 function Header() {
   const { data: wallet } = useWallet();
+  const { data: role } = useIsStaff();
   const { data: profile } = useMyProfile();
   const initials = (profile?.display_name || profile?.username || "?")
     .slice(0, 2)
@@ -44,6 +56,11 @@ function Header() {
           className="h-10 w-auto drop-shadow-[0_0_12px_rgba(220,38,38,0.5)]"
         />
       </Link>
+      {role?.staff && (
+        <Link to="/admin" className="grid size-9 place-items-center rounded-full bg-surface ring-1 ring-border">
+          <Shield className="size-4 text-accent" />
+        </Link>
+      )}
       <Link
         to="/wallet"
         className="flex items-center gap-2 rounded-full bg-surface px-3 py-1.5 ring-1 ring-border animate-glow-pulse"
