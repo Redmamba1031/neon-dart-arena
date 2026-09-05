@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { AlertTriangle, Ban, Coins, Gift, Shield, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Ban, Banknote, Coins, Gift, Shield, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   formatMoney,
   useAdminActions,
   useAdminAdjustCoins,
+  useAllWithdrawals,
+  useAdminMarkWithdrawalPaid,
+  useAdminRejectWithdrawal,
   useAdminBanPlayer,
   useAdminRefundRedemption,
   useAdminResolveDispute,
@@ -79,6 +82,7 @@ function AdminPage() {
         <Disputes />
         <BanTool />
         <CoinTool />
+        <Withdrawals />
         <Redemptions />
         {role.owner && <StaffTool />}
         <ActionLog />
@@ -275,10 +279,10 @@ function CoinTool() {
         disabled={!player || !amount || note.trim().length < 3 || adjust.isPending}
         onClick={() =>
           adjust.mutate(
-            { userId: player!.id, amount, note: note.trim() },
+            { userId: player!.id, amount: Math.round(amount * 100), note: note.trim() },
             {
               onSuccess: () => {
-                toast.success(`${amount > 0 ? "Added" : "Removed"} ${formatMoney(Math.abs(amount))}`);
+                toast.success(`${amount > 0 ? "Added" : "Removed"} ${formatMoney(Math.abs(amount) * 100)}`);
                 setAmount(0);
                 setNote("");
               },
@@ -289,6 +293,69 @@ function CoinTool() {
       >
         Apply
       </button>
+    </section>
+  );
+}
+
+/* ---------- withdrawals ---------- */
+function Withdrawals() {
+  const { data: rows = [] } = useAllWithdrawals();
+  const markPaid = useAdminMarkWithdrawalPaid();
+  const reject = useAdminRejectWithdrawal();
+  const { data: profiles } = useProfilesByIds(rows.map((r) => r.user_id));
+
+  return (
+    <section className={card}>
+      <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+        <Banknote className="size-4 text-primary" /> Cash payouts
+      </h2>
+      {rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No payout requests.</p>
+      ) : (
+        <div className="space-y-2">
+          {rows.map((r) => (
+            <div key={r.id} className="rounded-lg bg-background ring-1 ring-border p-3 space-y-2">
+              <p className="text-sm font-semibold">
+                {formatMoney(Number(r.amount_cents))} · {r.method} · {r.destination}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                {profiles?.[r.user_id]?.display_name ?? profiles?.[r.user_id]?.username ?? "Player"} ·{" "}
+                {r.status} · {new Date(r.created_at).toLocaleString()}
+              </p>
+              {r.status === "pending" && (
+                <div className="flex gap-2">
+                  <button
+                    className={btn}
+                    disabled={markPaid.isPending}
+                    onClick={() =>
+                      markPaid.mutate(
+                        { requestId: r.id },
+                        { onSuccess: () => toast.success("Marked as sent"), onError: err },
+                      )
+                    }
+                  >
+                    Mark sent
+                  </button>
+                  <button
+                    className={btn}
+                    disabled={reject.isPending}
+                    onClick={() => {
+                      const reason = window.prompt("Reason for rejecting this payout?");
+                      if (!reason) return;
+                      reject.mutate(
+                        { requestId: r.id, reason },
+                        { onSuccess: () => toast.success("Rejected and refunded"), onError: err },
+                      );
+                    }}
+                  >
+                    Reject &amp; refund
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
