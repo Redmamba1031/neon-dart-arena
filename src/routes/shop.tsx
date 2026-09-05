@@ -100,36 +100,32 @@ function BuyCoinsPanel({ onSelect }: { onSelect: (priceId: string) => void }) {
   const { data: packs = [], isLoading } = useCoinPacks();
 
   if (isLoading) {
-    return <div className="text-center text-sm text-muted-foreground py-12">Loading packs…</div>;
+    return <div className="text-center text-sm text-muted-foreground py-12">Loading amounts…</div>;
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {packs.map((p) => {
-        const usd = (Number(p.usd_cents) / 100).toFixed(2);
-        const baseCoins = Math.round(Number(p.usd_cents)); // 1 cent = 1 base coin
-        const bonus = Number(p.coins_granted) - baseCoins;
-        return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        {packs.map((p) => (
           <button
             key={p.price_id as string}
             onClick={() => onSelect(p.price_id as string)}
             className="relative rounded-2xl bg-surface ring-1 ring-border p-4 text-left transition-all hover:ring-primary/60 hover:scale-[1.02]"
           >
-            {bonus > 0 && (
-              <span className="absolute top-2 right-2 rounded-full bg-success/20 text-success text-[9px] font-bold uppercase tracking-widest px-2 py-0.5">
-                +{Math.round((bonus / baseCoins) * 100)}%
-              </span>
-            )}
             <Coins className="size-5 text-primary" />
-            <p className="mt-2 font-display text-xl font-bold">{Number(p.coins_granted).toLocaleString()}</p>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">coins</p>
-            <p className="mt-2 text-sm font-semibold">${usd}</p>
+            <p className="mt-2 font-display text-xl font-bold">{formatMoney(Number(p.coins_granted))}</p>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">added to your account</p>
+            <p className="mt-2 text-sm font-semibold">{formatMoney(Number(p.usd_cents))}</p>
           </button>
-        );
-      })}
+        ))}
+      </div>
+      <p className="text-[10px] text-muted-foreground text-center">
+        You get exactly what you pay — $25 in, $25 on your account.
+      </p>
     </div>
   );
 }
+
 
 function CheckoutModal({ priceId, onClose }: { priceId: string; onClose: () => void }) {
   const returnUrl = `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`;
