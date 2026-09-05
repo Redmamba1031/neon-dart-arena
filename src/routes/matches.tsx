@@ -219,6 +219,7 @@ const MODES = ["501", "Cricket", "Medley", "Piddle"] as const;
 
 function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const create = useCreateMatch();
+  const { data: wallet } = useWallet();
   const [mode, setMode] = useState<(typeof MODES)[number]>("501");
   const [bestOf, setBestOf] = useState<1 | 3 | 5>(1);
   const [stake, setStake] = useState(10);
@@ -228,9 +229,15 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const isMedley = mode === "Medley";
   const bestOfOptions: (1 | 3 | 5)[] = isMedley ? [3, 5] : [1, 3, 5];
   const showOhOneRules = mode === "501" || isMedley;
+  const balance = wallet?.balance_cents ?? 0;
+  const notEnough = toCents(stake) > balance;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (notEnough) {
+      toast.error("Not enough coins for this stake — grab a coin pack in the Shop.");
+      return;
+    }
     try {
       await create.mutateAsync({
         mode,
@@ -245,6 +252,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       toast.error(err?.message ?? "Create failed");
     }
   };
+
 
   return (
     <form onSubmit={submit} className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
