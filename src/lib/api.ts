@@ -894,3 +894,76 @@ export function useStaffList() {
     },
   });
 }
+
+// ---------- Withdrawals (cash out) ----------
+export type WithdrawalRequest = Database["public"]["Tables"]["withdrawal_requests"]["Row"];
+
+export function useMyWithdrawals() {
+  return useQuery({
+    queryKey: ["my-withdrawals"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [] as WithdrawalRequest[];
+      const { data, error } = await supabase
+        .from("withdrawal_requests")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useRequestWithdrawal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { amountCents: number; method: string; destination: string }) => {
+      const { error } = await supabase.rpc("request_withdrawal", {
+        _amount_cents: args.amountCents,
+        _method: args.method,
+        _destination: args.destination,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      ["my-withdrawals", "wallet", "transactions"].forEach((k) =>
+        qc.invalidateQueries({ queryKey: [k] }),
+      );
+    },
+  });
+}
+
+export function useAllWithdrawals() {
+  return useQuery({
+    queryKey: ["admin-withdrawals"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("withdrawal_requests")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useAdminMarkWithdrawalPaid() {
+  return useAdminMutation(async (args: { requestId: string; note?: string }) => {
+    const { error } = await supabase.rpc("admin_mark_withdrawal_paid", {
+      _request_id: args.requestId, _note: args.note ?? null,
+    });
+    if (error) throw error;
+  }, ["admin-withdrawals", "wallet"]);
+}
+
+export function useAdminRejectWithdrawal() {
+  return useAdminMutation(async (args: { requestId: string; reason: string }) => {
+    const { error } = await supabase.rpc("admin_reject_withdrawal", {
+      _request_id: args.requestId, _reason: args.reason,
+    });
+    if (error) throw error;
+  }, ["admin-withdrawals", "wallet", "transactions"]);
+}
