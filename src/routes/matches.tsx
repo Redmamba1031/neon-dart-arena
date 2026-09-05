@@ -244,7 +244,8 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const bestOfOptions: (1 | 3 | 5)[] = isMedley ? [3, 5] : [1, 3, 5];
   const showOhOneRules = mode === "501" || isMedley;
   const balance = wallet?.balance_cents ?? 0;
-  const notEnough = toCents(stake) > balance;
+  const walletReady = wallet !== undefined;
+  const notEnough = walletReady && toCents(stake) > balance;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -357,7 +358,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         Pot {formatCoins(toCents(stake) * 2)} • Winner takes the pot minus 5% rake
       </p>
       <p className={`text-[11px] ${notEnough ? "text-primary font-bold" : "text-muted-foreground"}`}>
-        Your balance: {formatCoins(balance)}
+        Your balance: {walletReady ? formatCoins(balance) : "…"}
         {notEnough && " — not enough coins for this stake. Get more in the Shop."}
       </p>
       <button

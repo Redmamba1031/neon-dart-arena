@@ -201,7 +201,7 @@ export function useCreateMatch() {
         _stake_cents: args.stake_cents,
         _double_in: args.double_in ?? false,
         _finish_rule: args.finish_rule ?? "double",
-        ...(args.opponent_id ? { _opponent_id: args.opponent_id } : {}),
+        _opponent_id: args.opponent_id ?? undefined,
       });
       if (error) throw error;
       return data as string; // match id
