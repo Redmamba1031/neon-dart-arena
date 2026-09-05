@@ -29,7 +29,7 @@ export const Route = createFileRoute("/shop")({
 });
 
 
-type Tab = "buy" | "redeem";
+type Tab = "buy" | "cashout" | "redeem";
 
 function Shop() {
   const [tab, setTab] = useState<Tab>("buy");
@@ -39,25 +39,27 @@ function Shop() {
     <AppShell>
       <div className="px-5 py-6 space-y-6 animate-fade-in-up">
         <div>
-          <h1 className="font-display text-2xl font-bold text-gradient-neon">Shop</h1>
-          <p className="text-xs text-muted-foreground mt-1">Top up coins or cash out for gift cards.</p>
+          <h1 className="font-display text-2xl font-bold text-gradient-neon">Cashier</h1>
+          <p className="text-xs text-muted-foreground mt-1">Add funds, cash out, or grab a gift card.</p>
         </div>
 
         <div className="flex rounded-xl bg-surface p-1 ring-1 ring-border">
           {([
-            { id: "buy", label: "Buy Coins", icon: Coins },
-            { id: "redeem", label: "Redeem", icon: Gift },
+            { id: "buy", label: "Add Funds", icon: Coins },
+            { id: "cashout", label: "Cash Out", icon: Banknote },
+            { id: "redeem", label: "Gift Cards", icon: Gift },
           ] as const).map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${
                 tab === t.id ? "bg-gradient-neon text-background" : "text-muted-foreground"
               }`}
             >
               <t.icon className="size-3.5" /> {t.label}
             </button>
           ))}
+
         </div>
 
         {tab === "buy" ? <BuyCoinsPanel onSelect={setCheckoutPriceId} /> : <RedeemPanel />}
