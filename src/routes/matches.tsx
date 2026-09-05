@@ -338,9 +338,13 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       <p className="text-[11px] text-muted-foreground">
         Pot {formatCoins(toCents(stake) * 2)} • Winner takes the pot minus 5% rake
       </p>
+      <p className={`text-[11px] ${notEnough ? "text-primary font-bold" : "text-muted-foreground"}`}>
+        Your balance: {formatCoins(balance)}
+        {notEnough && " — not enough coins for this stake. Get more in the Shop."}
+      </p>
       <button
         type="submit"
-        disabled={create.isPending}
+        disabled={create.isPending || notEnough}
         className="w-full rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-60"
       >
         {create.isPending && <Loader2 className="size-4 animate-spin" />}
