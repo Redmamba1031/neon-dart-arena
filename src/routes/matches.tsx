@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Swords, Plus, Loader2, Trophy, X, Play, Search } from "lucide-react";
+import { Swords, Plus, Loader2, Trophy, X, Search } from "lucide-react";
 import {
   useOpenMatches,
   useMyMatches,
@@ -9,7 +9,6 @@ import {
   useCreateMatch,
   useJoinMatch,
   useCancelMatch,
-  useSettleMatch,
   useMyProfile,
   useWallet,
   useProfilesByIds,
@@ -21,6 +20,7 @@ import {
   type Match,
 } from "@/lib/api";
 import { toast } from "sonner";
+import { MatchReportPanel } from "@/components/MatchReportPanel";
 
 export const Route = createFileRoute("/matches")({
   head: () => ({
@@ -126,7 +126,6 @@ function MatchRow({
 }) {
   const join = useJoinMatch();
   const cancel = useCancelMatch();
-  const settle = useSettleMatch();
 
   const isMine = m.creator_id === meId || m.opponent_id === meId;
   const rules = [m.double_in ? "Double In" : "Straight In", finishLabel(m.finish_rule)].join(" • ");
