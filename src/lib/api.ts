@@ -723,3 +723,170 @@ export function useFinalizeTournamentReport() {
     },
   });
 }
+
+// ---------- Admin ----------
+export function useIsStaff() {
+  return useQuery({
+    queryKey: ["is-staff"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return { staff: false, owner: false };
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      const roles = (data ?? []).map((r) => r.role as string);
+      return { staff: roles.includes("owner") || roles.includes("admin"), owner: roles.includes("owner") };
+    },
+  });
+}
+
+export function useMyBan() {
+  return useQuery({
+    queryKey: ["my-ban"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("player_bans")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useDisputedMatches() {
+  return useQuery({
+    queryKey: ["admin-disputes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("matches")
+        .select("*")
+        .eq("disputed", true)
+        .eq("status", "live")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useAllBans() {
+  return useQuery({
+    queryKey: ["admin-bans"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("player_bans")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useAllRedemptions() {
+  return useQuery({
+    queryKey: ["admin-redemptions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("gift_card_redemptions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useAdminActions() {
+  return useQuery({
+    queryKey: ["admin-actions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("admin_actions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+function useAdminMutation<T>(fn: (args: T) => Promise<void>, keys: string[]) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: () => {
+      keys.forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
+      qc.invalidateQueries({ queryKey: ["admin-actions"] });
+    },
+  });
+}
+
+export function useAdminResolveDispute() {
+  return useAdminMutation(async (args: { matchId: string; winnerId: string; note?: string }) => {
+    const { error } = await supabase.rpc("admin_resolve_dispute", {
+      _match_id: args.matchId, _winner_id: args.winnerId, _note: args.note ?? null,
+    });
+    if (error) throw error;
+  }, ["admin-disputes", "matches", "wallet", "leaderboard"]);
+}
+
+export function useAdminBanPlayer() {
+  return useAdminMutation(async (args: { userId: string; reason: string }) => {
+    const { error } = await supabase.rpc("admin_ban_player", { _user_id: args.userId, _reason: args.reason });
+    if (error) throw error;
+  }, ["admin-bans"]);
+}
+
+export function useAdminUnbanPlayer() {
+  return useAdminMutation(async (userId: string) => {
+    const { error } = await supabase.rpc("admin_unban_player", { _user_id: userId });
+    if (error) throw error;
+  }, ["admin-bans"]);
+}
+
+export function useAdminAdjustCoins() {
+  return useAdminMutation(async (args: { userId: string; amount: number; note: string }) => {
+    const { error } = await supabase.rpc("admin_adjust_coins", {
+      _user_id: args.userId, _amount_cents: Math.round(args.amount), _note: args.note,
+    });
+    if (error) throw error;
+  }, ["wallet", "transactions"]);
+}
+
+export function useAdminRefundRedemption() {
+  return useAdminMutation(async (args: { redemptionId: string; reason: string }) => {
+    const { error } = await supabase.rpc("admin_refund_redemption", {
+      _redemption_id: args.redemptionId, _reason: args.reason,
+    });
+    if (error) throw error;
+  }, ["admin-redemptions"]);
+}
+
+export function useAdminSetRole() {
+  return useAdminMutation(async (args: { userId: string; grant: boolean }) => {
+    const { error } = await supabase.rpc("admin_set_role", {
+      _user_id: args.userId, _role: "admin", _grant: args.grant,
+    });
+    if (error) throw error;
+  }, ["admin-staff"]);
+}
+
+export function useStaffList() {
+  return useQuery({
+    queryKey: ["admin-staff"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("user_roles").select("user_id, role");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
