@@ -136,6 +136,12 @@ export function MatchReportPanel({
         <span>Posting a false winner will get your account permanently banned.</span>
       </p>
 
+      <p className="text-[10px] text-destructive flex items-start gap-1.5">
+        <AlertTriangle className="size-3 shrink-0 mt-[1px]" />
+        <span>Camera must show the board from more than 8 feet away. Flagged and proven by your opponent = automatic loss.</span>
+      </p>
+
+
       {iReported && expired && (
         <button
           onClick={doFinalize}
