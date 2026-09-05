@@ -11,15 +11,17 @@ export type Tournament = Database["public"]["Tables"]["tournaments"]["Row"];
 export type TournamentParticipant = Database["public"]["Tables"]["tournament_participants"]["Row"];
 export type TournamentMatch = Database["public"]["Tables"]["tournament_matches"]["Row"];
 
-export const formatCoins = (cents: number | null | undefined) => {
-  const coins = Math.round((cents ?? 0) / 100);
+// Wallet amounts are stored as whole coins (1 stored unit = 1 coin).
+export const formatCoins = (units: number | null | undefined) => {
+  const coins = Math.round(units ?? 0);
   return `${coins.toLocaleString()} ${Math.abs(coins) === 1 ? "coin" : "coins"}`;
 };
 
 // Back-compat alias used by several routes; renders coins, not USD.
 export const formatUsd = formatCoins;
 
-export const toCents = (coins: number) => Math.round(coins * 100);
+export const toCents = (coins: number) => Math.round(coins);
+
 
 
 

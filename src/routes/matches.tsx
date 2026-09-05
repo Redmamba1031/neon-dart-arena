@@ -223,7 +223,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const { data: wallet } = useWallet();
   const [mode, setMode] = useState<(typeof MODES)[number]>("501");
   const [bestOf, setBestOf] = useState<1 | 3 | 5>(1);
-  const [stake, setStake] = useState(10);
+  const [stake, setStake] = useState(100);
   const [doubleIn, setDoubleIn] = useState(false);
   const [finish, setFinish] = useState<"straight" | "double" | "master" | "both">("double");
 
@@ -301,7 +301,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         <Field label="Stake (coins)">
           <input
             type="number"
-            min={1}
+            min={100}
             max={1000000}
             value={stake}
             onChange={(e) => setStake(Number(e.target.value))}
