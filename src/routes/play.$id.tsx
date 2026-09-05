@@ -15,7 +15,7 @@ export const Route = createFileRoute("/play/$id")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: PlayMatch;
+  component: PlayMatch,
 });
 
 function PlayMatch() {
