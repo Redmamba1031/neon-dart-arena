@@ -319,7 +319,7 @@ function Withdrawals() {
                 {formatMoney(Number(r.amount_cents))} · {r.method} · {r.destination}
               </p>
               <p className="text-[11px] text-muted-foreground">
-                {profiles?.[r.user_id]?.display_name ?? profiles?.[r.user_id]?.username ?? "Player"} ·{" "}
+                {profiles?.get(r.user_id)?.display_name ?? profiles?.get(r.user_id)?.username ?? "Player"} ·{" "}
                 {r.status} · {new Date(r.created_at).toLocaleString()}
               </p>
               {r.status === "pending" && (
