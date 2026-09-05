@@ -301,7 +301,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         <Field label="Stake (coins)">
           <input
             type="number"
-            min={1}
+            min={100}
             max={1000000}
             value={stake}
             onChange={(e) => setStake(Number(e.target.value))}
