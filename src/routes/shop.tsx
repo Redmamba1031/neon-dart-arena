@@ -237,8 +237,9 @@ function RedeemPanel() {
     <div className="space-y-6">
       <div className="rounded-xl bg-surface ring-1 ring-border p-4">
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Available</p>
-        <p className="mt-1 font-display text-2xl font-bold text-gradient-neon">{formatCoins(balance)}</p>
-        <p className="mt-1 text-[10px] text-muted-foreground">Rate: 150 coins = $1 in gift card value</p>
+        <p className="mt-1 font-display text-2xl font-bold text-gradient-neon">{formatMoney(balance)}</p>
+        <p className="mt-1 text-[10px] text-muted-foreground">Gift cards cost their face value.</p>
+
       </div>
 
       <div className="grid grid-cols-2 gap-3">
