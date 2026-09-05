@@ -638,3 +638,88 @@ export function useDartThrows(legId: string | undefined) {
     },
   });
 }
+
+// ---------- Result reporting (45 minute window) ----------
+export const REPORT_WINDOW_MINUTES = 45;
+
+export function timeLeftLabel(deadline: string | null | undefined) {
+  if (!deadline) return null;
+  const ms = new Date(deadline).getTime() - Date.now();
+  if (ms <= 0) return "Time expired";
+  const mins = Math.floor(ms / 60000);
+  const secs = Math.floor((ms % 60000) / 1000);
+  return `${mins}:${String(secs).padStart(2, "0")} left`;
+}
+
+export function useReportMatchWinner() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { matchId: string; winnerId: string }) => {
+      const { data, error } = await supabase.rpc("report_match_winner", {
+        _match_id: args.matchId,
+        _winner_id: args.winnerId,
+      });
+      if (error) throw error;
+      return data as "reported" | "settled" | "disputed";
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["my-matches"] });
+      qc.invalidateQueries({ queryKey: ["match"] });
+      qc.invalidateQueries({ queryKey: ["match-history"] });
+      qc.invalidateQueries({ queryKey: ["leaderboard"] });
+    },
+  });
+}
+
+export function useFinalizeMatchReport() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (matchId: string) => {
+      const { error } = await supabase.rpc("finalize_match_report", { _match_id: matchId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["my-matches"] });
+      qc.invalidateQueries({ queryKey: ["match"] });
+      qc.invalidateQueries({ queryKey: ["match-history"] });
+      qc.invalidateQueries({ queryKey: ["leaderboard"] });
+    },
+  });
+}
+
+export function useReportTournamentWinner() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { matchId: string; winnerId: string }) => {
+      const { data, error } = await supabase.rpc("report_tournament_winner", {
+        _match_id: args.matchId,
+        _winner_id: args.winnerId,
+      });
+      if (error) throw error;
+      return data as "reported" | "settled" | "disputed";
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["tournament-detail"] });
+      qc.invalidateQueries({ queryKey: ["tournaments"] });
+      qc.invalidateQueries({ queryKey: ["leaderboard"] });
+    },
+  });
+}
+
+export function useFinalizeTournamentReport() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (matchId: string) => {
+      const { error } = await supabase.rpc("finalize_tournament_match_report", { _match_id: matchId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["tournament-detail"] });
+      qc.invalidateQueries({ queryKey: ["tournaments"] });
+    },
+  });
+}
