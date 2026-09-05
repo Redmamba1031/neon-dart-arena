@@ -79,7 +79,7 @@ function BottomNav() {
   const items = [
     { to: "/", label: "Lobby", icon: Home },
     { to: "/matches", label: "1v1", icon: Swords },
-    { to: "/shop", label: "Shop", icon: ShoppingBag },
+    { to: "/shop", label: "Cashier", icon: ShoppingBag },
     { to: "/leaderboard", label: "Rank", icon: Award },
     { to: "/profile", label: "Profile", icon: User },
   ] as const;
