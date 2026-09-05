@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TournamentsRouteImport } from './routes/tournaments'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -20,6 +21,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
+import { Route as PlayIdRouteImport } from './routes/play.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -40,6 +42,11 @@ const TournamentsRoute = TournamentsRouteImport.update({
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -81,6 +88,11 @@ const TournamentsIdRoute = TournamentsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => TournamentsRoute,
+} as any)
+const PlayIdRoute = PlayIdRouteImport.update({
+  id: '/play/$id',
+  path: '/play/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   id: '/checkout/return',
@@ -125,12 +137,14 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/play/$id': typeof PlayIdRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -144,12 +158,14 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/play/$id': typeof PlayIdRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -164,12 +180,14 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
   '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/play/$id': typeof PlayIdRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -185,12 +203,14 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/profile'
+    | '/reset-password'
     | '/shop'
     | '/tournaments'
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/checkout/return'
+    | '/play/$id'
     | '/tournaments/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -204,12 +224,14 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/profile'
+    | '/reset-password'
     | '/shop'
     | '/tournaments'
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/checkout/return'
+    | '/play/$id'
     | '/tournaments/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -223,12 +245,14 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/profile'
+    | '/reset-password'
     | '/shop'
     | '/tournaments'
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/checkout/return'
+    | '/play/$id'
     | '/tournaments/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -243,12 +267,14 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   MessagesRoute: typeof MessagesRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ShopRoute: typeof ShopRoute
   TournamentsRoute: typeof TournamentsRouteWithChildren
   WalletRoute: typeof WalletRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  PlayIdRoute: typeof PlayIdRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -275,6 +301,13 @@ declare module '@tanstack/react-router' {
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -332,6 +365,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tournaments/$id'
       preLoaderRoute: typeof TournamentsIdRouteImport
       parentRoute: typeof TournamentsRoute
+    }
+    '/play/$id': {
+      id: '/play/$id'
+      path: '/play/$id'
+      fullPath: '/play/$id'
+      preLoaderRoute: typeof PlayIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/checkout/return': {
       id: '/checkout/return'
@@ -398,6 +438,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   MessagesRoute: MessagesRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ShopRoute: ShopRoute,
   TournamentsRoute: TournamentsRouteWithChildren,
   WalletRoute: WalletRoute,
@@ -405,6 +446,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  PlayIdRoute: PlayIdRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,

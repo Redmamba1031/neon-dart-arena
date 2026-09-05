@@ -68,7 +68,7 @@ function Leaderboard() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate">{nameOf(you)} (you)</p>
                 <p className="text-[11px] text-muted-foreground">
-                  {you.wins} wins • {you.games_played} played
+                  {you.wins} wins • {you.matches_played} played
                 </p>
               </div>
               <span className="font-display text-sm font-bold text-success">
@@ -126,7 +126,7 @@ function Row({ p }: { p: Ranked }) {
           {p.isYou && <span className="ml-1 text-[10px] text-primary">(you)</span>}
         </p>
         <p className="text-[10px] text-muted-foreground">
-          {p.wins} W • {p.games_played} played
+          {p.wins} W • {p.matches_played} played
         </p>
       </div>
       <span className="font-display text-sm font-semibold text-success">
