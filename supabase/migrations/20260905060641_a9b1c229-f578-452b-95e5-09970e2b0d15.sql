@@ -1,0 +1,21 @@
+REVOKE EXECUTE ON FUNCTION public.cancel_tournament(uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.complete_leg(uuid, uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.create_match(match_mode, integer, bigint, boolean, finish_rule, uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.create_tournament(text, match_mode, integer, integer, bigint, boolean, finish_rule) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.join_tournament(uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.record_dart(uuid, integer, integer, integer, integer, boolean, integer, jsonb) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.redeem_gift_card(text, text, text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.report_tournament_match(uuid, uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.respond_challenge(uuid, boolean) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.start_leg(uuid, match_mode) FROM anon, public;
+
+GRANT EXECUTE ON FUNCTION public.cancel_tournament(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.complete_leg(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_match(match_mode, integer, bigint, boolean, finish_rule, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_tournament(text, match_mode, integer, integer, bigint, boolean, finish_rule) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.join_tournament(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.record_dart(uuid, integer, integer, integer, integer, boolean, integer, jsonb) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.redeem_gift_card(text, text, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.report_tournament_match(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.respond_challenge(uuid, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.start_leg(uuid, match_mode) TO authenticated;
