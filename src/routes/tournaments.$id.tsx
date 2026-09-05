@@ -43,7 +43,7 @@ function TournamentDetail() {
 
   const t = data.tournament;
   const pool = Number(t.entry_cents) * t.size;
-  const net = pool - Math.floor((pool * (t.rake_bps ?? 500)) / 10000);
+  const net = pool - Math.floor((pool * (t.rake_bps ?? 1000)) / 10000);
 
   const handleReport = async (matchId: string, winnerId: string) => {
     try {
