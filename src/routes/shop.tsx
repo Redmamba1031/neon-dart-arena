@@ -62,7 +62,14 @@ function Shop() {
 
         </div>
 
-        {tab === "buy" ? <BuyCoinsPanel onSelect={setCheckoutPriceId} /> : <RedeemPanel />}
+        {tab === "buy" ? (
+          <BuyCoinsPanel onSelect={setCheckoutPriceId} />
+        ) : tab === "cashout" ? (
+          <CashOutPanel />
+        ) : (
+          <RedeemPanel />
+        )}
+
       </div>
 
       {checkoutPriceId && (
