@@ -953,7 +953,7 @@ export function useAllWithdrawals() {
 export function useAdminMarkWithdrawalPaid() {
   return useAdminMutation(async (args: { requestId: string; note?: string }) => {
     const { error } = await supabase.rpc("admin_mark_withdrawal_paid", {
-      _request_id: args.requestId, _note: args.note ?? null,
+      _request_id: args.requestId, _note: args.note,
     });
     if (error) throw error;
   }, ["admin-withdrawals", "wallet"]);
