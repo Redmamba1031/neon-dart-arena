@@ -824,28 +824,17 @@ export type Database = {
         Args: { _leg_id: string; _winner_id: string }
         Returns: undefined
       }
-      create_match:
-        | {
-            Args: {
-              _best_of: number
-              _double_in?: boolean
-              _finish_rule?: Database["public"]["Enums"]["finish_rule"]
-              _mode: Database["public"]["Enums"]["match_mode"]
-              _stake_cents: number
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              _best_of: number
-              _double_in?: boolean
-              _finish_rule?: Database["public"]["Enums"]["finish_rule"]
-              _mode: Database["public"]["Enums"]["match_mode"]
-              _opponent_id?: string
-              _stake_cents: number
-            }
-            Returns: string
-          }
+      create_match: {
+        Args: {
+          _best_of: number
+          _double_in?: boolean
+          _finish_rule?: Database["public"]["Enums"]["finish_rule"]
+          _mode: Database["public"]["Enums"]["match_mode"]
+          _opponent_id?: string
+          _stake_cents: number
+        }
+        Returns: string
+      }
       create_tournament: {
         Args: {
           _best_of: number
