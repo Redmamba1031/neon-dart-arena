@@ -4,7 +4,7 @@ import { supabaseForUser } from "../supabase";
 export default defineTool({
   name: "get_my_wallet",
   title: "Get my wallet",
-  description: "Get the signed-in player's SMYD coin balance and recent wallet transactions.",
+  description: "Get the signed-in player's SMYD cash balance and recent wallet transactions.",
   inputSchema: {},
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async (_input, ctx) => {
@@ -23,8 +23,8 @@ export default defineTool({
     ]);
     const error = wallet.error ?? txns.error;
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
-    const coins = Math.round((wallet.data?.balance_cents ?? 0) / 100);
-    const payload = { coins, wallet: wallet.data, transactions: txns.data ?? [] };
+    const balance_usd = (Number(wallet.data?.balance_cents ?? 0) / 100).toFixed(2);
+    const payload = { balance_usd, wallet: wallet.data, transactions: txns.data ?? [] };
     return {
       content: [{ type: "text", text: JSON.stringify(payload) }],
       structuredContent: payload,

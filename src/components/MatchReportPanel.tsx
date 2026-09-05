@@ -63,7 +63,7 @@ export function MatchReportPanel({
   const send = async (winnerId: string) => {
     try {
       const result = await report.mutateAsync({ matchId: m.id, winnerId });
-      if (result === "settled") toast.success("Result confirmed — coins paid out");
+      if (result === "settled") toast.success("Result confirmed — paid out");
       else if (result === "disputed") toast.error("Results don't match — this match is now disputed");
       else toast.success("Result submitted — waiting for your opponent to confirm");
     } catch (e: any) {
@@ -74,7 +74,7 @@ export function MatchReportPanel({
   const doFinalize = async () => {
     try {
       await finalize.mutateAsync(m.id);
-      toast.success("Result finalised — coins paid out");
+      toast.success("Result finalised — paid out");
     } catch (e: any) {
       toast.error(e?.message ?? "Could not finalise");
     }
@@ -84,7 +84,7 @@ export function MatchReportPanel({
     return (
       <div className="mt-3 rounded-lg bg-destructive/10 ring-1 ring-destructive/40 p-3 text-[11px] text-destructive flex items-start gap-2">
         <AlertTriangle className="size-4 shrink-0" />
-        <span>Both players reported different winners. This match is under review — coins stay held until it's resolved.</span>
+        <span>Both players reported different winners. This match is under review — funds stay held until it's resolved.</span>
       </div>
     );
   }
@@ -100,7 +100,7 @@ export function MatchReportPanel({
 
       {theyReported && (
         <p className="text-[11px] text-muted-foreground">
-          {nameOf(m.reported_by)} reported <span className="text-foreground font-semibold">{nameOf(m.reported_winner_id)}</span> as the winner. Confirm to release the coins.
+          {nameOf(m.reported_by)} reported <span className="text-foreground font-semibold">{nameOf(m.reported_winner_id)}</span> as the winner. Confirm to release the funds.
         </p>
       )}
       {iReported && (

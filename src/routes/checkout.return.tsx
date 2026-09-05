@@ -19,7 +19,7 @@ function CheckoutReturn() {
         <h1 className="font-display text-3xl font-bold">Purchase complete</h1>
         <p className="text-muted-foreground text-sm">
           {session_id
-            ? "Your coins will land in your wallet within a few seconds."
+            ? "Your funds will land in your account within a few seconds."
             : "No session info found."}
         </p>
         <div className="flex gap-3 justify-center">

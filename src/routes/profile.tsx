@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2 } from "lucide-react";
-import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatCoins } from "@/lib/api";
+import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -95,8 +95,8 @@ function Profile() {
             <Coins className="size-5" />
           </div>
           <div className="flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Coin balance</p>
-            <p className="font-display text-xl font-bold">{formatCoins(wallet?.balance_cents ?? 0)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Account balance</p>
+            <p className="font-display text-xl font-bold">{formatMoney(wallet?.balance_cents ?? 0)}</p>
           </div>
           <Link to="/shop" className="text-[11px] font-bold uppercase tracking-wider text-primary">
             Shop

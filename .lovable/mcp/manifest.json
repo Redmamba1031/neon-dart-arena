@@ -95,7 +95,7 @@
       {
         "name": "get_my_wallet",
         "title": "Get my wallet",
-        "description": "Get the signed-in player's SMYD coin balance and recent wallet transactions.",
+        "description": "Get the signed-in player's SMYD cash balance and recent wallet transactions.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,

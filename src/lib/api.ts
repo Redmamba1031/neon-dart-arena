@@ -11,16 +11,20 @@ export type Tournament = Database["public"]["Tables"]["tournaments"]["Row"];
 export type TournamentParticipant = Database["public"]["Tables"]["tournament_participants"]["Row"];
 export type TournamentMatch = Database["public"]["Tables"]["tournament_matches"]["Row"];
 
-// Wallet amounts are stored as whole coins (1 stored unit = 1 coin).
-export const formatCoins = (units: number | null | undefined) => {
-  const coins = Math.round(units ?? 0);
-  return `${coins.toLocaleString()} ${Math.abs(coins) === 1 ? "coin" : "coins"}`;
-};
+// Balances are stored in cents (100 stored units = $1.00).
+export const formatMoney = (cents: number | null | undefined) =>
+  (Math.round(cents ?? 0) / 100).toLocaleString(undefined, {
+    style: "currency",
+    currency: "USD",
+  });
 
-// Back-compat alias used by several routes; renders coins, not USD.
-export const formatUsd = formatCoins;
+// Back-compat aliases used across routes — all render real money now.
+export const formatCoins = formatMoney;
+export const formatUsd = formatMoney;
 
-export const toCents = (coins: number) => Math.round(coins);
+// Convert a dollar amount typed by the user into stored cents.
+export const toCents = (dollars: number) => Math.round(dollars * 100);
+
 
 
 
@@ -889,4 +893,77 @@ export function useStaffList() {
       return data ?? [];
     },
   });
+}
+
+// ---------- Withdrawals (cash out) ----------
+export type WithdrawalRequest = Database["public"]["Tables"]["withdrawal_requests"]["Row"];
+
+export function useMyWithdrawals() {
+  return useQuery({
+    queryKey: ["my-withdrawals"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [] as WithdrawalRequest[];
+      const { data, error } = await supabase
+        .from("withdrawal_requests")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useRequestWithdrawal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { amountCents: number; method: string; destination: string }) => {
+      const { error } = await supabase.rpc("request_withdrawal", {
+        _amount_cents: args.amountCents,
+        _method: args.method,
+        _destination: args.destination,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      ["my-withdrawals", "wallet", "transactions"].forEach((k) =>
+        qc.invalidateQueries({ queryKey: [k] }),
+      );
+    },
+  });
+}
+
+export function useAllWithdrawals() {
+  return useQuery({
+    queryKey: ["admin-withdrawals"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("withdrawal_requests")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useAdminMarkWithdrawalPaid() {
+  return useAdminMutation(async (args: { requestId: string; note?: string }) => {
+    const { error } = await supabase.rpc("admin_mark_withdrawal_paid", {
+      _request_id: args.requestId, _note: args.note,
+    });
+    if (error) throw error;
+  }, ["admin-withdrawals", "wallet"]);
+}
+
+export function useAdminRejectWithdrawal() {
+  return useAdminMutation(async (args: { requestId: string; reason: string }) => {
+    const { error } = await supabase.rpc("admin_reject_withdrawal", {
+      _request_id: args.requestId, _reason: args.reason,
+    });
+    if (error) throw error;
+  }, ["admin-withdrawals", "wallet", "transactions"]);
 }

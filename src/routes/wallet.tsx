@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { ArrowDownLeft, ArrowUpRight, Coins } from "lucide-react";
-import { useWallet, useTransactions, formatCoins, type WalletTxn } from "@/lib/api";
+import { useWallet, useTransactions, formatMoney, type WalletTxn } from "@/lib/api";
 
 export const Route = createFileRoute("/wallet")({
   head: () => ({
     meta: [
-      { title: "Coins — SMYD" },
-      { name: "description", content: "Track your SMYD coins, earned from matches." },
+      { title: "Balance — SMYD" },
+      { name: "description", content: "Track your SMYD account balance and match earnings." },
     ],
   }),
   component: Wallet,
@@ -49,25 +49,25 @@ function Wallet() {
             <div className="scanline absolute inset-0 opacity-10 pointer-events-none" />
             <div className="flex items-center gap-2 text-primary">
               <Coins className="size-4" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Coin Balance</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Account Balance</span>
             </div>
             <p className="mt-3 font-display text-5xl font-bold text-gradient-neon">
-              {isLoading ? "—" : formatCoins(wallet?.balance_cents)}
+              {isLoading ? "—" : formatMoney(wallet?.balance_cents)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Earn more by winning matches.
+              Win matches to grow it, or cash out from the Cashier.
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <Mini label="Lifetime Won" value={formatCoins(lifetimePayouts)} tint="text-success" />
+          <Mini label="Lifetime Won" value={formatMoney(lifetimePayouts)} tint="text-success" />
           <Mini
             label="This Week"
-            value={`${weekNet >= 0 ? "+" : "−"}${formatCoins(Math.abs(weekNet))}`}
+            value={`${weekNet >= 0 ? "+" : "−"}${formatMoney(Math.abs(weekNet))}`}
             tint={weekNet >= 0 ? "text-success" : "text-destructive"}
           />
-          <Mini label="Pending" value="0 coins" />
+          <Mini label="Pending" value="$0.00" />
         </div>
 
         <div>
@@ -99,7 +99,7 @@ function Wallet() {
                     </div>
                     <span className={`font-display text-sm font-semibold ${positive ? "text-success" : "text-foreground"}`}>
                       {positive ? "+" : "−"}
-                      {formatCoins(Math.abs(Number(t.amount_cents)))}
+                      {formatMoney(Math.abs(Number(t.amount_cents)))}
                     </span>
                   </div>
                 );

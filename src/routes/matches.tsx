@@ -15,7 +15,7 @@ import {
   useMyChallenges,
   useRespondChallenge,
   usePlayerSearch,
-  formatCoins,
+  formatMoney,
   toCents,
   type Match,
 } from "@/lib/api";
@@ -26,9 +26,9 @@ export const Route = createFileRoute("/matches")({
   head: () => ({
     meta: [
       { title: "1v1 Matches — SMYD" },
-      { name: "description", content: "Create or join head-to-head darts matches and stake coins on 501, Cricket, Medley or Piddle." },
+      { name: "description", content: "Create or join head-to-head darts matches and stake real money on 501, Cricket, Medley or Piddle." },
       { property: "og:title", content: "1v1 Matches — SMYD" },
-      { property: "og:description", content: "Head-to-head darts matches with coin stakes on SMYD." },
+      { property: "og:description", content: "Head-to-head darts matches with real cash stakes on SMYD." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -150,7 +150,7 @@ function MatchRow({
             {nameOf(m.creator_id)} <span className="text-muted-foreground">vs</span> {nameOf(m.opponent_id)}
           </p>
           <p className="text-[11px] text-muted-foreground">
-            {m.mode} • Bo{m.best_of} • Stake {formatCoins(m.stake_cents)}
+            {m.mode} • Bo{m.best_of} • Stake {formatMoney(m.stake_cents)}
           </p>
           <p className="text-[10px] text-muted-foreground mt-0.5">{rules}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -180,7 +180,7 @@ function MatchRow({
               disabled={join.isPending}
               className="flex-1 rounded-lg bg-primary py-2 text-[11px] font-bold uppercase tracking-wider text-primary-foreground disabled:opacity-50"
             >
-              Join • {formatCoins(m.stake_cents)}
+              Join • {formatMoney(m.stake_cents)}
             </button>
           )}
           {m.creator_id === meId && (
@@ -212,7 +212,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const { data: wallet } = useWallet();
   const [mode, setMode] = useState<(typeof MODES)[number]>("501");
   const [bestOf, setBestOf] = useState<1 | 3 | 5>(1);
-  const [stake, setStake] = useState(500);
+  const [stake, setStake] = useState(5);
   const [doubleIn, setDoubleIn] = useState(false);
   const [finish, setFinish] = useState<"straight" | "double" | "master" | "both">("double");
   const [opponent, setOpponent] = useState<{ id: string; name: string } | null>(null);
@@ -227,7 +227,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (notEnough) {
-      toast.error("Not enough coins for this stake — grab a coin pack in the Shop.");
+      toast.error("Not enough funds for this stake — add money in the Cashier.");
       return;
     }
     try {
@@ -294,11 +294,11 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
             ))}
           </div>
         </Field>
-        <Field label="Stake (coins)">
+        <Field label="Stake (USD)">
           <input
             type="number"
-            min={500}
-            max={1000000}
+            min={5}
+            max={10000}
             value={stake}
             onChange={(e) => setStake(Number(e.target.value))}
             className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
@@ -332,11 +332,11 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       )}
 
       <p className="text-[11px] text-muted-foreground">
-        Pot {formatCoins(toCents(stake) * 2)} • Winner takes the pot minus 10% house fee
+        Pot {formatMoney(toCents(stake) * 2)} • Winner takes the pot minus 10% house fee
       </p>
       <p className={`text-[11px] ${notEnough ? "text-primary font-bold" : "text-muted-foreground"}`}>
-        Your balance: {walletReady ? formatCoins(balance) : "…"}
-        {notEnough && " — not enough coins for this stake. Get more in the Shop."}
+        Your balance: {walletReady ? formatMoney(balance) : "…"}
+        {notEnough && " — not enough funds for this stake. Add money in the Cashier."}
       </p>
       <button
         type="submit"
@@ -344,7 +344,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         className="w-full rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-60"
       >
         {create.isPending && <Loader2 className="size-4 animate-spin" />}
-        Create & Stake {formatCoins(toCents(stake))}
+        Create & Stake {formatMoney(toCents(stake))}
       </button>
     </form>
   );
@@ -386,7 +386,7 @@ function ChallengeInbox({ meId }: { meId: string | undefined }) {
           <p className="text-sm font-semibold">
             {nameFrom(profiles, c.challenger_id)} challenged you
           </p>
-          <p className="text-[11px] text-muted-foreground">Stake {formatCoins(c.matches?.stake_cents ?? 0)}</p>
+          <p className="text-[11px] text-muted-foreground">Stake {formatMoney(c.matches?.stake_cents ?? 0)}</p>
           <div className="mt-2 flex gap-2">
             <button
               onClick={() => act(c.id, true)}
@@ -408,7 +408,7 @@ function ChallengeInbox({ meId }: { meId: string | undefined }) {
       {outgoing.map((c) => (
         <div key={c.id} className="rounded-xl bg-surface ring-1 ring-border p-3">
           <p className="text-sm font-semibold">Waiting on {nameFrom(profiles, c.challenged_id)}</p>
-          <p className="text-[11px] text-muted-foreground">Stake {formatCoins(c.matches?.stake_cents ?? 0)} • pending</p>
+          <p className="text-[11px] text-muted-foreground">Stake {formatMoney(c.matches?.stake_cents ?? 0)} • pending</p>
         </div>
       ))}
     </div>

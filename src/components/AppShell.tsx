@@ -2,7 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { Award, Home, Shield, ShoppingBag, Swords, User, Wallet } from "lucide-react";
 import { useEffect } from "react";
 import smydLogo from "@/assets/smyd-logo.png";
-import { formatCoins, useIsStaff, useMyBan, useMyProfile, useWallet } from "@/lib/api";
+import { formatMoney, useIsStaff, useMyBan, useMyProfile, useWallet } from "@/lib/api";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -67,7 +67,7 @@ function Header() {
       >
         <Wallet className="size-3.5 text-primary" />
         <span className="font-display text-sm font-medium text-primary">
-          {formatCoins(wallet?.balance_cents)}
+          {formatMoney(wallet?.balance_cents)}
         </span>
       </Link>
     </header>
@@ -79,7 +79,7 @@ function BottomNav() {
   const items = [
     { to: "/", label: "Lobby", icon: Home },
     { to: "/matches", label: "1v1", icon: Swords },
-    { to: "/shop", label: "Shop", icon: ShoppingBag },
+    { to: "/shop", label: "Cashier", icon: ShoppingBag },
     { to: "/leaderboard", label: "Rank", icon: Award },
     { to: "/profile", label: "Profile", icon: User },
   ] as const;

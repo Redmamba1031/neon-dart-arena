@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { ArrowLeft, Swords, Trophy } from "lucide-react";
 import { MatchReportPanel } from "@/components/MatchReportPanel";
-import { useMatch, useMyProfile, useProfilesByIds, formatCoins } from "@/lib/api";
+import { useMatch, useMyProfile, useProfilesByIds, formatMoney } from "@/lib/api";
 
 export const Route = createFileRoute("/play/$id")({
   head: () => ({
@@ -60,7 +60,7 @@ function PlayMatch() {
             {nameOf(match.creator_id)} <span className="text-muted-foreground text-base">vs</span> {nameOf(match.opponent_id)}
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            {match.mode} • Bo{match.best_of} • Stake {formatCoins(match.stake_cents)} • Pot {formatCoins(Number(match.stake_cents) * 2)}
+            {match.mode} • Bo{match.best_of} • Stake {formatMoney(match.stake_cents)} • Pot {formatMoney(Number(match.stake_cents) * 2)}
           </p>
 
           {match.status === "completed" && match.winner_id && (
@@ -72,7 +72,7 @@ function PlayMatch() {
 
         <div className="rounded-xl bg-surface/60 ring-1 ring-border p-4 text-[11px] text-muted-foreground leading-relaxed">
           Play your match on your board, then post the winner here. You get <span className="text-foreground font-semibold">45 minutes</span> from
-          the start of the match. Coins are released as soon as both players post the same winner. If you disagree, the match is flagged
+          the start of the match. Funds are released as soon as both players post the same winner. If you disagree, the match is flagged
           for review. If your opponent never posts, you can claim the result once the 45 minutes are up.
           <span className="block mt-2 text-destructive font-semibold">
             Camera rule: your camera must show the full board from more than 8 feet away for the whole match. If your opponent
