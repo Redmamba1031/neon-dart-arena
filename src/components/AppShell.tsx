@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Award, Home, ShoppingBag, Swords, Trophy, User, Wallet } from "lucide-react";
+import { Award, Home, ShoppingBag, Swords, User, Wallet } from "lucide-react";
 import { useEffect } from "react";
 import smydLogo from "@/assets/smyd-logo.png";
 import { formatCoins, useMyProfile, useWallet } from "@/lib/api";
@@ -62,7 +62,6 @@ function BottomNav() {
   const items = [
     { to: "/", label: "Lobby", icon: Home },
     { to: "/matches", label: "1v1", icon: Swords },
-    { to: "/tournaments", label: "Cups", icon: Trophy },
     { to: "/shop", label: "Shop", icon: ShoppingBag },
     { to: "/leaderboard", label: "Rank", icon: Award },
     { to: "/profile", label: "Profile", icon: User },

@@ -7,7 +7,7 @@ export const Route = createFileRoute("/wallet")({
   head: () => ({
     meta: [
       { title: "Coins — SMYD" },
-      { name: "description", content: "Track your SMYD coins, earned from matches and tournaments." },
+      { name: "description", content: "Track your SMYD coins, earned from matches." },
     ],
   }),
   component: Wallet,
@@ -55,7 +55,7 @@ function Wallet() {
               {isLoading ? "—" : formatCoins(wallet?.balance_cents)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Earn more by winning matches and tournaments.
+              Earn more by winning matches.
             </p>
           </div>
         </div>
