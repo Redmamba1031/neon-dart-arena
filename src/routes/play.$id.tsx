@@ -75,8 +75,13 @@ function PlayMatch() {
           the start of the match. Coins are released as soon as both players post the same winner. If you disagree, the match is flagged
           for review. If your opponent never posts, you can claim the result once the 45 minutes are up.
           <span className="block mt-2 text-destructive font-semibold">
+            Camera rule: your camera must show the full board from more than 8 feet away for the whole match. If your opponent
+            flags you and proves it, you take an automatic loss.
+          </span>
+          <span className="block mt-2 text-destructive font-semibold">
             Fair play rule: reporting a false winner results in a permanent ban from SMYD.
           </span>
+
         </div>
       </div>
     </AppShell>
