@@ -68,7 +68,7 @@ export function useWallet() {
 
   useEffect(() => {
     const channel = supabase
-      .channel("wallet-realtime")
+      .channel(`wallet-realtime-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "wallets" }, () => {
         qc.invalidateQueries({ queryKey: ["wallet"] });
         qc.invalidateQueries({ queryKey: ["transactions"] });
@@ -120,7 +120,7 @@ export function useOpenMatches() {
 
   useEffect(() => {
     const channel = supabase
-      .channel("matches-realtime")
+      .channel(`matches-realtime-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, () => {
         qc.invalidateQueries({ queryKey: ["open-matches"] });
         qc.invalidateQueries({ queryKey: ["my-matches"] });
@@ -282,7 +282,7 @@ export function useTournaments() {
   const qc = useQueryClient();
   useEffect(() => {
     const channel = supabase
-      .channel("tournaments-realtime")
+      .channel(`tournaments-realtime-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "tournaments" }, () => {
         qc.invalidateQueries({ queryKey: ["tournaments"] });
       })
