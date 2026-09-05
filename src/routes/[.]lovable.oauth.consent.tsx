@@ -76,8 +76,8 @@ function Consent() {
           Connect {clientName} to your SMYD account
         </h1>
         <p className="mt-3 text-center text-sm text-muted-foreground">
-          {clientName} will be able to read your profile, coin wallet, tournaments and leaderboard,
-          and join tournaments on your behalf.
+          {clientName} will be able to read your profile, coin wallet and leaderboard
+          on your behalf.
         </p>
         {error && (
           <p role="alert" className="mt-4 text-center text-xs text-destructive">

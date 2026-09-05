@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
-import { Route as TournamentsRouteImport } from './routes/tournaments'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -20,7 +19,6 @@ import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as PlayIdRouteImport } from './routes/play.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -32,11 +30,6 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TournamentsRoute = TournamentsRouteImport.update({
-  id: '/tournaments',
-  path: '/tournaments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopRoute = ShopRouteImport.update({
@@ -83,11 +76,6 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const TournamentsIdRoute = TournamentsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => TournamentsRoute,
 } as any)
 const PlayIdRoute = PlayIdRouteImport.update({
   id: '/play/$id',
@@ -139,13 +127,11 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
-  '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/play/$id': typeof PlayIdRoute
-  '/tournaments/$id': typeof TournamentsIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -160,13 +146,11 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
-  '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/play/$id': typeof PlayIdRoute
-  '/tournaments/$id': typeof TournamentsIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -182,13 +166,11 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
-  '/tournaments': typeof TournamentsRouteWithChildren
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/play/$id': typeof PlayIdRoute
-  '/tournaments/$id': typeof TournamentsIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -205,13 +187,11 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/shop'
-    | '/tournaments'
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/checkout/return'
     | '/play/$id'
-    | '/tournaments/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/payments/webhook'
@@ -226,13 +206,11 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/shop'
-    | '/tournaments'
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/checkout/return'
     | '/play/$id'
-    | '/tournaments/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/payments/webhook'
@@ -247,13 +225,11 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/shop'
-    | '/tournaments'
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/checkout/return'
     | '/play/$id'
-    | '/tournaments/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/payments/webhook'
@@ -269,7 +245,6 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ShopRoute: typeof ShopRoute
-  TournamentsRoute: typeof TournamentsRouteWithChildren
   WalletRoute: typeof WalletRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -287,13 +262,6 @@ declare module '@tanstack/react-router' {
       path: '/wallet'
       fullPath: '/wallet'
       preLoaderRoute: typeof WalletRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tournaments': {
-      id: '/tournaments'
-      path: '/tournaments'
-      fullPath: '/tournaments'
-      preLoaderRoute: typeof TournamentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop': {
@@ -359,13 +327,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tournaments/$id': {
-      id: '/tournaments/$id'
-      path: '/$id'
-      fullPath: '/tournaments/$id'
-      preLoaderRoute: typeof TournamentsIdRouteImport
-      parentRoute: typeof TournamentsRoute
-    }
     '/play/$id': {
       id: '/play/$id'
       path: '/play/$id'
@@ -418,18 +379,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface TournamentsRouteChildren {
-  TournamentsIdRoute: typeof TournamentsIdRoute
-}
-
-const TournamentsRouteChildren: TournamentsRouteChildren = {
-  TournamentsIdRoute: TournamentsIdRoute,
-}
-
-const TournamentsRouteWithChildren = TournamentsRoute._addFileChildren(
-  TournamentsRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LeaderboardRoute: LeaderboardRoute,
@@ -440,7 +389,6 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ShopRoute: ShopRoute,
-  TournamentsRoute: TournamentsRouteWithChildren,
   WalletRoute: WalletRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
