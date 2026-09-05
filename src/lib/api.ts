@@ -833,7 +833,7 @@ function useAdminMutation<T>(fn: (args: T) => Promise<void>, keys: string[]) {
 export function useAdminResolveDispute() {
   return useAdminMutation(async (args: { matchId: string; winnerId: string; note?: string }) => {
     const { error } = await supabase.rpc("admin_resolve_dispute", {
-      _match_id: args.matchId, _winner_id: args.winnerId, _note: args.note ?? null,
+      _match_id: args.matchId, _winner_id: args.winnerId, _note: args.note,
     });
     if (error) throw error;
   }, ["admin-disputes", "matches", "wallet", "leaderboard"]);
