@@ -121,7 +121,7 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
   const mode = "Medley" as const;
   const bestOf = 3 as const;
   const [size, setSize] = useState<4 | 8 | 16 | 32>(4);
-  const [entry, setEntry] = useState(100);
+  const [entry, setEntry] = useState(500);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,7 +163,7 @@ function CreateForm({ onCreated }: { onCreated: (id: string) => void }) {
           </select>
         </Field>
         <Field label="Entry (coins)">
-          <input type="number" min={100} max={1000000} value={entry} onChange={(e) => setEntry(Number(e.target.value))} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm" />
+          <input type="number" min={500} max={1000000} value={entry} onChange={(e) => setEntry(Number(e.target.value))} className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm" />
         </Field>
 
       </div>
