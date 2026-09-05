@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { MessageSquare, Settings, LogOut, Target, ChevronRight } from "lucide-react";
-import { useMyProfile, useLeaderboard, formatUsd } from "@/lib/api";
+import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2 } from "lucide-react";
+import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatCoins } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -20,11 +22,26 @@ function Profile() {
   const { data: profile } = useMyProfile();
   const { data: leaderboard = [] } = useLeaderboard(500);
 
+  const { data: wallet } = useWallet();
+  const [editing, setEditing] = useState(false);
+
   const me = leaderboard.find((l) => l.user_id === profile?.id);
   const wins = me?.wins ?? 0;
-  const total = me?.games_played ?? 0;
+  const losses = me?.losses ?? 0;
+  const total = me?.matches_played ?? 0;
   const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
   const rank = profile ? leaderboard.findIndex((l) => l.user_id === profile.id) + 1 : 0;
+
+  const sendReset = async () => {
+    const { data } = await supabase.auth.getUser();
+    const email = data.user?.email;
+    if (!email) return toast.error("No email on this account");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Password reset link sent to your email");
+  };
 
   const name = profile?.display_name || profile?.username || "Player";
   const initials = name
@@ -64,13 +81,30 @@ function Profile() {
                 </p>
               </div>
             </div>
-            <div className="mt-5 grid grid-cols-3 gap-3 relative">
+            <div className="mt-5 grid grid-cols-4 gap-2 relative">
               <Stat label="Wins" value={String(wins)} />
+              <Stat label="Losses" value={String(losses)} />
               <Stat label="Win %" value={`${winRate}%`} tint="text-primary" />
               <Stat label="Played" value={String(total)} tint="text-accent" />
             </div>
           </div>
         </div>
+
+        <div className="rounded-xl bg-surface ring-1 ring-border p-4 flex items-center gap-3">
+          <div className="size-10 rounded-lg bg-accent/15 grid place-items-center text-accent">
+            <Coins className="size-5" />
+          </div>
+          <div className="flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Coin balance</p>
+            <p className="font-display text-xl font-bold">{formatCoins(wallet?.balance_cents ?? 0)}</p>
+          </div>
+          <Link to="/shop" className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            Shop
+          </Link>
+        </div>
+
+        {editing && <EditProfile onDone={() => setEditing(false)} initial={{ username: profile?.username ?? "", display_name: profile?.display_name ?? "", avatar_url: profile?.avatar_url ?? "" }} />}
+
 
         <Link
           to="/messages"
@@ -93,7 +127,8 @@ function Profile() {
         </Section>
 
         <div className="space-y-2">
-          <Action icon={Settings} label="Settings" onClick={() => toast.info("Settings coming soon")} />
+          <Action icon={Settings} label={editing ? "Close editor" : "Edit profile"} onClick={() => setEditing((v) => !v)} />
+          <Action icon={KeyRound} label="Reset password" onClick={sendReset} />
           <Action icon={LogOut} label="Sign Out" danger onClick={handleSignOut} />
         </div>
       </div>
@@ -154,5 +189,78 @@ function Action({
       <Icon className="size-4" />
       <span className="text-sm font-medium">{label}</span>
     </button>
+  );
+}
+
+function EditProfile({
+  initial,
+  onDone,
+}: {
+  initial: { username: string; display_name: string; avatar_url: string };
+  onDone: () => void;
+}) {
+  const update = useUpdateProfile();
+  const [username, setUsername] = useState(initial.username);
+  const [displayName, setDisplayName] = useState(initial.display_name);
+  const [avatar, setAvatar] = useState(initial.avatar_url);
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const u = username.trim();
+    if (u.length < 2 || !/^[a-zA-Z0-9_-]+$/.test(u)) {
+      toast.error("Username: 2+ characters, letters, numbers, _ and - only");
+      return;
+    }
+    try {
+      await update.mutateAsync({
+        username: u,
+        display_name: displayName.trim() || u,
+        avatar_url: avatar.trim() || null,
+      });
+      toast.success("Profile updated");
+      onDone();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save profile");
+    }
+  };
+
+  return (
+    <form onSubmit={save} className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3 animate-fade-in-up">
+      <EditField label="Username" value={username} onChange={setUsername} placeholder="viperx" />
+      <EditField label="Display name" value={displayName} onChange={setDisplayName} placeholder="Viper X" />
+      <EditField label="Avatar image URL" value={avatar} onChange={setAvatar} placeholder="https://…" />
+      <button
+        type="submit"
+        disabled={update.isPending}
+        className="w-full rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-60"
+      >
+        {update.isPending && <Loader2 className="size-4 animate-spin" />}
+        Save changes
+      </button>
+    </form>
+  );
+}
+
+function EditField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label className="block">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
+      <input
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
+      />
+    </label>
   );
 }

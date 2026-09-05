@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      challenges: {
+        Row: {
+          challenged_id: string
+          challenger_id: string
+          created_at: string
+          id: string
+          match_id: string
+          responded_at: string | null
+          status: Database["public"]["Enums"]["challenge_status"]
+        }
+        Insert: {
+          challenged_id: string
+          challenger_id: string
+          created_at?: string
+          id?: string
+          match_id: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["challenge_status"]
+        }
+        Update: {
+          challenged_id?: string
+          challenger_id?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["challenge_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coin_packs: {
         Row: {
           active: boolean
@@ -43,6 +81,66 @@ export type Database = {
           usd_cents?: number
         }
         Relationships: []
+      }
+      dart_throws: {
+        Row: {
+          busted: boolean
+          created_at: string
+          dart_number: number
+          id: string
+          leg_id: string
+          match_id: string
+          multiplier: number
+          player_id: string
+          points: number
+          remaining_after: number | null
+          segment: number
+          turn_number: number
+        }
+        Insert: {
+          busted?: boolean
+          created_at?: string
+          dart_number: number
+          id?: string
+          leg_id: string
+          match_id: string
+          multiplier: number
+          player_id: string
+          points?: number
+          remaining_after?: number | null
+          segment: number
+          turn_number: number
+        }
+        Update: {
+          busted?: boolean
+          created_at?: string
+          dart_number?: number
+          id?: string
+          leg_id?: string
+          match_id?: string
+          multiplier?: number
+          player_id?: string
+          points?: number
+          remaining_after?: number | null
+          segment?: number
+          turn_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dart_throws_leg_id_fkey"
+            columns: ["leg_id"]
+            isOneToOne: false
+            referencedRelation: "match_legs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dart_throws_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       deposits: {
         Row: {
@@ -177,27 +275,39 @@ export type Database = {
       }
       match_legs: {
         Row: {
-          completed_at: string
+          completed_at: string | null
+          creator_remaining: number | null
           id: string
           leg_mode: Database["public"]["Enums"]["match_mode"]
           leg_number: number
           match_id: string
+          opponent_remaining: number | null
+          started_at: string
+          state: Json
           winner_id: string | null
         }
         Insert: {
-          completed_at?: string
+          completed_at?: string | null
+          creator_remaining?: number | null
           id?: string
           leg_mode: Database["public"]["Enums"]["match_mode"]
           leg_number: number
           match_id: string
+          opponent_remaining?: number | null
+          started_at?: string
+          state?: Json
           winner_id?: string | null
         }
         Update: {
-          completed_at?: string
+          completed_at?: string | null
+          creator_remaining?: number | null
           id?: string
           leg_mode?: Database["public"]["Enums"]["match_mode"]
           leg_number?: number
           match_id?: string
+          opponent_remaining?: number | null
+          started_at?: string
+          state?: Json
           winner_id?: string | null
         }
         Relationships: [
@@ -210,6 +320,50 @@ export type Database = {
           },
         ]
       }
+      match_results: {
+        Row: {
+          created_at: string
+          id: string
+          loser_id: string | null
+          loser_legs: number
+          match_id: string
+          payout_cents: number
+          rake_cents: number
+          winner_id: string
+          winner_legs: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          loser_id?: string | null
+          loser_legs?: number
+          match_id: string
+          payout_cents?: number
+          rake_cents?: number
+          winner_id: string
+          winner_legs?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          loser_id?: string | null
+          loser_legs?: number
+          match_id?: string
+          payout_cents?: number
+          rake_cents?: number
+          winner_id?: string
+          winner_legs?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_results_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: true
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           best_of: number
@@ -217,11 +371,14 @@ export type Database = {
           completed_at: string | null
           created_at: string
           creator_id: string
+          creator_legs: number
           double_in: boolean
           finish_rule: Database["public"]["Enums"]["finish_rule"]
           id: string
+          invited_id: string | null
           mode: Database["public"]["Enums"]["match_mode"]
           opponent_id: string | null
+          opponent_legs: number
           rake_bps: number
           stake_cents: number
           started_at: string | null
@@ -234,11 +391,14 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           creator_id: string
+          creator_legs?: number
           double_in?: boolean
           finish_rule?: Database["public"]["Enums"]["finish_rule"]
           id?: string
+          invited_id?: string | null
           mode: Database["public"]["Enums"]["match_mode"]
           opponent_id?: string | null
+          opponent_legs?: number
           rake_bps?: number
           stake_cents: number
           started_at?: string | null
@@ -251,11 +411,14 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           creator_id?: string
+          creator_legs?: number
           double_in?: boolean
           finish_rule?: Database["public"]["Enums"]["finish_rule"]
           id?: string
+          invited_id?: string | null
           mode?: Database["public"]["Enums"]["match_mode"]
           opponent_id?: string | null
+          opponent_legs?: number
           rake_bps?: number
           stake_cents?: number
           started_at?: string | null
@@ -270,24 +433,33 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          losses: number
+          rating: number
           updated_at: string
           username: string | null
+          wins: number
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
           id: string
+          losses?: number
+          rating?: number
           updated_at?: string
           username?: string | null
+          wins?: number
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          losses?: number
+          rating?: number
           updated_at?: string
           username?: string | null
+          wins?: number
         }
         Relationships: []
       }
@@ -528,15 +700,72 @@ export type Database = {
       }
     }
     Views: {
+      coin_transactions: {
+        Row: {
+          amount_coins: number | null
+          created_at: string | null
+          id: string | null
+          kind: Database["public"]["Enums"]["txn_kind"] | null
+          match_id: string | null
+          note: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_coins?: number | null
+          created_at?: string | null
+          id?: string | null
+          kind?: Database["public"]["Enums"]["txn_kind"] | null
+          match_id?: string | null
+          note?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_coins?: number | null
+          created_at?: string | null
+          id?: string | null
+          kind?: Database["public"]["Enums"]["txn_kind"] | null
+          match_id?: string | null
+          note?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       leaderboard_view: {
         Row: {
           avatar_url: string | null
           display_name: string | null
-          games_played: number | null
+          losses: number | null
+          matches_played: number | null
+          rating: number | null
           total_winnings_cents: number | null
           user_id: string | null
           username: string | null
+          win_pct: number | null
           wins: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          losses?: number | null
+          matches_played?: never
+          rating?: number | null
+          total_winnings_cents?: never
+          user_id?: string | null
+          username?: string | null
+          win_pct?: never
+          wins?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          losses?: number | null
+          matches_played?: never
+          rating?: number | null
+          total_winnings_cents?: never
+          user_id?: string | null
+          username?: string | null
+          win_pct?: never
+          wins?: number | null
         }
         Relationships: []
       }
@@ -591,12 +820,17 @@ export type Database = {
         Args: { _tournament_id: string }
         Returns: undefined
       }
+      complete_leg: {
+        Args: { _leg_id: string; _winner_id: string }
+        Returns: undefined
+      }
       create_match: {
         Args: {
           _best_of: number
           _double_in?: boolean
           _finish_rule?: Database["public"]["Enums"]["finish_rule"]
           _mode: Database["public"]["Enums"]["match_mode"]
+          _opponent_id?: string
           _stake_cents: number
         }
         Returns: string
@@ -632,6 +866,19 @@ export type Database = {
       }
       join_match: { Args: { _match_id: string }; Returns: undefined }
       join_tournament: { Args: { _tournament_id: string }; Returns: undefined }
+      record_dart: {
+        Args: {
+          _busted?: boolean
+          _dart_number: number
+          _leg_id: string
+          _multiplier: number
+          _remaining_after?: number
+          _segment: number
+          _state?: Json
+          _turn_number: number
+        }
+        Returns: undefined
+      }
       redeem_gift_card: {
         Args: {
           _delivery_email: string
@@ -644,14 +891,26 @@ export type Database = {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
       }
+      respond_challenge: {
+        Args: { _accept: boolean; _challenge_id: string }
+        Returns: undefined
+      }
       settle_match: {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
+      }
+      start_leg: {
+        Args: {
+          _leg_mode: Database["public"]["Enums"]["match_mode"]
+          _match_id: string
+        }
+        Returns: string
       }
     }
     Enums: {
       app_role: "owner"
       bracket_side: "winners" | "losers" | "grand_final"
+      challenge_status: "pending" | "accepted" | "declined" | "cancelled"
       finish_rule: "straight" | "double" | "master" | "both"
       match_mode: "501" | "Cricket" | "Medley" | "Piddle"
       match_status: "open" | "live" | "completed" | "cancelled"
@@ -792,6 +1051,7 @@ export const Constants = {
     Enums: {
       app_role: ["owner"],
       bracket_side: ["winners", "losers", "grand_final"],
+      challenge_status: ["pending", "accepted", "declined", "cancelled"],
       finish_rule: ["straight", "double", "master", "both"],
       match_mode: ["501", "Cricket", "Medley", "Piddle"],
       match_status: ["open", "live", "completed", "cancelled"],

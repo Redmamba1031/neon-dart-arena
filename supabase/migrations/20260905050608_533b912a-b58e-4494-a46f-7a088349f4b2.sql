@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.create_match(public.match_mode, integer, bigint, boolean, public.finish_rule);

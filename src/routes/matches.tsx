@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Swords, Plus, Loader2, Trophy, X } from "lucide-react";
+import { Swords, Plus, Loader2, Trophy, X, Play, Search } from "lucide-react";
 import {
   useOpenMatches,
   useMyMatches,
@@ -13,6 +13,9 @@ import {
   useMyProfile,
   useWallet,
   useProfilesByIds,
+  useMyChallenges,
+  useRespondChallenge,
+  usePlayerSearch,
   formatCoins,
   toCents,
   type Match,
@@ -66,6 +69,8 @@ function Matches() {
             {showCreate ? "Close" : "New"}
           </button>
         </div>
+
+        <ChallengeInbox meId={me?.id} />
 
         {showCreate && <CreateMatchForm onCreated={() => { setShowCreate(false); setTab("mine"); }} />}
 
@@ -190,6 +195,13 @@ function MatchRow({
           )}
           {m.status === "live" && isMine && (
             <>
+              <Link
+                to="/play/$id"
+                params={{ id: m.id }}
+                className="flex-1 rounded-lg bg-primary py-2 text-center text-[11px] font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-1.5"
+              >
+                <Play className="size-3.5" /> Play
+              </Link>
               <button
                 onClick={() => act(() => settle.mutateAsync({ matchId: m.id, winnerId: m.creator_id }), "Result reported")}
                 disabled={settle.isPending}
@@ -223,15 +235,17 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const { data: wallet } = useWallet();
   const [mode, setMode] = useState<(typeof MODES)[number]>("501");
   const [bestOf, setBestOf] = useState<1 | 3 | 5>(1);
-  const [stake, setStake] = useState(100);
+  const [stake, setStake] = useState(500);
   const [doubleIn, setDoubleIn] = useState(false);
   const [finish, setFinish] = useState<"straight" | "double" | "master" | "both">("double");
+  const [opponent, setOpponent] = useState<{ id: string; name: string } | null>(null);
 
   const isMedley = mode === "Medley";
   const bestOfOptions: (1 | 3 | 5)[] = isMedley ? [3, 5] : [1, 3, 5];
   const showOhOneRules = mode === "501" || isMedley;
   const balance = wallet?.balance_cents ?? 0;
-  const notEnough = toCents(stake) > balance;
+  const walletReady = wallet !== undefined;
+  const notEnough = walletReady && toCents(stake) > balance;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,8 +260,9 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         stake_cents: toCents(stake),
         double_in: showOhOneRules ? doubleIn : false,
         finish_rule: showOhOneRules ? finish : "double",
+        opponent_id: opponent?.id ?? null,
       });
-      toast.success("Match created — waiting for an opponent");
+      toast.success(opponent ? `Challenge sent to ${opponent.name}` : "Match created — waiting for an opponent");
       onCreated();
     } catch (err: any) {
       toast.error(err?.message ?? "Create failed");
@@ -257,6 +272,10 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
 
   return (
     <form onSubmit={submit} className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
+      <Field label="Challenge a player">
+        <OpponentPicker value={opponent} onChange={setOpponent} />
+      </Field>
+
       <Field label="Game mode">
         <div className="grid grid-cols-4 gap-2">
           {MODES.map((m) => (
@@ -301,7 +320,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         <Field label="Stake (coins)">
           <input
             type="number"
-            min={100}
+            min={500}
             max={1000000}
             value={stake}
             onChange={(e) => setStake(Number(e.target.value))}
@@ -339,7 +358,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         Pot {formatCoins(toCents(stake) * 2)} • Winner takes the pot minus 5% rake
       </p>
       <p className={`text-[11px] ${notEnough ? "text-primary font-bold" : "text-muted-foreground"}`}>
-        Your balance: {formatCoins(balance)}
+        Your balance: {walletReady ? formatCoins(balance) : "…"}
         {notEnough && " — not enough coins for this stake. Get more in the Shop."}
       </p>
       <button
@@ -360,5 +379,111 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
       <div className="mt-1">{children}</div>
     </label>
+  );
+}
+
+function ChallengeInbox({ meId }: { meId: string | undefined }) {
+  const { data: challenges = [] } = useMyChallenges();
+  const respond = useRespondChallenge();
+  const ids = challenges.flatMap((c) => [c.challenger_id, c.challenged_id]);
+  const { data: profiles } = useProfilesByIds(ids);
+
+  const incoming = challenges.filter((c) => c.challenged_id === meId);
+  const outgoing = challenges.filter((c) => c.challenger_id === meId);
+  if (incoming.length === 0 && outgoing.length === 0) return null;
+
+  const act = async (challengeId: string, accept: boolean) => {
+    try {
+      await respond.mutateAsync({ challengeId, accept });
+      toast.success(accept ? "Challenge accepted — good luck" : "Challenge declined");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not respond");
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Challenges</p>
+      {incoming.map((c) => (
+        <div key={c.id} className="rounded-xl bg-surface ring-1 ring-primary/40 p-3">
+          <p className="text-sm font-semibold">
+            {nameFrom(profiles, c.challenger_id)} challenged you
+          </p>
+          <p className="text-[11px] text-muted-foreground">Stake {formatCoins(c.matches?.stake_cents ?? 0)}</p>
+          <div className="mt-2 flex gap-2">
+            <button
+              onClick={() => act(c.id, true)}
+              disabled={respond.isPending}
+              className="flex-1 rounded-lg bg-primary py-2 text-[11px] font-bold uppercase tracking-wider text-primary-foreground disabled:opacity-50"
+            >
+              Accept
+            </button>
+            <button
+              onClick={() => act(c.id, false)}
+              disabled={respond.isPending}
+              className="flex-1 rounded-lg bg-secondary py-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground disabled:opacity-50"
+            >
+              Decline
+            </button>
+          </div>
+        </div>
+      ))}
+      {outgoing.map((c) => (
+        <div key={c.id} className="rounded-xl bg-surface ring-1 ring-border p-3">
+          <p className="text-sm font-semibold">Waiting on {nameFrom(profiles, c.challenged_id)}</p>
+          <p className="text-[11px] text-muted-foreground">Stake {formatCoins(c.matches?.stake_cents ?? 0)} • pending</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function OpponentPicker({
+  value,
+  onChange,
+}: {
+  value: { id: string; name: string } | null;
+  onChange: (v: { id: string; name: string } | null) => void;
+}) {
+  const [term, setTerm] = useState("");
+  const { data: results = [], isFetching } = usePlayerSearch(term);
+
+  if (value) {
+    return (
+      <div className="flex items-center justify-between rounded-lg bg-background ring-1 ring-border px-3 py-2">
+        <span className="text-sm font-semibold">{value.name}</span>
+        <button type="button" onClick={() => onChange(null)} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          Change
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 rounded-lg bg-background ring-1 ring-border px-3 py-2">
+        <Search className="size-4 text-muted-foreground" />
+        <input
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+          placeholder="Search a player (optional)"
+          className="w-full bg-transparent text-sm focus:outline-none"
+        />
+      </div>
+      {isFetching && <p className="text-[11px] text-muted-foreground">Searching…</p>}
+      {results.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          onClick={() => onChange({ id: p.id, name: p.display_name || p.username || "Player" })}
+          className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-left text-sm hover:ring-primary/50"
+        >
+          {p.display_name || p.username}
+        </button>
+      ))}
+      {term.trim().length >= 2 && !isFetching && results.length === 0 && (
+        <p className="text-[11px] text-muted-foreground">No players found — leave empty for an open match.</p>
+      )}
+    </div>
   );
 }

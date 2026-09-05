@@ -86,6 +86,19 @@ function Login() {
     }
   };
 
+  const handleForgot = async () => {
+    const parsed = z.string().trim().email().safeParse(email);
+    if (!parsed.success) {
+      toast.error("Enter your email address first, then tap Forgot password");
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Password reset link sent — check your email");
+  };
+
   const handleGoogle = async () => {
     if (busy) return;
     setBusy(true);
@@ -159,6 +172,15 @@ function Login() {
           >
             {busy ? "Please wait…" : mode === "signin" ? "Enter the Arena" : "Create Account"}
           </button>
+          {mode === "signin" && (
+            <button
+              type="button"
+              onClick={handleForgot}
+              className="w-full text-center text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary"
+            >
+              Forgot password?
+            </button>
+          )}
         </form>
 
         <div className="my-6 flex items-center gap-3">

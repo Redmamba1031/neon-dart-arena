@@ -188,6 +188,7 @@ type CreateMatchArgs = {
   stake_cents: number;
   double_in?: boolean;
   finish_rule?: "straight" | "double" | "master" | "both";
+  opponent_id?: string | null;
 };
 
 export function useCreateMatch() {
@@ -200,6 +201,7 @@ export function useCreateMatch() {
         _stake_cents: args.stake_cents,
         _double_in: args.double_in ?? false,
         _finish_rule: args.finish_rule ?? "double",
+        _opponent_id: args.opponent_id ?? undefined,
       });
       if (error) throw error;
       return data as string; // match id
@@ -430,6 +432,209 @@ export function useIsOwner() {
         .maybeSingle();
       if (error) throw error;
       return !!data;
+    },
+  });
+}
+
+// ---------- Profile editing ----------
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (patch: { username?: string; display_name?: string; avatar_url?: string | null }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not signed in");
+      const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
+      if (error) {
+        if (error.code === "23505") throw new Error("That username is already taken");
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-profile"] });
+      qc.invalidateQueries({ queryKey: ["leaderboard"] });
+    },
+  });
+}
+
+export function usePlayerSearch(term: string) {
+  const q = term.trim();
+  return useQuery({
+    queryKey: ["player-search", q],
+    enabled: q.length >= 2,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url")
+        .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
+        .limit(8);
+      if (error) throw error;
+      return (data ?? []).filter((p) => p.id !== user?.id);
+    },
+  });
+}
+
+// ---------- Challenges ----------
+export type Challenge = Database["public"]["Tables"]["challenges"]["Row"];
+
+export function useMyChallenges() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    const channel = supabase
+      .channel(`challenges-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "challenges" }, () => {
+        qc.invalidateQueries({ queryKey: ["challenges"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [qc]);
+
+  return useQuery({
+    queryKey: ["challenges"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("challenges")
+        .select("*, matches(stake_cents, mode, best_of)")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useRespondChallenge() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { challengeId: string; accept: boolean }) => {
+      const { error } = await supabase.rpc("respond_challenge", {
+        _challenge_id: args.challengeId,
+        _accept: args.accept,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      ["challenges", "wallet", "my-matches", "open-matches"].forEach((k) =>
+        qc.invalidateQueries({ queryKey: [k] }),
+      );
+    },
+  });
+}
+
+// ---------- Live play ----------
+export function useMatch(id: string | undefined) {
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!id) return;
+    const channel = supabase
+      .channel(`match-${id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "matches", filter: `id=eq.${id}` }, () => {
+        qc.invalidateQueries({ queryKey: ["match", id] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "match_legs", filter: `match_id=eq.${id}` }, () => {
+        qc.invalidateQueries({ queryKey: ["match", id] });
+        qc.invalidateQueries({ queryKey: ["legs", id] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [qc, id]);
+
+  return useQuery({
+    queryKey: ["match", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("matches").select("*").eq("id", id!).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useMatchLegs(matchId: string | undefined) {
+  return useQuery({
+    queryKey: ["legs", matchId],
+    enabled: !!matchId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("match_legs")
+        .select("*")
+        .eq("match_id", matchId!)
+        .order("leg_number");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useStartLeg() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { matchId: string; legMode: "501" | "Cricket" | "Medley" | "Piddle" }) => {
+      const { data, error } = await supabase.rpc("start_leg", {
+        _match_id: args.matchId,
+        _leg_mode: args.legMode,
+      });
+      if (error) throw error;
+      return data as string;
+    },
+    onSuccess: (_d, v) => qc.invalidateQueries({ queryKey: ["legs", v.matchId] }),
+  });
+}
+
+export function useRecordDart() {
+  return useMutation({
+    mutationFn: async (args: {
+      legId: string; turnNumber: number; dartNumber: number;
+      segment: number; multiplier: number; busted?: boolean;
+      remainingAfter?: number | null; state?: unknown;
+    }) => {
+      const { error } = await supabase.rpc("record_dart", {
+        _leg_id: args.legId,
+        _turn_number: args.turnNumber,
+        _dart_number: args.dartNumber,
+        _segment: args.segment,
+        _multiplier: args.multiplier,
+        _busted: args.busted ?? false,
+        _remaining_after: args.remainingAfter ?? undefined,
+        _state: (args.state ?? null) as never,
+      });
+      if (error) throw error;
+    },
+  });
+}
+
+export function useCompleteLeg() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { legId: string; winnerId: string }) => {
+      const { error } = await supabase.rpc("complete_leg", {
+        _leg_id: args.legId,
+        _winner_id: args.winnerId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      ["match", "legs", "wallet", "my-matches", "match-history", "leaderboard", "my-profile"].forEach((k) =>
+        qc.invalidateQueries({ queryKey: [k] }),
+      );
+    },
+  });
+}
+
+export function useDartThrows(legId: string | undefined) {
+  return useQuery({
+    queryKey: ["darts", legId],
+    enabled: !!legId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("dart_throws")
+        .select("*")
+        .eq("leg_id", legId!)
+        .order("created_at");
+      if (error) throw error;
+      return data ?? [];
     },
   });
 }
