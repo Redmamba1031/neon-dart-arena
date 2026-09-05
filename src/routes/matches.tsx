@@ -11,6 +11,7 @@ import {
   useCancelMatch,
   useSettleMatch,
   useMyProfile,
+  useWallet,
   useProfilesByIds,
   formatCoins,
   toCents,
