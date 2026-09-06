@@ -24,7 +24,7 @@ export const Route = createFileRoute("/api/public/health")({
               },
             },
           });
-          const { error } = await client.from("coin_packs").select("id").limit(1);
+          const { error } = await client.from("coin_packs").select("price_id").limit(1);
           if (error) throw error;
         } catch (e) {
           database = "error";
