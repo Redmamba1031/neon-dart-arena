@@ -77,7 +77,7 @@ function RefundsPage() {
         <Section title="Contact">
           <p>
             For any refund question, email{" "}
-            <a href="mailto:support@smyd.online" className="text-primary underline">support@smyd.online</a>{" "}
+            <a href="mailto:redmond1031@gmail.com" className="text-primary underline">redmond1031@gmail.com</a>{" "}
             with your username and the transaction in question.
           </p>
         </Section>

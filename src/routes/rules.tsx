@@ -96,7 +96,7 @@ function RulesPage() {
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           <p>
             By entering a match you agree to every rule on this page. If you have a rules question before
-            playing, contact <a href="mailto:support@smyd.online" className="font-semibold underline">support@smyd.online</a>.
+            playing, contact <a href="mailto:redmond1031@gmail.com" className="font-semibold underline">redmond1031@gmail.com</a>.
           </p>
         </div>
       </div>

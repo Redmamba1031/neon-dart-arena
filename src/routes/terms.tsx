@@ -93,7 +93,7 @@ function TermsPage() {
 
         <Section title="Contact">
           <p>
-            Email <a href="mailto:support@smyd.online" className="text-primary underline">support@smyd.online</a> with any questions about these terms.
+            Email <a href="mailto:redmond1031@gmail.com" className="text-primary underline">redmond1031@gmail.com</a> with any questions about these terms.
           </p>
         </Section>
       </div>
