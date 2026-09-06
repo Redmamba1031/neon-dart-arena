@@ -74,6 +74,25 @@ function Header() {
   );
 }
 
+export function LegalFooter() {
+  const links = [
+    { to: "/rules", label: "Rules" },
+    { to: "/terms", label: "Terms" },
+    { to: "/privacy", label: "Privacy" },
+    { to: "/refunds", label: "Refunds" },
+    { to: "/support", label: "Support" },
+  ] as const;
+  return (
+    <div className="flex items-center justify-center gap-3 px-5 pb-2 pt-4">
+      {links.map(({ to, label }) => (
+        <Link key={to} to={to} className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+          {label}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 function BottomNav() {
   const { pathname } = useLocation();
   const items = [
