@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import smydLogo from "@/assets/smyd-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -39,10 +40,12 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const { next } = Route.useSearch();
   const nextPath = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
   const returnUrl = typeof window !== "undefined" ? `${window.location.origin}${nextPath}` : undefined;
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
