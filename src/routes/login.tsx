@@ -58,15 +58,24 @@ function Login() {
           toast.error(parsed.error.issues[0].message);
           return;
         }
+        if (!accepted) {
+          toast.error("You must read and accept the Rules, Terms, Privacy and Refund policy");
+          return;
+        }
         setBusy(true);
         const { error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
             emailRedirectTo: returnUrl,
-            data: { username: parsed.data.username, display_name: parsed.data.username },
+            data: {
+              username: parsed.data.username,
+              display_name: parsed.data.username,
+              terms_accepted_at: new Date().toISOString(),
+            },
           },
         });
+
         if (error) throw error;
         toast.success("Check your email to confirm your account.");
         setMode("signin");
