@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import smydLogo from "@/assets/smyd-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -39,10 +40,12 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const { next } = Route.useSearch();
   const nextPath = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
   const returnUrl = typeof window !== "undefined" ? `${window.location.origin}${nextPath}` : undefined;
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,15 +58,24 @@ function Login() {
           toast.error(parsed.error.issues[0].message);
           return;
         }
+        if (!accepted) {
+          toast.error("You must read and accept the Rules, Terms, Privacy and Refund policy");
+          return;
+        }
         setBusy(true);
         const { error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
             emailRedirectTo: returnUrl,
-            data: { username: parsed.data.username, display_name: parsed.data.username },
+            data: {
+              username: parsed.data.username,
+              display_name: parsed.data.username,
+              terms_accepted_at: new Date().toISOString(),
+            },
           },
         });
+
         if (error) throw error;
         toast.success("Check your email to confirm your account.");
         setMode("signin");
@@ -101,8 +113,13 @@ function Login() {
 
   const handleGoogle = async () => {
     if (busy) return;
+    if (mode === "signup" && !accepted) {
+      toast.error("You must read and accept the Rules, Terms, Privacy and Refund policy");
+      return;
+    }
     setBusy(true);
     try {
+
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: returnUrl,
       });
@@ -165,13 +182,33 @@ function Login() {
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
           />
 
+          {mode === "signup" && (
+            <label className="flex items-start gap-3 rounded-xl bg-surface p-3 ring-1 ring-border">
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-primary"
+              />
+              <span className="text-[11px] leading-relaxed text-muted-foreground">
+                I have read and accept the{" "}
+                <Link to="/rules" className="text-primary underline">Competition Rules</Link>,{" "}
+                <Link to="/terms" className="text-primary underline">Terms of Service</Link>,{" "}
+                <Link to="/privacy" className="text-primary underline">Privacy Policy</Link> and{" "}
+                <Link to="/refunds" className="text-primary underline">Refund Policy</Link>. I am 18+ and
+                understand that posting a false winner results in a permanent ban.
+              </span>
+            </label>
+          )}
+
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || (mode === "signup" && !accepted)}
             className="w-full rounded-xl bg-gradient-neon py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-background transition-transform active:scale-[0.98] ring-neon disabled:opacity-60"
           >
             {busy ? "Please wait…" : mode === "signin" ? "Enter the Arena" : "Create Account"}
           </button>
+
           {mode === "signin" && (
             <button
               type="button"
@@ -191,7 +228,7 @@ function Login() {
 
         <button
           onClick={handleGoogle}
-          disabled={busy}
+          disabled={busy || (mode === "signup" && !accepted)}
           className="w-full rounded-xl bg-surface ring-1 ring-border py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-foreground transition-colors hover:bg-surface/80 disabled:opacity-60"
         >
           Continue with Google
