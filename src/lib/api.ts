@@ -967,3 +967,37 @@ export function useAdminRejectWithdrawal() {
     if (error) throw error;
   }, ["admin-withdrawals", "wallet", "transactions"]);
 }
+
+/* ---------- ops monitoring ---------- */
+export function useOpsSnapshot() {
+  return useQuery({
+    queryKey: ["admin-ops"],
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const nowIso = new Date().toISOString();
+      const [stuck, disputes, payouts, giftFails, health] = await Promise.all([
+        supabase
+          .from("matches")
+          .select("id, mode, stake_cents, report_deadline, reported_winner_id")
+          .eq("status", "live")
+          .lt("report_deadline", nowIso)
+          .order("report_deadline", { ascending: true })
+          .limit(25),
+        supabase.from("matches").select("id", { count: "exact", head: true }).eq("disputed", true).eq("status", "live"),
+        supabase.from("withdrawal_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("gift_card_redemptions").select("id", { count: "exact", head: true }).eq("status", "failed"),
+        fetch("/api/public/health")
+          .then(async (r) => (await r.json()) as { status: string; latency_ms: number; detail: string | null })
+          .catch(() => ({ status: "error", latency_ms: 0, detail: "unreachable" })),
+      ]);
+      if (stuck.error) throw stuck.error;
+      return {
+        stuckMatches: stuck.data ?? [],
+        disputeCount: disputes.count ?? 0,
+        pendingPayouts: payouts.count ?? 0,
+        failedGiftCards: giftFails.count ?? 0,
+        health,
+      };
+    },
+  });
+}
