@@ -113,8 +113,13 @@ function Login() {
 
   const handleGoogle = async () => {
     if (busy) return;
+    if (mode === "signup" && !accepted) {
+      toast.error("You must read and accept the Rules, Terms, Privacy and Refund policy");
+      return;
+    }
     setBusy(true);
     try {
+
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: returnUrl,
       });
