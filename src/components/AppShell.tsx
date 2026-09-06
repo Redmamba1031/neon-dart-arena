@@ -16,7 +16,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <PaymentTestModeBanner />
         <BanBanner />
         <Header />
-        <main className="flex-1 pb-24">{children}</main>
+        <main className="flex-1 pb-24">
+          {children}
+          <LegalFooter />
+        </main>
         <BottomNav />
       </div>
     </div>
