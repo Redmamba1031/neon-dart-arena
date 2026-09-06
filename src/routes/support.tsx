@@ -35,7 +35,7 @@ function SupportPage() {
         </div>
 
         <a
-          href="mailto:support@smyd.online"
+          href="mailto:redmond1031@gmail.com"
           className="flex items-center gap-3 rounded-2xl bg-surface p-5 ring-1 ring-primary/50 transition-colors hover:ring-primary"
         >
           <span className="grid size-11 place-items-center rounded-xl bg-primary/15">
@@ -43,7 +43,7 @@ function SupportPage() {
           </span>
           <span>
             <span className="block font-display text-sm font-bold">Email support</span>
-            <span className="block text-xs text-muted-foreground">support@smyd.online — include your username</span>
+            <span className="block text-xs text-muted-foreground">redmond1031@gmail.com — include your username</span>
           </span>
         </a>
 

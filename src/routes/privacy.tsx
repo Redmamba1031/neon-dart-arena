@@ -80,7 +80,7 @@ function PrivacyPage() {
 
         <Section title="Contact">
           <p>
-            Questions about this policy? Email <a href="mailto:support@smyd.online" className="text-primary underline">support@smyd.online</a>.
+            Questions about this policy? Email <a href="mailto:redmond1031@gmail.com" className="text-primary underline">redmond1031@gmail.com</a>.
           </p>
         </Section>
       </div>
