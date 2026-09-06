@@ -16,7 +16,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <PaymentTestModeBanner />
         <BanBanner />
         <Header />
-        <main className="flex-1 pb-24">{children}</main>
+        <main className="flex-1 pb-24">
+          {children}
+          <LegalFooter />
+        </main>
         <BottomNav />
       </div>
     </div>
@@ -71,6 +74,25 @@ function Header() {
         </span>
       </Link>
     </header>
+  );
+}
+
+export function LegalFooter() {
+  const links = [
+    { to: "/rules", label: "Rules" },
+    { to: "/terms", label: "Terms" },
+    { to: "/privacy", label: "Privacy" },
+    { to: "/refunds", label: "Refunds" },
+    { to: "/support", label: "Support" },
+  ] as const;
+  return (
+    <div className="flex items-center justify-center gap-3 px-5 pb-2 pt-4">
+      {links.map(({ to, label }) => (
+        <Link key={to} to={to} className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+          {label}
+        </Link>
+      ))}
+    </div>
   );
 }
 
