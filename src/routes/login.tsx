@@ -182,13 +182,33 @@ function Login() {
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
           />
 
+          {mode === "signup" && (
+            <label className="flex items-start gap-3 rounded-xl bg-surface p-3 ring-1 ring-border">
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-primary"
+              />
+              <span className="text-[11px] leading-relaxed text-muted-foreground">
+                I have read and accept the{" "}
+                <Link to="/rules" className="text-primary underline">Competition Rules</Link>,{" "}
+                <Link to="/terms" className="text-primary underline">Terms of Service</Link>,{" "}
+                <Link to="/privacy" className="text-primary underline">Privacy Policy</Link> and{" "}
+                <Link to="/refunds" className="text-primary underline">Refund Policy</Link>. I am 18+ and
+                understand that posting a false winner results in a permanent ban.
+              </span>
+            </label>
+          )}
+
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || (mode === "signup" && !accepted)}
             className="w-full rounded-xl bg-gradient-neon py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-background transition-transform active:scale-[0.98] ring-neon disabled:opacity-60"
           >
             {busy ? "Please wait…" : mode === "signin" ? "Enter the Arena" : "Create Account"}
           </button>
+
           {mode === "signin" && (
             <button
               type="button"
