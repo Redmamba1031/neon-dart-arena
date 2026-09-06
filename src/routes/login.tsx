@@ -228,7 +228,7 @@ function Login() {
 
         <button
           onClick={handleGoogle}
-          disabled={busy}
+          disabled={busy || (mode === "signup" && !accepted)}
           className="w-full rounded-xl bg-surface ring-1 ring-border py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-foreground transition-colors hover:bg-surface/80 disabled:opacity-60"
         >
           Continue with Google
