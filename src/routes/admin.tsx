@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { AlertTriangle, Ban, Banknote, Coins, Gift, Shield, ShieldCheck } from "lucide-react";
+import { Activity, AlertTriangle, Ban, Banknote, Coins, Gift, Shield, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   formatMoney,
@@ -19,6 +19,7 @@ import {
   useAllRedemptions,
   useDisputedMatches,
   useIsStaff,
+  useOpsSnapshot,
   usePlayerSearch,
   useProfilesByIds,
   useStaffList,
@@ -79,6 +80,7 @@ function AdminPage() {
           <h1 className="font-display text-3xl font-bold mt-1">Admin</h1>
         </div>
 
+        <OpsPanel />
         <Disputes />
         <BanTool />
         <CoinTool />
@@ -88,6 +90,68 @@ function AdminPage() {
         <ActionLog />
       </div>
     </AppShell>
+  );
+}
+
+/* ---------- ops monitoring ---------- */
+function Stat({ label, value, alert }: { label: string; value: string | number; alert?: boolean }) {
+  return (
+    <div className={`rounded-lg bg-background ring-1 px-3 py-2 ${alert ? "ring-destructive" : "ring-border"}`}>
+      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className={`font-display text-lg font-bold ${alert ? "text-destructive" : ""}`}>{value}</p>
+    </div>
+  );
+}
+
+function OpsPanel() {
+  const { data, isLoading, refetch, isFetching } = useOpsSnapshot();
+  const healthy = data?.health.status === "ok";
+
+  return (
+    <section className={card}>
+      <div className="flex items-center justify-between">
+        <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+          <Activity className="size-4 text-accent" /> System health
+        </h2>
+        <button className="text-xs text-muted-foreground underline" onClick={() => void refetch()} disabled={isFetching}>
+          {isFetching ? "checking…" : "refresh"}
+        </button>
+      </div>
+
+      {isLoading || !data ? (
+        <p className="text-sm text-muted-foreground">Checking systems…</p>
+      ) : (
+        <>
+          <div className="flex items-center gap-2 text-sm">
+            <span className={`size-2 rounded-full ${healthy ? "bg-accent" : "bg-destructive"}`} />
+            <span className="font-medium">{healthy ? "All systems operational" : "Backend degraded"}</span>
+            <span className="text-xs text-muted-foreground">{data.health.latency_ms}ms</span>
+          </div>
+          {data.health.detail && <p className="text-xs text-destructive">{data.health.detail}</p>}
+
+          <div className="grid grid-cols-2 gap-2">
+            <Stat label="Overdue matches" value={data.stuckMatches.length} alert={data.stuckMatches.length > 0} />
+            <Stat label="Open disputes" value={data.disputeCount} alert={data.disputeCount > 0} />
+            <Stat label="Pending payouts" value={data.pendingPayouts} alert={data.pendingPayouts > 0} />
+            <Stat label="Failed gift cards" value={data.failedGiftCards} alert={data.failedGiftCards > 0} />
+          </div>
+
+          {data.stuckMatches.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Past the 45-minute window</p>
+              {data.stuckMatches.map((m) => (
+                <div key={m.id} className="flex items-center justify-between rounded-lg bg-background ring-1 ring-border px-3 py-2 text-xs">
+                  <span className="font-medium uppercase">{m.mode}</span>
+                  <span className="text-muted-foreground">
+                    {formatMoney(Number(m.stake_cents))} · {m.reported_winner_id ? "one report in" : "no report"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </section>
   );
 }
 
