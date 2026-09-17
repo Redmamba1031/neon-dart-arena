@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Swords, Plus, Loader2, Trophy, X, Search, MapPin } from "lucide-react";
-import { distanceMiles, locationLabel } from "@/lib/geo";
+import { locationLabel } from "@/lib/geo";
 import {
   useOpenMatches,
   useMyMatches,
@@ -13,6 +13,8 @@ import {
   useMyProfile,
   useWallet,
   useProfilesByIds,
+  useMyCoords,
+  useDistancesToUsers,
   useMyChallenges,
   useRespondChallenge,
   usePlayerSearch,
@@ -55,11 +57,10 @@ function Matches() {
 
   const allIds = base.flatMap((m) => [m.creator_id, m.opponent_id].filter(Boolean) as string[]);
   const { data: profiles } = useProfilesByIds(allIds);
+  const { data: myCoords } = useMyCoords();
+  const { data: distances } = useDistancesToUsers(allIds);
 
-  const milesTo = (id: string | null) => {
-    const p = id ? profiles?.get(id) : null;
-    return distanceMiles(me?.lat, me?.lng, p?.lat, p?.lng);
-  };
+  const milesTo = (id: string | null) => (id ? distances?.get(id) ?? null : null);
 
   const list =
     tab === "open" && radius != null
@@ -111,7 +112,7 @@ function Matches() {
               <button
                 key={String(r)}
                 onClick={() => setRadius(r)}
-                disabled={r !== null && me?.lat == null}
+                disabled={r !== null && myCoords?.lat == null}
                 className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ring-1 disabled:opacity-40 ${
                   radius === r ? "bg-primary text-primary-foreground ring-primary" : "bg-surface text-muted-foreground ring-border"
                 }`}
@@ -121,7 +122,7 @@ function Matches() {
             ))}
           </div>
         )}
-        {tab === "open" && me?.lat == null && (
+        {tab === "open" && myCoords?.lat == null && (
           <p className="text-[11px] text-muted-foreground">
             Turn on your location in your profile to find players near you.
           </p>

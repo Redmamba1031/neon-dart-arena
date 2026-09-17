@@ -50,7 +50,7 @@ export function useMyProfile() {
 
 export type ProfileLite = Pick<
   Profile,
-  "id" | "username" | "display_name" | "avatar_url" | "city" | "region_code" | "lat" | "lng"
+  "id" | "username" | "display_name" | "avatar_url" | "city" | "region_code"
 >;
 
 export function useProfilesByIds(ids: string[]) {
@@ -61,7 +61,7 @@ export function useProfilesByIds(ids: string[]) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, display_name, avatar_url, city, region_code, lat, lng")
+        .select("id, username, display_name, avatar_url, city, region_code")
         .in("id", unique);
       if (error) throw error;
       const map = new Map<string, ProfileLite>();
@@ -71,7 +71,42 @@ export function useProfilesByIds(ids: string[]) {
   });
 }
 
+
 // ---------- Location ----------
+/** Your own coordinates. Other players' coordinates are never readable. */
+export function useMyCoords() {
+  return useQuery({
+    queryKey: ["my-coords"],
+    queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return null;
+      const { data, error } = await supabase
+        .from("profile_locations")
+        .select("lat, lng")
+        .eq("user_id", auth.user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data ?? null;
+    },
+  });
+}
+
+/** Rounded distance in miles from you to each given player (no coordinates exposed). */
+export function useDistancesToUsers(ids: string[]) {
+  const unique = Array.from(new Set(ids.filter(Boolean)));
+  return useQuery({
+    queryKey: ["distances", unique.sort().join(",")],
+    enabled: unique.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("distances_from_me", { _ids: unique });
+      if (error) throw error;
+      const map = new Map<string, number>();
+      data?.forEach((r) => map.set(r.user_id, r.miles));
+      return map;
+    },
+  });
+}
+
 export function useRestrictedRegions() {
   return useQuery({
     queryKey: ["restricted-regions"],
@@ -113,6 +148,8 @@ export function useUpdateLocation() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-profile"] });
       qc.invalidateQueries({ queryKey: ["profiles"] });
+      qc.invalidateQueries({ queryKey: ["my-coords"] });
+      qc.invalidateQueries({ queryKey: ["distances"] });
     },
   });
 }
