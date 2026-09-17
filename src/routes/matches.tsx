@@ -203,6 +203,13 @@ function MatchRow({
             {m.mode} • Bo{m.best_of} • Stake {formatMoney(m.stake_cents)}
           </p>
           <p className="text-[10px] text-muted-foreground mt-0.5">{rules}</p>
+          {placeOf(m.creator_id) && (
+            <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
+              <MapPin className="size-3" />
+              {placeOf(m.creator_id)}
+              {milesOf(m.creator_id) != null && ` • ${milesOf(m.creator_id)} mi away`}
+            </p>
+          )}
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span
               className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
