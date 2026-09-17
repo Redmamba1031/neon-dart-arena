@@ -148,6 +148,8 @@ export function useUpdateLocation() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-profile"] });
       qc.invalidateQueries({ queryKey: ["profiles"] });
+      qc.invalidateQueries({ queryKey: ["my-coords"] });
+      qc.invalidateQueries({ queryKey: ["distances"] });
     },
   });
 }
