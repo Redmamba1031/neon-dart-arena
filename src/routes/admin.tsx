@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Activity, AlertTriangle, Ban, Banknote, Coins, Gift, Shield, ShieldCheck } from "lucide-react";
+import { Activity, AlertTriangle, Ban, Banknote, Coins, Gift, Shield, ShieldCheck, TrendingUp } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   formatMoney,
