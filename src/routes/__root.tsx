@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import appCss from "../styles.css?url";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { Toaster } from "@/components/ui/sonner";
 
 // Public routes accessible without auth. Everything else requires sign-in.
 // The OAuth consent route runs its own auth check + sign-in redirect (preserving
@@ -115,6 +116,7 @@ function RootComponent() {
       <AuthGate>
         <Outlet />
       </AuthGate>
+      <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }
