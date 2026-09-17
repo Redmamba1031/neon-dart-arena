@@ -102,10 +102,10 @@ export function useUpdateLocation() {
       const { error } = await supabase.rpc("update_my_location", {
         _country: input.country ?? "US",
         _region_code: input.region_code,
-        _region_name: input.region_name ?? null,
-        _city: input.city ?? null,
-        _lat: input.lat ?? null,
-        _lng: input.lng ?? null,
+        _region_name: input.region_name ?? "",
+        _city: input.city ?? "",
+        _lat: input.lat ?? undefined,
+        _lng: input.lng ?? undefined,
         _source: input.source ?? "manual",
       });
       if (error) throw error;
