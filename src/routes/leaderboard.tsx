@@ -58,7 +58,7 @@ function Leaderboard() {
             {top.length > 3 && (
               <div className="rounded-xl bg-surface ring-1 ring-border divide-y divide-border/60">
                 {top.slice(3).map((p) => (
-                  <Row key={p.user_id} p={p} />
+                  <Row key={p.user_id} p={p} place={placeOf(p.user_id)} />
                 ))}
               </div>
             )}
