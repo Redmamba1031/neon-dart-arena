@@ -981,6 +981,16 @@ export type Database = {
         Args: { _seeds: string[]; _tid: string }
         Returns: undefined
       }
+      _charge_entry: {
+        Args: {
+          _entry_cents: number
+          _match_id: string
+          _note: string
+          _rake_bps: number
+          _user_id: string
+        }
+        Returns: undefined
+      }
       _credit_wallet: {
         Args: {
           _amount_cents: number
@@ -1121,6 +1131,10 @@ export type Database = {
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       join_match: { Args: { _match_id: string }; Returns: undefined }
       join_tournament: { Args: { _tournament_id: string }; Returns: undefined }
+      match_fee_cents: {
+        Args: { _entry_cents: number; _rake_bps: number }
+        Returns: number
+      }
       record_dart: {
         Args: {
           _busted?: boolean
