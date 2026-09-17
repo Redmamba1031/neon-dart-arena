@@ -48,6 +48,11 @@ export function useMyProfile() {
   });
 }
 
+export type ProfileLite = Pick<
+  Profile,
+  "id" | "username" | "display_name" | "avatar_url" | "city" | "region_code" | "lat" | "lng"
+>;
+
 export function useProfilesByIds(ids: string[]) {
   const unique = Array.from(new Set(ids.filter(Boolean)));
   return useQuery({
@@ -56,12 +61,58 @@ export function useProfilesByIds(ids: string[]) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, display_name, avatar_url")
+        .select("id, username, display_name, avatar_url, city, region_code, lat, lng")
         .in("id", unique);
       if (error) throw error;
-      const map = new Map<string, Pick<Profile, "id" | "username" | "display_name" | "avatar_url">>();
+      const map = new Map<string, ProfileLite>();
       data?.forEach((p) => map.set(p.id, p));
       return map;
+    },
+  });
+}
+
+// ---------- Location ----------
+export function useRestrictedRegions() {
+  return useQuery({
+    queryKey: ["restricted-regions"],
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("restricted_regions")
+        .select("code, name, reason")
+        .eq("active", true);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useUpdateLocation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      region_code: string;
+      region_name?: string | null;
+      city?: string | null;
+      lat?: number | null;
+      lng?: number | null;
+      source?: "device" | "manual";
+      country?: string;
+    }) => {
+      const { error } = await supabase.rpc("update_my_location", {
+        _country: input.country ?? "US",
+        _region_code: input.region_code,
+        _region_name: input.region_name ?? null,
+        _city: input.city ?? null,
+        _lat: input.lat ?? null,
+        _lng: input.lng ?? null,
+        _source: input.source ?? "manual",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-profile"] });
+      qc.invalidateQueries({ queryKey: ["profiles"] });
     },
   });
 }
