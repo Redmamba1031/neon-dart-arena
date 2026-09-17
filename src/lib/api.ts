@@ -50,7 +50,7 @@ export function useMyProfile() {
 
 export type ProfileLite = Pick<
   Profile,
-  "id" | "username" | "display_name" | "avatar_url" | "city" | "region_code" | "lat" | "lng"
+  "id" | "username" | "display_name" | "avatar_url" | "city" | "region_code"
 >;
 
 export function useProfilesByIds(ids: string[]) {
@@ -61,7 +61,8 @@ export function useProfilesByIds(ids: string[]) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, display_name, avatar_url, city, region_code, lat, lng")
+        .select("id, username, display_name, avatar_url, city, region_code")
+        .in("id", unique);
         .in("id", unique);
       if (error) throw error;
       const map = new Map<string, ProfileLite>();
