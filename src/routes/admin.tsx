@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Activity, AlertTriangle, Ban, Banknote, Coins, Gift, Shield, ShieldCheck } from "lucide-react";
+import { Activity, AlertTriangle, Ban, Banknote, Coins, Gift, Shield, ShieldCheck, TrendingUp } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   formatMoney,
@@ -23,6 +23,8 @@ import {
   usePlayerSearch,
   useProfilesByIds,
   useStaffList,
+  useServiceFeeEarnings,
+  PAYOUT_STEP_CENTS,
 } from "@/lib/api";
 
 export const Route = createFileRoute("/admin")({
@@ -80,6 +82,7 @@ function AdminPage() {
           <h1 className="font-display text-3xl font-bold mt-1">Admin</h1>
         </div>
 
+        <EarningsPanel />
         <OpsPanel />
         <Disputes />
         <BanTool />
@@ -90,6 +93,54 @@ function AdminPage() {
         <ActionLog />
       </div>
     </AppShell>
+  );
+}
+
+/* ---------- service fee earnings ---------- */
+function EarningsPanel() {
+  const { data, isLoading } = useServiceFeeEarnings();
+  const milestones = data?.milestones ?? 0;
+
+  useEffect(() => {
+    if (!data || milestones < 1) return;
+    const key = "smyd-payout-milestone-seen";
+    const seen = Number(localStorage.getItem(key) ?? "0");
+    if (milestones > seen) {
+      localStorage.setItem(key, String(milestones));
+      toast.success(`Payout ready: ${formatMoney(milestones * PAYOUT_STEP_CENTS)} in service fees earned`, {
+        description: "You've passed another $100 in earnings.",
+        duration: 8000,
+      });
+    }
+  }, [data, milestones]);
+
+  const pct = data ? Math.round((data.towardNextCents / PAYOUT_STEP_CENTS) * 100) : 0;
+
+  return (
+    <section className={card}>
+      <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+        <TrendingUp className="size-4 text-accent" /> Service fee earnings
+      </h2>
+      {isLoading || !data ? (
+        <p className="text-sm text-muted-foreground">Loading earnings…</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <Stat label="Total earned" value={formatMoney(data.totalCents)} />
+            <Stat label="$100 milestones" value={milestones} />
+          </div>
+          <div className="space-y-1">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-background ring-1 ring-border">
+              <div className="h-full bg-accent transition-all" style={{ width: `${pct}%` }} />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {formatMoney(data.towardNextCents)} toward the next {formatMoney(PAYOUT_STEP_CENTS)} · next alert at{" "}
+              {formatMoney(data.nextMilestoneCents)}
+            </p>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 

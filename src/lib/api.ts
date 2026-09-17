@@ -1089,3 +1089,31 @@ export function useOpsSnapshot() {
     },
   });
 }
+
+/* ---------- service fee earnings ---------- */
+export const PAYOUT_STEP_CENTS = 10_000;
+
+export function useServiceFeeEarnings() {
+  return useQuery({
+    queryKey: ["service-fee-earnings"],
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("wallet_transactions")
+        .select("amount_cents")
+        .eq("user_id", user.id)
+        .eq("kind", "rake");
+      if (error) throw error;
+      const totalCents = (data ?? []).reduce((sum, t) => sum + Number(t.amount_cents ?? 0), 0);
+      const milestones = Math.floor(totalCents / PAYOUT_STEP_CENTS);
+      return {
+        totalCents,
+        milestones,
+        nextMilestoneCents: (milestones + 1) * PAYOUT_STEP_CENTS,
+        towardNextCents: totalCents % PAYOUT_STEP_CENTS,
+      };
+    },
+  });
+}
