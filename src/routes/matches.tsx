@@ -104,6 +104,29 @@ function Matches() {
           ))}
         </div>
 
+        {tab === "open" && (
+          <div className="flex items-center gap-2 overflow-x-auto">
+            <MapPin className="size-4 shrink-0 text-muted-foreground" />
+            {([null, 50, 150, 500] as const).map((r) => (
+              <button
+                key={String(r)}
+                onClick={() => setRadius(r)}
+                disabled={r !== null && me?.lat == null}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ring-1 disabled:opacity-40 ${
+                  radius === r ? "bg-primary text-primary-foreground ring-primary" : "bg-surface text-muted-foreground ring-border"
+                }`}
+              >
+                {r === null ? "Anywhere" : `${r} mi`}
+              </button>
+            ))}
+          </div>
+        )}
+        {tab === "open" && me?.lat == null && (
+          <p className="text-[11px] text-muted-foreground">
+            Turn on your location in your profile to find players near you.
+          </p>
+        )}
+
         {loading ? (
           <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">Loading…</div>
         ) : list.length === 0 ? (
