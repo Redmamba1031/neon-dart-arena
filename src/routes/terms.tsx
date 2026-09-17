@@ -36,8 +36,10 @@ function TermsPage() {
         <Section title="The service">
           <p>
             SMYD (Show Me Your Darts) is a platform for skill-based darts competitions. Players match up,
-            play their game on their own board, and report the result. Winners are paid from the stakes
-            both players put up, minus a 10% house fee. SMYD is a game of skill, not gambling.
+            play their game on their own board, and report the result. Each player pays a fixed entry that
+            is split into a prize contribution and a disclosed SMYD service fee. The prize contributions
+            form the prize pot, and 100% of the prize pot is awarded to the winner. Outcomes are determined
+            solely by the players' darts performance — SMYD is a contest of skill, not gambling.
           </p>
         </Section>
 

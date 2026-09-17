@@ -352,7 +352,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
             ))}
           </div>
         </Field>
-        <Field label="Stake (USD)">
+        <Field label="Entry (USD)">
           <input
             type="number"
             min={5}
@@ -390,11 +390,13 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       )}
 
       <p className="text-[11px] text-muted-foreground">
-        Pot {formatMoney(toCents(stake) * 2)} • Winner takes the pot minus 10% house fee
+        Entry {formatMoney(toCents(stake))} each = {formatMoney(toCents(stake) - Math.floor(toCents(stake) / 10))} to the prize pot +{" "}
+        {formatMoney(Math.floor(toCents(stake) / 10))} service fee • Winner takes 100% of the prize pot (
+        {formatMoney((toCents(stake) - Math.floor(toCents(stake) / 10)) * 2)})
       </p>
       <p className={`text-[11px] ${notEnough ? "text-primary font-bold" : "text-muted-foreground"}`}>
         Your balance: {walletReady ? formatMoney(balance) : "…"}
-        {notEnough && " — not enough funds for this stake. Add money in the Cashier."}
+        {notEnough && " — not enough funds for this entry. Add money in the Cashier."}
       </p>
       <button
         type="submit"

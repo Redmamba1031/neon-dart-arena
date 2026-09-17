@@ -42,12 +42,12 @@ function RefundsPage() {
           </p>
         </Section>
 
-        <Section title="Match stakes">
+        <Section title="Match entries">
           <ul className="list-disc space-y-1 pl-5">
-            <li>Cancel a match before anyone joins and your full stake is returned instantly.</li>
-            <li>If a challenge is declined, the creator's stake is refunded in full.</li>
-            <li>Once a match is live, stakes are held until the result is confirmed — they cannot be withdrawn mid-match.</li>
-            <li>Disputed matches stay held until staff review. The winner of the review receives the pot (minus the house fee); there are no partial refunds on completed matches.</li>
+            <li>Cancel a match before anyone joins and your full entry — prize contribution and service fee — is returned instantly.</li>
+            <li>If a challenge is declined, the creator's full entry, including the service fee, is refunded.</li>
+            <li>Once a match is live, entries are held until the result is confirmed — they cannot be withdrawn mid-match.</li>
+            <li>Disputed matches stay held until staff review. The winner of the review receives 100% of the prize pot; there are no partial refunds on completed matches. Service fees on played matches are non-refundable.</li>
           </ul>
         </Section>
 
