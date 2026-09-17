@@ -82,6 +82,7 @@ function AdminPage() {
           <h1 className="font-display text-3xl font-bold mt-1">Admin</h1>
         </div>
 
+        <EarningsPanel />
         <OpsPanel />
         <Disputes />
         <BanTool />
