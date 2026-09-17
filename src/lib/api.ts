@@ -63,7 +63,6 @@ export function useProfilesByIds(ids: string[]) {
         .from("profiles")
         .select("id, username, display_name, avatar_url, city, region_code")
         .in("id", unique);
-        .in("id", unique);
       if (error) throw error;
       const map = new Map<string, ProfileLite>();
       data?.forEach((p) => map.set(p.id, p));
