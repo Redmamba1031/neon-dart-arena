@@ -55,11 +55,10 @@ function Matches() {
 
   const allIds = base.flatMap((m) => [m.creator_id, m.opponent_id].filter(Boolean) as string[]);
   const { data: profiles } = useProfilesByIds(allIds);
+  const { data: myCoords } = useMyCoords();
+  const { data: distances } = useDistancesToUsers(allIds);
 
-  const milesTo = (id: string | null) => {
-    const p = id ? profiles?.get(id) : null;
-    return distanceMiles(me?.lat, me?.lng, p?.lat, p?.lng);
-  };
+  const milesTo = (id: string | null) => (id ? distances?.get(id) ?? null : null);
 
   const list =
     tab === "open" && radius != null
