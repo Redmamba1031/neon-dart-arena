@@ -48,11 +48,26 @@ function Matches() {
   const { data: mine = [], isLoading: loadingMine } = useMyMatches();
   const { data: history = [], isLoading: loadingHistory } = useMatchHistory();
 
-  const list = tab === "open" ? open.filter((m) => m.creator_id !== me?.id) : tab === "mine" ? mine : history;
+  const [radius, setRadius] = useState<number | null>(null);
+
+  const base = tab === "open" ? open.filter((m) => m.creator_id !== me?.id) : tab === "mine" ? mine : history;
   const loading = tab === "open" ? loadingOpen : tab === "mine" ? loadingMine : loadingHistory;
 
-  const ids = list.flatMap((m) => [m.creator_id, m.opponent_id].filter(Boolean) as string[]);
-  const { data: profiles } = useProfilesByIds(ids);
+  const allIds = base.flatMap((m) => [m.creator_id, m.opponent_id].filter(Boolean) as string[]);
+  const { data: profiles } = useProfilesByIds(allIds);
+
+  const milesTo = (id: string | null) => {
+    const p = id ? profiles?.get(id) : null;
+    return distanceMiles(me?.lat, me?.lng, p?.lat, p?.lng);
+  };
+
+  const list =
+    tab === "open" && radius != null
+      ? base.filter((m) => {
+          const d = milesTo(m.creator_id);
+          return d != null && d <= radius;
+        })
+      : base;
 
   return (
     <AppShell>
