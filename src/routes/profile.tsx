@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2 } from "lucide-react";
-import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney } from "@/lib/api";
+import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2, MapPin, Crosshair } from "lucide-react";
+import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney, useUpdateLocation, useRestrictedRegions } from "@/lib/api";
+import { US_STATES, getDeviceLocation, locationLabel, stateName } from "@/lib/geo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
