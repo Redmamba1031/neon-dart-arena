@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2, MapPin, Crosshair } from "lucide-react";
-import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney, useUpdateLocation, useRestrictedRegions } from "@/lib/api";
+import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney, useUpdateLocation, useRestrictedRegions, useMyCoords } from "@/lib/api";
 import { US_STATES, getDeviceLocation, locationLabel, stateName } from "@/lib/geo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -142,12 +142,14 @@ function Profile() {
 function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["data"] }) {
   const update = useUpdateLocation();
   const { data: restricted = [] } = useRestrictedRegions();
+  const { data: myCoords } = useMyCoords();
   const [state, setState] = useState(profile?.region_code ?? "");
   const [city, setCity] = useState(profile?.city ?? "");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
-    profile?.lat != null && profile?.lng != null ? { lat: profile.lat, lng: profile.lng } : null,
+    null,
   );
   const [locating, setLocating] = useState(false);
+  const savedCoords = coords ?? (myCoords?.lat != null && myCoords?.lng != null ? { lat: myCoords.lat, lng: myCoords.lng } : null);
   const [touched, setTouched] = useState(false);
 
   const current = touched ? state : profile?.region_code ?? state;
@@ -173,8 +175,8 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
         region_code: state,
         region_name: stateName(state),
         city,
-        lat: coords?.lat ?? null,
-        lng: coords?.lng ?? null,
+        lat: savedCoords?.lat ?? null,
+        lng: savedCoords?.lng ?? null,
         source: coords ? "device" : "manual",
       });
       toast.success("Location saved");
@@ -204,7 +206,7 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
         className="w-full rounded-lg bg-background ring-1 ring-border py-2.5 text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-60"
       >
         {locating ? <Loader2 className="size-4 animate-spin" /> : <Crosshair className="size-4" />}
-        {coords ? "Location detected" : "Use my current location"}
+        {savedCoords ? "Location detected" : "Use my current location"}
       </button>
 
       <label className="block">
