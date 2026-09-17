@@ -103,6 +103,8 @@ function Profile() {
           </Link>
         </div>
 
+        <LocationCard profile={profile} />
+
         {editing && <EditProfile onDone={() => setEditing(false)} initial={{ username: profile?.username ?? "", display_name: profile?.display_name ?? "", avatar_url: profile?.avatar_url ?? "" }} />}
 
 
