@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Swords, Plus, Loader2, Trophy, X, Search } from "lucide-react";
+import { Swords, Plus, Loader2, Trophy, X, Search, MapPin } from "lucide-react";
+import { distanceMiles, locationLabel } from "@/lib/geo";
 import {
   useOpenMatches,
   useMyMatches,
@@ -47,11 +48,26 @@ function Matches() {
   const { data: mine = [], isLoading: loadingMine } = useMyMatches();
   const { data: history = [], isLoading: loadingHistory } = useMatchHistory();
 
-  const list = tab === "open" ? open.filter((m) => m.creator_id !== me?.id) : tab === "mine" ? mine : history;
+  const [radius, setRadius] = useState<number | null>(null);
+
+  const base = tab === "open" ? open.filter((m) => m.creator_id !== me?.id) : tab === "mine" ? mine : history;
   const loading = tab === "open" ? loadingOpen : tab === "mine" ? loadingMine : loadingHistory;
 
-  const ids = list.flatMap((m) => [m.creator_id, m.opponent_id].filter(Boolean) as string[]);
-  const { data: profiles } = useProfilesByIds(ids);
+  const allIds = base.flatMap((m) => [m.creator_id, m.opponent_id].filter(Boolean) as string[]);
+  const { data: profiles } = useProfilesByIds(allIds);
+
+  const milesTo = (id: string | null) => {
+    const p = id ? profiles?.get(id) : null;
+    return distanceMiles(me?.lat, me?.lng, p?.lat, p?.lng);
+  };
+
+  const list =
+    tab === "open" && radius != null
+      ? base.filter((m) => {
+          const d = milesTo(m.creator_id);
+          return d != null && d <= radius;
+        })
+      : base;
 
   return (
     <AppShell>
@@ -88,6 +104,29 @@ function Matches() {
           ))}
         </div>
 
+        {tab === "open" && (
+          <div className="flex items-center gap-2 overflow-x-auto">
+            <MapPin className="size-4 shrink-0 text-muted-foreground" />
+            {([null, 50, 150, 500] as const).map((r) => (
+              <button
+                key={String(r)}
+                onClick={() => setRadius(r)}
+                disabled={r !== null && me?.lat == null}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ring-1 disabled:opacity-40 ${
+                  radius === r ? "bg-primary text-primary-foreground ring-primary" : "bg-surface text-muted-foreground ring-border"
+                }`}
+              >
+                {r === null ? "Anywhere" : `${r} mi`}
+              </button>
+            ))}
+          </div>
+        )}
+        {tab === "open" && me?.lat == null && (
+          <p className="text-[11px] text-muted-foreground">
+            Turn on your location in your profile to find players near you.
+          </p>
+        )}
+
         {loading ? (
           <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">Loading…</div>
         ) : list.length === 0 ? (
@@ -97,7 +136,14 @@ function Matches() {
         ) : (
           <div className="space-y-3">
             {list.map((m) => (
-              <MatchRow key={m.id} match={m} meId={me?.id} nameOf={(id) => nameFrom(profiles, id)} />
+              <MatchRow
+                key={m.id}
+                match={m}
+                meId={me?.id}
+                nameOf={(id) => nameFrom(profiles, id)}
+                placeOf={(id) => (id ? locationLabel(profiles?.get(id)) : null)}
+                milesOf={milesTo}
+              />
             ))}
           </div>
         )}
@@ -119,10 +165,14 @@ function MatchRow({
   match: m,
   meId,
   nameOf,
+  placeOf,
+  milesOf,
 }: {
   match: Match;
   meId: string | undefined;
   nameOf: (id: string | null) => string;
+  placeOf: (id: string | null) => string | null;
+  milesOf: (id: string | null) => number | null;
 }) {
   const join = useJoinMatch();
   const cancel = useCancelMatch();
@@ -153,6 +203,13 @@ function MatchRow({
             {m.mode} • Bo{m.best_of} • Stake {formatMoney(m.stake_cents)}
           </p>
           <p className="text-[10px] text-muted-foreground mt-0.5">{rules}</p>
+          {placeOf(m.creator_id) && (
+            <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
+              <MapPin className="size-3" />
+              {placeOf(m.creator_id)}
+              {milesOf(m.creator_id) != null && ` • ${milesOf(m.creator_id)} mi away`}
+            </p>
+          )}
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span
               className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${

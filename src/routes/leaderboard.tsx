@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Trophy } from "lucide-react";
-import { useLeaderboard, useMyProfile, formatUsd, type LeaderboardRow } from "@/lib/api";
+import { useLeaderboard, useMyProfile, useProfilesByIds, formatUsd, type LeaderboardRow } from "@/lib/api";
+import { locationLabel } from "@/lib/geo";
 
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
@@ -22,6 +23,9 @@ function nameOf(p: LeaderboardRow) {
 function Leaderboard() {
   const { data: me } = useMyProfile();
   const { data: rows = [], isLoading } = useLeaderboard(50);
+
+  const { data: profiles } = useProfilesByIds(rows.map((r) => r.user_id).filter(Boolean) as string[]);
+  const placeOf = (id: string | null) => (id ? locationLabel(profiles?.get(id)) : null);
 
   const ranked: Ranked[] = rows.map((r, i) => ({ ...r, rank: i + 1, isYou: r.user_id === me?.id }));
   const top = ranked;
@@ -54,7 +58,7 @@ function Leaderboard() {
             {top.length > 3 && (
               <div className="rounded-xl bg-surface ring-1 ring-border divide-y divide-border/60">
                 {top.slice(3).map((p) => (
-                  <Row key={p.user_id} p={p} />
+                  <Row key={p.user_id} p={p} place={placeOf(p.user_id)} />
                 ))}
               </div>
             )}
@@ -112,7 +116,7 @@ function Podium({
   );
 }
 
-function Row({ p }: { p: Ranked }) {
+function Row({ p, place }: { p: Ranked; place?: string | null }) {
   const name = nameOf(p);
   return (
     <div className="px-4 py-3 flex items-center gap-3">
@@ -126,7 +130,7 @@ function Row({ p }: { p: Ranked }) {
           {p.isYou && <span className="ml-1 text-[10px] text-primary">(you)</span>}
         </p>
         <p className="text-[10px] text-muted-foreground">
-          {p.wins} W • {p.matches_played} played
+          {p.wins} W • {p.matches_played} played{place ? ` • ${place}` : ""}
         </p>
       </div>
       <span className="font-display text-sm font-semibold text-success">
