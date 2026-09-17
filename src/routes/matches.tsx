@@ -165,10 +165,14 @@ function MatchRow({
   match: m,
   meId,
   nameOf,
+  placeOf,
+  milesOf,
 }: {
   match: Match;
   meId: string | undefined;
   nameOf: (id: string | null) => string;
+  placeOf: (id: string | null) => string | null;
+  milesOf: (id: string | null) => number | null;
 }) {
   const join = useJoinMatch();
   const cancel = useCancelMatch();
