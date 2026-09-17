@@ -24,6 +24,9 @@ function Leaderboard() {
   const { data: me } = useMyProfile();
   const { data: rows = [], isLoading } = useLeaderboard(50);
 
+  const { data: profiles } = useProfilesByIds(rows.map((r) => r.user_id).filter(Boolean) as string[]);
+  const placeOf = (id: string | null) => (id ? locationLabel(profiles?.get(id)) : null);
+
   const ranked: Ranked[] = rows.map((r, i) => ({ ...r, rank: i + 1, isYou: r.user_id === me?.id }));
   const top = ranked;
   const you = ranked.find((p) => p.isYou);
