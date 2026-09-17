@@ -16,9 +16,9 @@ export const Route = createFileRoute("/wallet")({
 const KIND_LABEL: Record<WalletTxn["kind"], string> = {
   deposit: "Bonus",
   withdrawal: "Adjustment",
-  match_stake: "Match stake",
+  match_stake: "Prize pot entry",
   match_payout: "Match payout",
-  rake: "Platform fee",
+  rake: "Service fee",
   refund: "Refund",
 };
 
