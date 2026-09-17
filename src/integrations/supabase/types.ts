@@ -499,36 +499,87 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          city: string | null
+          country: string | null
           created_at: string
           display_name: string | null
           id: string
+          lat: number | null
+          lng: number | null
+          location_source: string | null
+          location_updated_at: string | null
           losses: number
           rating: number
+          region_code: string | null
+          region_name: string | null
           updated_at: string
           username: string | null
           wins: number
         }
         Insert: {
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           display_name?: string | null
           id: string
+          lat?: number | null
+          lng?: number | null
+          location_source?: string | null
+          location_updated_at?: string | null
           losses?: number
           rating?: number
+          region_code?: string | null
+          region_name?: string | null
           updated_at?: string
           username?: string | null
           wins?: number
         }
         Update: {
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          lat?: number | null
+          lng?: number | null
+          location_source?: string | null
+          location_updated_at?: string | null
           losses?: number
           rating?: number
+          region_code?: string | null
+          region_name?: string | null
           updated_at?: string
           username?: string | null
           wins?: number
+        }
+        Relationships: []
+      }
+      restricted_regions: {
+        Row: {
+          active: boolean
+          code: string
+          country: string
+          created_at: string
+          name: string
+          reason: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          country?: string
+          created_at?: string
+          name: string
+          reason?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          country?: string
+          created_at?: string
+          name?: string
+          reason?: string
         }
         Relationships: []
       }
@@ -902,6 +953,7 @@ export type Database = {
         Returns: undefined
       }
       _assert_not_banned: { Args: { _user_id: string }; Returns: undefined }
+      _assert_region_allowed: { Args: { _user_id: string }; Returns: undefined }
       _build_bracket_4: {
         Args: { _seeds: string[]; _tid: string }
         Returns: undefined
@@ -1098,6 +1150,18 @@ export type Database = {
           _match_id: string
         }
         Returns: string
+      }
+      update_my_location: {
+        Args: {
+          _city: string
+          _country: string
+          _lat?: number
+          _lng?: number
+          _region_code: string
+          _region_name: string
+          _source?: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
