@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Swords, Plus, Loader2, Trophy, X, Search } from "lucide-react";
+import { Swords, Plus, Loader2, Trophy, X, Search, MapPin } from "lucide-react";
+import { distanceMiles, locationLabel } from "@/lib/geo";
 import {
   useOpenMatches,
   useMyMatches,
