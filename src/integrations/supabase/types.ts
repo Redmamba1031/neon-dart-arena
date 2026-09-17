@@ -991,6 +991,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      _collect_fee: {
+        Args: { _fee: number; _match_id: string; _note: string }
+        Returns: undefined
+      }
       _credit_wallet: {
         Args: {
           _amount_cents: number
@@ -1011,6 +1015,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      _house_account: { Args: never; Returns: string }
       _log_admin: {
         Args: {
           _action: string
@@ -1030,6 +1035,10 @@ export type Database = {
         Returns: undefined
       }
       _require_staff: { Args: never; Returns: undefined }
+      _return_fee: {
+        Args: { _fee: number; _match_id: string; _note: string }
+        Returns: undefined
+      }
       _settle_match: {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
