@@ -496,6 +496,27 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_locations: {
+        Row: {
+          lat: number | null
+          lng: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          lat?: number | null
+          lng?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          lat?: number | null
+          lng?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -504,8 +525,6 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
-          lat: number | null
-          lng: number | null
           location_source: string | null
           location_updated_at: string | null
           losses: number
@@ -523,8 +542,6 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
-          lat?: number | null
-          lng?: number | null
           location_source?: string | null
           location_updated_at?: string | null
           losses?: number
@@ -542,8 +559,6 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
-          lat?: number | null
-          lng?: number | null
           location_source?: string | null
           location_updated_at?: string | null
           losses?: number
@@ -1083,6 +1098,13 @@ export type Database = {
           _user_id: string
         }
         Returns: undefined
+      }
+      distances_from_me: {
+        Args: { _ids: string[] }
+        Returns: {
+          miles: number
+          user_id: string
+        }[]
       }
       finalize_match_report: { Args: { _match_id: string }; Returns: undefined }
       finalize_tournament_match_report: {
