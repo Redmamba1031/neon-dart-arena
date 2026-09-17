@@ -136,7 +136,14 @@ function Matches() {
         ) : (
           <div className="space-y-3">
             {list.map((m) => (
-              <MatchRow key={m.id} match={m} meId={me?.id} nameOf={(id) => nameFrom(profiles, id)} />
+              <MatchRow
+                key={m.id}
+                match={m}
+                meId={me?.id}
+                nameOf={(id) => nameFrom(profiles, id)}
+                placeOf={(id) => (id ? locationLabel(profiles?.get(id)) : null)}
+                milesOf={milesTo}
+              />
             ))}
           </div>
         )}
