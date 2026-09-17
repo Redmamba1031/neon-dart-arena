@@ -138,6 +138,108 @@ function Profile() {
   );
 }
 
+function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["data"] }) {
+  const update = useUpdateLocation();
+  const { data: restricted = [] } = useRestrictedRegions();
+  const [state, setState] = useState(profile?.region_code ?? "");
+  const [city, setCity] = useState(profile?.city ?? "");
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
+    profile?.lat != null && profile?.lng != null ? { lat: profile.lat, lng: profile.lng } : null,
+  );
+  const [locating, setLocating] = useState(false);
+  const [touched, setTouched] = useState(false);
+
+  const current = touched ? state : profile?.region_code ?? state;
+  const blocked = restricted.find((r) => r.code === current);
+
+  const useDevice = async () => {
+    setLocating(true);
+    try {
+      const pos = await getDeviceLocation();
+      setCoords(pos);
+      toast.success("Location captured — confirm your state and save");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not get your location");
+    } finally {
+      setLocating(false);
+    }
+  };
+
+  const save = async () => {
+    if (!state) return toast.error("Pick your state first");
+    try {
+      await update.mutateAsync({
+        region_code: state,
+        region_name: stateName(state),
+        city,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
+        source: coords ? "device" : "manual",
+      });
+      toast.success("Location saved");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save your location");
+    }
+  };
+
+  return (
+    <div className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
+      <div className="flex items-center gap-3">
+        <div className="size-10 rounded-lg bg-primary/15 grid place-items-center text-primary">
+          <MapPin className="size-5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Location</p>
+          <p className="text-sm font-semibold">
+            {locationLabel(profile) ?? "Not set — required to play for money"}
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={useDevice}
+        disabled={locating}
+        className="w-full rounded-lg bg-background ring-1 ring-border py-2.5 text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-60"
+      >
+        {locating ? <Loader2 className="size-4 animate-spin" /> : <Crosshair className="size-4" />}
+        {coords ? "Location detected" : "Use my current location"}
+      </button>
+
+      <label className="block">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">State</span>
+        <select
+          value={state}
+          onChange={(e) => { setState(e.target.value); setTouched(true); }}
+          className="mt-1 w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
+        >
+          <option value="">Select your state…</option>
+          {US_STATES.map((s) => (
+            <option key={s.code} value={s.code}>{s.name}</option>
+          ))}
+        </select>
+      </label>
+
+      <EditField label="City" value={city} onChange={setCity} placeholder="Indianapolis" />
+
+      {blocked && (
+        <p className="rounded-lg bg-destructive/10 px-3 py-2 text-[11px] text-destructive ring-1 ring-destructive/30">
+          Real-money play is not available in {blocked.name}. {blocked.reason}
+        </p>
+      )}
+
+      <button
+        onClick={save}
+        disabled={update.isPending}
+        className="w-full rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-60"
+      >
+        {update.isPending && <Loader2 className="size-4 animate-spin" />}
+        Save location
+      </button>
+    </div>
+  );
+}
+
 function Stat({ label, value, tint = "text-foreground" }: { label: string; value: string; tint?: string }) {
   return (
     <div className="rounded-lg bg-surface/80 p-2.5 text-center ring-1 ring-border">
