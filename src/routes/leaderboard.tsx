@@ -130,7 +130,7 @@ function Row({ p, place }: { p: Ranked; place?: string | null }) {
           {p.isYou && <span className="ml-1 text-[10px] text-primary">(you)</span>}
         </p>
         <p className="text-[10px] text-muted-foreground">
-          {p.wins} W • {p.matches_played} played
+          {p.wins} W • {p.matches_played} played{place ? ` • ${place}` : ""}
         </p>
       </div>
       <span className="font-display text-sm font-semibold text-success">
