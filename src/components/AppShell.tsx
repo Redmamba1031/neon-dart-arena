@@ -87,12 +87,17 @@ export function LegalFooter() {
     { to: "/support", label: "Support" },
   ] as const;
   return (
-    <div className="flex items-center justify-center gap-3 px-5 pb-2 pt-4">
-      {links.map(({ to, label }) => (
-        <Link key={to} to={to} className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground">
-          {label}
-        </Link>
-      ))}
+    <div className="space-y-1 px-5 pb-2 pt-4">
+      <div className="flex items-center justify-center gap-3">
+        {links.map(({ to, label }) => (
+          <Link key={to} to={to} className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+            {label}
+          </Link>
+        ))}
+      </div>
+      <p className="text-center text-[8px] text-muted-foreground/70">
+        SMYD™ and the SMYD logo are trademarks of SMYD's owner. All rights reserved.
+      </p>
     </div>
   );
 }
