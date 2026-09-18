@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Clock, AlertTriangle, Check } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   useReportMatchWinner,
