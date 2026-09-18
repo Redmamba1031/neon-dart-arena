@@ -185,7 +185,7 @@ function MatchRow({
     try {
       await fn();
       toast.success(ok);
-      toast.info("Find your opponent in SMYD Messages to set up and play the match, then post the winner here.", { duration: 8000 });
+      toast.info("Find your opponent in the SMYD group on GranBoard to set up and play the match, then post the winner here.", { duration: 8000 });
     } catch (e: any) {
       toast.error(e?.message ?? "Action failed");
     }
@@ -299,7 +299,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         opponent_id: opponent?.id ?? null,
       });
       toast.success(opponent ? `Challenge sent to ${opponent.name}` : "Match created — waiting for an opponent");
-      toast.info("Once your match is accepted, find your opponent in SMYD Messages to set up and play the match.", { duration: 8000 });
+      toast.info("Once your match is accepted, find your opponent in the SMYD group on GranBoard to set up and play the match.", { duration: 8000 });
       onCreated();
     } catch (err: any) {
       toast.error(err?.message ?? "Create failed");
@@ -401,7 +401,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         {notEnough && " — not enough funds for this entry. Add money in the Cashier."}
       </p>
       <p className="text-[11px] text-muted-foreground">
-        After your match is created and accepted, find your opponent in SMYD Messages to set up and play the match.
+        After your match is created and accepted, find your opponent in the SMYD group on GranBoard to set up and play the match.
       </p>
       <button
         type="submit"
@@ -438,7 +438,7 @@ function ChallengeInbox({ meId }: { meId: string | undefined }) {
     try {
       await respond.mutateAsync({ challengeId, accept });
       toast.success(accept ? "Challenge accepted — good luck" : "Challenge declined");
-      if (accept) toast.info("Find your opponent in SMYD Messages to set up and play the match, then post the winner here.", { duration: 8000 });
+      if (accept) toast.info("Find your opponent in the SMYD group on GranBoard to set up and play the match, then post the winner here.", { duration: 8000 });
     } catch (e: any) {
       toast.error(e?.message ?? "Could not respond");
     }
