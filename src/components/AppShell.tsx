@@ -52,12 +52,13 @@ function Header() {
       >
         {initials}
       </Link>
-      <Link to="/" className="flex items-center gap-2">
+      <Link to="/" className="flex items-start gap-0.5">
         <img
           src={smydLogo}
-          alt="SMYD — Show Me Your Darts"
+          alt="SMYD™ — Show Me Your Darts"
           className="h-10 w-auto drop-shadow-[0_0_12px_rgba(220,38,38,0.5)]"
         />
+        <span className="mt-0.5 text-[9px] font-bold text-muted-foreground">™</span>
       </Link>
       {role?.staff && (
         <Link to="/admin" className="grid size-9 place-items-center rounded-full bg-surface ring-1 ring-border">
@@ -86,12 +87,17 @@ export function LegalFooter() {
     { to: "/support", label: "Support" },
   ] as const;
   return (
-    <div className="flex items-center justify-center gap-3 px-5 pb-2 pt-4">
-      {links.map(({ to, label }) => (
-        <Link key={to} to={to} className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground">
-          {label}
-        </Link>
-      ))}
+    <div className="space-y-1 px-5 pb-2 pt-4">
+      <div className="flex items-center justify-center gap-3">
+        {links.map(({ to, label }) => (
+          <Link key={to} to={to} className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+            {label}
+          </Link>
+        ))}
+      </div>
+      <p className="text-center text-[8px] text-muted-foreground/70">
+        SMYD™ and the SMYD logo are trademarks of SMYD's owner. All rights reserved.
+      </p>
     </div>
   );
 }

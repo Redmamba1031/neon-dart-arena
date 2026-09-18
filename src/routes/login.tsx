@@ -137,7 +137,10 @@ function Login() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col px-6 py-10">
         <div className="flex flex-col items-center mb-10 animate-fade-in-up">
-          <img src={smydLogo} alt="SMYD — Show Me Your Darts" className="w-44 h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.45)]" />
+          <div className="flex items-start gap-0.5">
+            <img src={smydLogo} alt="SMYD™ — Show Me Your Darts" className="w-44 h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.45)]" />
+            <span className="mt-1 text-[10px] font-bold text-muted-foreground">™</span>
+          </div>
           <p className="mt-3 text-sm text-muted-foreground tracking-wide">Real-money GranBoard darts</p>
         </div>
 

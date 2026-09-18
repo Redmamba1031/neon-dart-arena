@@ -54,7 +54,7 @@ function RefundsPage() {
         <Section title="Gift cards">
           <p>
             Gift card redemptions are final once the card is delivered. If a redemption fails and no card is
-            delivered, the funds are automatically returned to your SMYD balance — if yours wasn't, contact
+            delivered, the funds are automatically returned to your SMYD™ balance — if yours wasn't, contact
             support or ask staff to refund the order from the admin panel.
           </p>
         </Section>
