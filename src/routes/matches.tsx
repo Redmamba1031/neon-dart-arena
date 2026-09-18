@@ -298,6 +298,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         opponent_id: opponent?.id ?? null,
       });
       toast.success(opponent ? `Challenge sent to ${opponent.name}` : "Match created — waiting for an opponent");
+      toast.info("Once your match is accepted, find your opponent in SMYD Messages to set up and play the match.", { duration: 8000 });
       onCreated();
     } catch (err: any) {
       toast.error(err?.message ?? "Create failed");
