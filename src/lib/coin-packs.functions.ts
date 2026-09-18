@@ -61,6 +61,21 @@ export const createCoinPackCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId, claims } = context as { userId: string; claims: { email?: string } };
 
+    // Indiana-only launch: block purchases from anywhere else
+    const { data: profileRow } = await admin()
+      .from("profiles")
+      .select("region_code, country")
+      .eq("id", userId)
+      .maybeSingle();
+    const profile = profileRow as { region_code?: string | null; country?: string | null } | null;
+    if (!profile?.region_code) {
+      throw new Error("Set your location in your profile before adding funds");
+    }
+    if ((profile.country ?? "US") !== "US" || profile.region_code !== "IN") {
+      throw new Error("SMYD is currently live in Indiana only — adding funds is not available in your area yet");
+    }
+
+
     // Look up coin pack in catalog (source of truth for coins granted)
     const { data: packRow, error: packErr } = await admin()
       .from("coin_packs")
