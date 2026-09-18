@@ -400,6 +400,9 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
         Your balance: {walletReady ? formatMoney(balance) : "…"}
         {notEnough && " — not enough funds for this entry. Add money in the Cashier."}
       </p>
+      <p className="text-[11px] text-muted-foreground">
+        After your match is created and accepted, find your opponent in SMYD Messages to set up and play the match.
+      </p>
       <button
         type="submit"
         disabled={create.isPending || notEnough}
