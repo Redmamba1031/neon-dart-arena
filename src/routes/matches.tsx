@@ -185,6 +185,7 @@ function MatchRow({
     try {
       await fn();
       toast.success(ok);
+      toast.info("Find your opponent in SMYD Messages to set up and play the match, then post the winner here.", { duration: 8000 });
     } catch (e: any) {
       toast.error(e?.message ?? "Action failed");
     }
@@ -434,6 +435,7 @@ function ChallengeInbox({ meId }: { meId: string | undefined }) {
     try {
       await respond.mutateAsync({ challengeId, accept });
       toast.success(accept ? "Challenge accepted — good luck" : "Challenge declined");
+      if (accept) toast.info("Find your opponent in SMYD Messages to set up and play the match, then post the winner here.", { duration: 8000 });
     } catch (e: any) {
       toast.error(e?.message ?? "Could not respond");
     }

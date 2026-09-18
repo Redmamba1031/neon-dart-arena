@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Clock, AlertTriangle, Check } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   useReportMatchWinner,
@@ -91,6 +92,9 @@ export function MatchReportPanel({
 
   return (
     <div className="mt-3 space-y-2">
+      <div className="rounded-lg bg-primary/10 ring-1 ring-primary/30 p-2.5 text-[11px] text-muted-foreground">
+        Your match is live — <Link to="/messages" className="font-bold text-primary underline underline-offset-2">find your opponent in SMYD Messages</Link> to set up and play the match, then come back here to post the winner.
+      </div>
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           Post the winner
