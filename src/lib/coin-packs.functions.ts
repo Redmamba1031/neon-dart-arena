@@ -62,11 +62,12 @@ export const createCoinPackCheckout = createServerFn({ method: "POST" })
     const { userId, claims } = context as { userId: string; claims: { email?: string } };
 
     // Indiana-only launch: block purchases from anywhere else
-    const { data: profile } = await admin()
+    const { data: profileRow } = await admin()
       .from("profiles")
       .select("region_code, country")
       .eq("id", userId)
       .maybeSingle();
+    const profile = profileRow as { region_code?: string | null; country?: string | null } | null;
     if (!profile?.region_code) {
       throw new Error("Set your location in your profile before adding funds");
     }
