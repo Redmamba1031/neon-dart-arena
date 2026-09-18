@@ -34,7 +34,7 @@ function PrivacyPage() {
         </div>
 
         <Section title="What we collect">
-          <p>When you use SMYD (Show Me Your Darts), we collect:</p>
+          <p>When you use SMYD™ (Show Me Your Darts), we collect:</p>
           <ul className="list-disc space-y-1 pl-5">
             <li>Account information — email address, username, display name, and avatar.</li>
             <li>Match and game data — matches you create or join, stakes, results you report, wins and losses, and leaderboard stats.</li>

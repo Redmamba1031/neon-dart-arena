@@ -35,7 +35,7 @@ function RulesPage() {
         <div>
           <h1 className="font-display text-2xl font-bold">Competition Rules</h1>
           <p className="mt-1 text-xs text-muted-foreground">
-            These rules apply to every match on SMYD and are part of the{" "}
+            These rules apply to every match on SMYD™ and are part of the{" "}
             <Link to="/terms" className="text-primary underline">Terms of Service</Link>.
           </p>
         </div>

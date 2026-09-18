@@ -52,12 +52,13 @@ function Header() {
       >
         {initials}
       </Link>
-      <Link to="/" className="flex items-center gap-2">
+      <Link to="/" className="flex items-start gap-0.5">
         <img
           src={smydLogo}
-          alt="SMYD — Show Me Your Darts"
+          alt="SMYD™ — Show Me Your Darts"
           className="h-10 w-auto drop-shadow-[0_0_12px_rgba(220,38,38,0.5)]"
         />
+        <span className="mt-0.5 text-[9px] font-bold text-muted-foreground">™</span>
       </Link>
       {role?.staff && (
         <Link to="/admin" className="grid size-9 place-items-center rounded-full bg-surface ring-1 ring-border">

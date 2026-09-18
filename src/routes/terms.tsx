@@ -35,7 +35,7 @@ function TermsPage() {
 
         <Section title="The service">
           <p>
-            SMYD (Show Me Your Darts) is a platform for skill-based darts competitions. Players match up,
+            SMYD™ (Show Me Your Darts) is a platform for skill-based darts competitions. Players match up,
             play their game on their own board, and report the result. Each player pays a fixed entry that
             is split into a prize contribution and a disclosed SMYD service fee. The prize contributions
             form the prize pot, and 100% of the prize pot is awarded to the winner. Outcomes are determined
@@ -75,6 +75,14 @@ function TermsPage() {
             <Link to="/rules" className="text-primary underline">Competition Rules</Link>, which are part of
             these terms. Posting a false result, colluding, or violating the camera rule can result in an
             automatic loss and a permanent ban.
+          </p>
+        </Section>
+
+        <Section title="Intellectual property">
+          <p>
+            SMYD™ and the SMYD logo are trademarks of SMYD's owner. The app, its source code, design, and
+            content are the owner's intellectual property. You may not copy, resell, or reuse any part of
+            the service without written permission.
           </p>
         </Section>
 
