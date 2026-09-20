@@ -2,11 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Banknote, Coins, Gift, Loader2, X } from "lucide-react";
+import { Banknote, Coins, Loader2, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CoinPackCheckout } from "@/components/CoinPackCheckout";
 import { supabase } from "@/integrations/supabase/client";
-import { redeemGiftCard } from "@/lib/redemptions.functions";
 import {
   useWallet,
   formatMoney,
@@ -18,9 +17,9 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Cashier — SMYD" },
-      { name: "description", content: "Add funds to your SMYD account, cash out to PayPal, Cash App or Venmo, or redeem gift cards." },
+      { name: "description", content: "Add funds to your SMYD account or cash out to PayPal, Cash App or Venmo." },
       { property: "og:title", content: "Cashier — SMYD" },
-      { property: "og:description", content: "Add funds, cash out, or redeem gift cards on SMYD." },
+      { property: "og:description", content: "Add funds or cash out on SMYD." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -29,7 +28,7 @@ export const Route = createFileRoute("/shop")({
 });
 
 
-type Tab = "buy" | "cashout" | "redeem";
+type Tab = "buy" | "cashout";
 
 function Shop() {
   const [tab, setTab] = useState<Tab>("buy");
@@ -40,14 +39,13 @@ function Shop() {
       <div className="px-5 py-6 space-y-6 animate-fade-in-up">
         <div>
           <h1 className="font-display text-2xl font-bold text-gradient-neon">Cashier</h1>
-          <p className="text-xs text-muted-foreground mt-1">Add funds, cash out, or grab a gift card.</p>
+          <p className="text-xs text-muted-foreground mt-1">Add funds or cash out.</p>
         </div>
 
         <div className="flex rounded-xl bg-surface p-1 ring-1 ring-border">
           {([
             { id: "buy", label: "Add Funds", icon: Coins },
             { id: "cashout", label: "Cash Out", icon: Banknote },
-            { id: "redeem", label: "Gift Cards", icon: Gift },
           ] as const).map((t) => (
             <button
               key={t.id}
@@ -62,13 +60,7 @@ function Shop() {
 
         </div>
 
-        {tab === "buy" ? (
-          <BuyCoinsPanel onSelect={setCheckoutPriceId} />
-        ) : tab === "cashout" ? (
-          <CashOutPanel />
-        ) : (
-          <RedeemPanel />
-        )}
+        {tab === "buy" ? <BuyCoinsPanel onSelect={setCheckoutPriceId} /> : <CashOutPanel />}
 
       </div>
 
@@ -147,183 +139,6 @@ function CheckoutModal({ priceId, onClose }: { priceId: string; onClose: () => v
   );
 }
 
-// ---------- Redeem ----------
-
-function useGiftOptions() {
-  return useQuery({
-    queryKey: ["gift-card-options"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("gift_card_options")
-        .select("*")
-        .eq("active", true)
-        .order("display_order");
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}
-
-function useRedemptions() {
-  const qc = useQueryClient();
-  useEffect(() => {
-    const ch = supabase
-      .channel("redemptions")
-      .on("postgres_changes", { event: "*", schema: "public", table: "gift_card_redemptions" }, () => {
-        qc.invalidateQueries({ queryKey: ["redemptions"] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [qc]);
-
-  return useQuery({
-    queryKey: ["redemptions"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-      const { data, error } = await supabase
-        .from("gift_card_redemptions")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}
-
-function RedeemPanel() {
-  const { data: options = [] } = useGiftOptions();
-  const { data: wallet } = useWallet();
-  const { data: history = [] } = useRedemptions();
-  const qc = useQueryClient();
-
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [recipientName, setRecipientName] = useState("");
-
-  const balance = Number(wallet?.balance_cents ?? 0);
-  const selected = options.find((o) => o.id === selectedId) || null;
-
-  const mutation = useMutation({
-    mutationFn: async () => {
-      if (!selected) throw new Error("Pick a gift card");
-      return redeemGiftCard({
-        data: {
-          optionId: selected.id as string,
-          deliveryEmail: email.trim(),
-          recipientName: recipientName.trim() || undefined,
-        },
-      });
-    },
-    onSuccess: () => {
-      toast.success("Gift card sent! Check your email.");
-      setSelectedId(null);
-      setEmail("");
-      setRecipientName("");
-      qc.invalidateQueries({ queryKey: ["wallet"] });
-      qc.invalidateQueries({ queryKey: ["transactions"] });
-      qc.invalidateQueries({ queryKey: ["redemptions"] });
-    },
-    onError: (e: Error) => {
-      toast.error(e.message);
-      qc.invalidateQueries({ queryKey: ["wallet"] });
-      qc.invalidateQueries({ queryKey: ["transactions"] });
-    },
-  });
-
-  return (
-    <div className="space-y-6">
-      <div className="rounded-xl bg-surface ring-1 ring-border p-4">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Available</p>
-        <p className="mt-1 font-display text-2xl font-bold text-gradient-neon">{formatMoney(balance)}</p>
-        <p className="mt-1 text-[10px] text-muted-foreground">Gift cards cost their face value.</p>
-
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        {options.map((o) => {
-          const affordable = balance >= Number(o.coins_cost);
-          const active = selectedId === o.id;
-          return (
-            <button
-              key={o.id as string}
-              disabled={!affordable}
-              onClick={() => setSelectedId(o.id as string)}
-              className={`rounded-2xl p-4 text-left transition-all ring-1 ${
-                active ? "bg-primary/10 ring-primary" : "bg-surface ring-border"
-              } ${!affordable && "opacity-40 cursor-not-allowed"}`}
-            >
-              <Gift className="size-5 text-primary" />
-              <p className="mt-2 font-display text-xl font-bold">${Number(o.denomination_usd_cents) / 100}</p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Amazon</p>
-              <p className="mt-2 text-xs font-semibold text-primary">
-                {formatMoney(Number(o.coins_cost))}
-              </p>
-            </button>
-          );
-        })}
-      </div>
-
-      {selected && (
-        <div className="space-y-3 rounded-xl bg-surface ring-1 ring-border p-4 animate-fade-in-up">
-          <Field
-            label="Delivery email"
-            type="email"
-            placeholder="you@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Field
-            label="Recipient name (optional)"
-            placeholder="Your name"
-            value={recipientName}
-            onChange={(e) => setRecipientName(e.target.value)}
-          />
-          <button
-            onClick={() => mutation.mutate()}
-            disabled={mutation.isPending || !email}
-            className="w-full rounded-xl bg-gradient-neon py-3.5 font-display text-sm font-bold uppercase tracking-[0.15em] text-background disabled:opacity-60 flex items-center justify-center gap-2"
-          >
-            {mutation.isPending && <Loader2 className="size-4 animate-spin" />}
-            Redeem for ${Number(selected.denomination_usd_cents) / 100} Amazon
-          </button>
-        </div>
-      )}
-
-      <div>
-        <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Redemption history
-        </h3>
-        {history.length === 0 ? (
-          <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">
-            No redemptions yet.
-          </div>
-        ) : (
-          <div className="rounded-xl bg-surface ring-1 ring-border divide-y divide-border/60">
-            {history.map((r) => (
-              <div key={r.id as string} className="flex items-center gap-3 px-4 py-3">
-                <Gift className="size-4 text-primary shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    ${Number(r.denomination_usd_cents) / 100} Amazon → {r.delivery_email as string}
-                  </p>
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    {String(r.status)} • {new Date(r.created_at as string).toLocaleDateString()}
-                  </p>
-                </div>
-                <span className="text-xs font-semibold text-muted-foreground">
-                  −{formatMoney(Number(r.coins_spent))}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function Field({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
