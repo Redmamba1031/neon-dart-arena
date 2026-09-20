@@ -5,7 +5,7 @@ export const Route = createFileRoute("/refunds")({
   head: () => ({
     meta: [
       { title: "Refund & Cancellation Policy — SMYD" },
-      { name: "description", content: "SMYD's refund and cancellation policy for deposits, match stakes, gift cards, and withdrawals." },
+      { name: "description", content: "SMYD's refund and cancellation policy for deposits, match entries, and withdrawals." },
       { property: "og:title", content: "Refund & Cancellation Policy — SMYD" },
       { property: "og:description", content: "How refunds and cancellations work on SMYD." },
       { property: "og:type", content: "website" },
@@ -51,13 +51,6 @@ function RefundsPage() {
           </ul>
         </Section>
 
-        <Section title="Gift cards">
-          <p>
-            Gift card redemptions are final once the card is delivered. If a redemption fails and no card is
-            delivered, the funds are automatically returned to your SMYD™ balance — if yours wasn't, contact
-            support or ask staff to refund the order from the admin panel.
-          </p>
-        </Section>
 
         <Section title="Withdrawals">
           <p>
