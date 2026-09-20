@@ -21,6 +21,7 @@ function Dashboard() {
       <section className="px-5 pt-6 grid grid-cols-2 gap-3 mb-6 animate-fade-in-up">
         <QuickAction to="/matches" icon={Swords} label="1v1 Matches" tint="primary" />
         <QuickAction to="/leaderboard" icon={Award} label="Leaderboard" tint="accent" />
+        <QuickAction to="/dashboard" icon={LayoutDashboard} label="My Dashboard" tint="primary" />
         <QuickAction to="/wallet" icon={Trophy} label="Wallet" tint="muted" />
         <QuickAction to="/messages" icon={MessageSquare} label="Messages" tint="primary" />
       </section>
