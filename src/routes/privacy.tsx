@@ -38,7 +38,7 @@ function PrivacyPage() {
           <ul className="list-disc space-y-1 pl-5">
             <li>Account information — email address, username, display name, and avatar.</li>
             <li>Match and game data — matches you create or join, stakes, results you report, wins and losses, and leaderboard stats.</li>
-            <li>Wallet and payment data — account balance, transaction history, gift card redemptions, and withdrawal requests. Card payments are processed by our payment processor; SMYD does not store full card numbers.</li>
+            <li>Wallet and payment data — account balance, transaction history, and withdrawal requests. Card payments are processed by our payment processor; SMYD does not store full card numbers.</li>
             <li>Messages — in-app messages you send to other players.</li>
             <li>Basic usage data — device and log information needed to run and secure the service.</li>
           </ul>
@@ -46,7 +46,7 @@ function PrivacyPage() {
 
         <Section title="How we use it">
           <ul className="list-disc space-y-1 pl-5">
-            <li>Run matches, wagers, payouts, leaderboards, and gift card redemptions.</li>
+            <li>Run matches, wagers, payouts, and leaderboards.</li>
             <li>Prevent fraud, cheating, and abuse, including reviewing disputed matches and enforcing bans.</li>
             <li>Communicate with you about your account, transactions, and support requests.</li>
             <li>Comply with legal obligations related to payments and skill-based competition.</li>
@@ -57,7 +57,7 @@ function PrivacyPage() {
           <p>
             Other players can see your username, display name, avatar, match history, and leaderboard stats.
             We share payment details only with the processors needed to complete your transaction (for example
-            our card processor for deposits and gift card providers for redemptions). We do not sell your
+            our card processor for deposits and payout providers for withdrawals). We do not sell your
             personal information.
           </p>
         </Section>

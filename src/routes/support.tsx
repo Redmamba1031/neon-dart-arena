@@ -20,7 +20,7 @@ const DOCS = [
   { to: "/rules", label: "Competition Rules", desc: "Reporting windows, camera rule, disputes, bans", icon: Shield },
   { to: "/terms", label: "Terms of Service", desc: "Eligibility, accounts, funds, fair play", icon: Scale },
   { to: "/privacy", label: "Privacy Policy", desc: "What we collect and how we use it", icon: FileText },
-  { to: "/refunds", label: "Refunds & Cancellations", desc: "Deposits, stakes, gift cards, withdrawals", icon: RefreshCcw },
+  { to: "/refunds", label: "Refunds & Cancellations", desc: "Deposits, match entries, withdrawals", icon: RefreshCcw },
 ] as const;
 
 function SupportPage() {

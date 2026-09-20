@@ -90,7 +90,7 @@ function RulesPage() {
           <p>
             Posting a false winner, colluding with your opponent, using multiple accounts, or any form of
             cheating results in a <span className="font-semibold text-foreground">permanent ban</span> from
-            SMYD. Banned players cannot create or join matches, accept challenges, or redeem gift cards, and
+            SMYD. Banned players cannot create or join matches, accept challenges, and
             funds may be held pending investigation.
           </p>
         </Rule>

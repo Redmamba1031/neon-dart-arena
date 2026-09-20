@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Activity, AlertTriangle, Ban, Banknote, Coins, Gift, Shield, ShieldCheck, TrendingUp } from "lucide-react";
+import { Activity, AlertTriangle, Ban, Banknote, Coins, Shield, ShieldCheck, TrendingUp } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   formatMoney,
@@ -11,12 +11,10 @@ import {
   useAdminMarkWithdrawalPaid,
   useAdminRejectWithdrawal,
   useAdminBanPlayer,
-  useAdminRefundRedemption,
   useAdminResolveDispute,
   useAdminSetRole,
   useAdminUnbanPlayer,
   useAllBans,
-  useAllRedemptions,
   useDisputedMatches,
   useIsStaff,
   useOpsSnapshot,
@@ -88,7 +86,6 @@ function AdminPage() {
         <BanTool />
         <CoinTool />
         <Withdrawals />
-        <Redemptions />
         {role.owner && <StaffTool />}
         <ActionLog />
       </div>
@@ -184,7 +181,6 @@ function OpsPanel() {
             <Stat label="Overdue matches" value={data.stuckMatches.length} alert={data.stuckMatches.length > 0} />
             <Stat label="Open disputes" value={data.disputeCount} alert={data.disputeCount > 0} />
             <Stat label="Pending payouts" value={data.pendingPayouts} alert={data.pendingPayouts > 0} />
-            <Stat label="Failed gift cards" value={data.failedGiftCards} alert={data.failedGiftCards > 0} />
           </div>
 
           {data.stuckMatches.length > 0 && (
@@ -475,51 +471,6 @@ function Withdrawals() {
   );
 }
 
-/* ---------- redemptions ---------- */
-function Redemptions() {
-  const { data: rows = [] } = useAllRedemptions();
-  const refund = useAdminRefundRedemption();
-  const { data: profiles } = useProfilesByIds(rows.map((r) => r.user_id));
-
-  return (
-    <section className={card}>
-      <h2 className="flex items-center gap-2 font-display text-lg font-bold">
-        <Gift className="size-4 text-accent" /> Gift card orders
-      </h2>
-      {rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No redemptions yet.</p>
-      ) : (
-        rows.map((r) => {
-          const p = profiles?.get(r.user_id);
-          return (
-            <div key={r.id} className="rounded-lg bg-background ring-1 ring-border p-3 space-y-1">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">
-                  {p?.display_name || p?.username || "Player"} · ${(r.denomination_usd_cents / 100).toFixed(0)} {r.brand}
-                </p>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{r.status}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">{r.delivery_email}</p>
-              {r.status === "pending" && (
-                <button
-                  className="text-xs text-primary underline"
-                  onClick={() =>
-                    refund.mutate(
-                      { redemptionId: r.id, reason: "Refunded by staff" },
-                      { onSuccess: () => toast.success("Refunded"), onError: err },
-                    )
-                  }
-                >
-                  refund
-                </button>
-              )}
-            </div>
-          );
-        })
-      )}
-    </section>
-  );
-}
 
 /* ---------- staff ---------- */
 function StaffTool() {
