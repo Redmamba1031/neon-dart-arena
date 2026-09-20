@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Trophy, Flame, MessageSquare, Award, Swords } from "lucide-react";
+import { Trophy, Flame, MessageSquare, Award, Swords, LayoutDashboard } from "lucide-react";
 import { useMyProfile } from "@/lib/api";
 
 export const Route = createFileRoute("/")({

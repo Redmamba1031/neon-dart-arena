@@ -60,10 +60,10 @@ function DashboardPage() {
   const opponentIds = [...active, ...history].flatMap((m) =>
     [m.creator_id, m.opponent_id].filter((id): id is string => !!id && id !== myId),
   );
-  const { data: opponents = [] } = useProfilesByIds(opponentIds);
+  const { data: opponents } = useProfilesByIds(opponentIds);
   const nameFor = (id: string | null) => {
     if (!id) return "Waiting for opponent";
-    const p = opponents.find((o) => o.id === id);
+    const p = opponents instanceof Map ? opponents.get(id) : undefined;
     return p?.display_name || p?.username || "Player";
   };
   const otherId = (m: Match) => (m.creator_id === myId ? m.opponent_id : m.creator_id);
