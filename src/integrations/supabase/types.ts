@@ -475,6 +475,33 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_accounts: {
+        Row: {
+          created_at: string
+          details_submitted: boolean
+          payouts_enabled: boolean
+          stripe_account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details_submitted?: boolean
+          payouts_enabled?: boolean
+          stripe_account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details_submitted?: boolean
+          payouts_enabled?: boolean
+          stripe_account_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       player_bans: {
         Row: {
           banned_by: string
@@ -852,39 +879,69 @@ export type Database = {
         Row: {
           admin_id: string | null
           amount_cents: number
+          approved_at: string | null
+          approved_by: string | null
+          attempts: number
           created_at: string
           destination: string
+          failure_reason: string | null
+          hold_until: string | null
           id: string
           method: string
           note: string | null
           processed_at: string | null
-          status: Database["public"]["Enums"]["withdrawal_status"]
+          provider: string | null
+          provider_payout_id: string | null
+          released_at: string | null
+          requires_review: boolean
+          risk_flags: string[]
+          status: string
           updated_at: string
           user_id: string
         }
         Insert: {
           admin_id?: string | null
           amount_cents: number
+          approved_at?: string | null
+          approved_by?: string | null
+          attempts?: number
           created_at?: string
           destination: string
+          failure_reason?: string | null
+          hold_until?: string | null
           id?: string
           method: string
           note?: string | null
           processed_at?: string | null
-          status?: Database["public"]["Enums"]["withdrawal_status"]
+          provider?: string | null
+          provider_payout_id?: string | null
+          released_at?: string | null
+          requires_review?: boolean
+          risk_flags?: string[]
+          status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           admin_id?: string | null
           amount_cents?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          attempts?: number
           created_at?: string
           destination?: string
+          failure_reason?: string | null
+          hold_until?: string | null
           id?: string
           method?: string
           note?: string | null
           processed_at?: string | null
-          status?: Database["public"]["Enums"]["withdrawal_status"]
+          provider?: string | null
+          provider_payout_id?: string | null
+          released_at?: string | null
+          requires_review?: boolean
+          risk_flags?: string[]
+          status?: string
           updated_at?: string
           user_id?: string
         }
@@ -1051,6 +1108,10 @@ export type Database = {
         Args: { _amount_cents: number; _note: string; _user_id: string }
         Returns: undefined
       }
+      admin_approve_withdrawal: {
+        Args: { _note?: string; _request_id: string }
+        Returns: undefined
+      }
       admin_ban_player: {
         Args: { _reason: string; _user_id: string }
         Returns: undefined
@@ -1065,6 +1126,10 @@ export type Database = {
       }
       admin_reject_withdrawal: {
         Args: { _reason: string; _request_id: string }
+        Returns: undefined
+      }
+      admin_release_withdrawal_now: {
+        Args: { _request_id: string }
         Returns: undefined
       }
       admin_resolve_dispute: {
@@ -1144,6 +1209,59 @@ export type Database = {
         Args: { _entry_cents: number; _rake_bps: number }
         Returns: number
       }
+      payouts_claim_due: {
+        Args: { _limit?: number }
+        Returns: {
+          admin_id: string | null
+          amount_cents: number
+          approved_at: string | null
+          approved_by: string | null
+          attempts: number
+          created_at: string
+          destination: string
+          failure_reason: string | null
+          hold_until: string | null
+          id: string
+          method: string
+          note: string | null
+          processed_at: string | null
+          provider: string | null
+          provider_payout_id: string | null
+          released_at: string | null
+          requires_review: boolean
+          risk_flags: string[]
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "withdrawal_requests"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      payouts_mark_failed: {
+        Args: { _reason: string; _refund?: boolean; _request_id: string }
+        Returns: undefined
+      }
+      payouts_mark_sent: {
+        Args: {
+          _provider: string
+          _provider_payout_id: string
+          _request_id: string
+        }
+        Returns: undefined
+      }
+      payouts_upsert_account: {
+        Args: {
+          _details_submitted: boolean
+          _payouts_enabled: boolean
+          _stripe_account_id: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
       record_dart: {
         Args: {
           _busted?: boolean
@@ -1207,6 +1325,10 @@ export type Database = {
           _source?: string
         }
         Returns: undefined
+      }
+      withdrawal_risk_flags: {
+        Args: { _amount_cents: number; _uid: string }
+        Returns: string[]
       }
     }
     Enums: {
