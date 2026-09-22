@@ -413,18 +413,46 @@ function Withdrawals() {
   const { data: rows = [] } = useAllWithdrawals();
   const markPaid = useAdminMarkWithdrawalPaid();
   const reject = useAdminRejectWithdrawal();
+  const approve = useAdminApproveWithdrawal();
+  const releaseNow = useAdminReleaseWithdrawalNow();
+  const runPayouts = useRunDuePayouts();
   const { data: profiles } = useProfilesByIds(rows.map((r) => r.user_id));
 
   return (
     <section className={card}>
-      <h2 className="flex items-center gap-2 font-display text-lg font-bold">
-        <Banknote className="size-4 text-primary" /> Cash payouts
-      </h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+          <Banknote className="size-4 text-primary" /> Cash payouts
+        </h2>
+        <button
+          className={btn}
+          disabled={runPayouts.isPending}
+          onClick={() =>
+            runPayouts.mutate(undefined, {
+              onSuccess: (res: { paid?: number; failed?: number }) =>
+                toast.success(`Sent ${res.paid ?? 0}, failed ${res.failed ?? 0}`),
+              onError: err,
+            })
+          }
+        >
+          Send due now
+        </button>
+      </div>
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">No payout requests.</p>
       ) : (
         <div className="space-y-2">
-          {rows.map((r) => (
+          {rows.map((r) => {
+            const row = r as typeof r & {
+              hold_until?: string | null;
+              risk_flags?: string[] | null;
+              requires_review?: boolean | null;
+              failure_reason?: string | null;
+              provider?: string | null;
+            };
+            const held = row.hold_until ? new Date(row.hold_until) : null;
+            const onHold = held ? held.getTime() > Date.now() : false;
+            return (
             <div key={r.id} className="rounded-lg bg-background ring-1 ring-border p-3 space-y-2">
               <p className="text-sm font-semibold">
                 {formatMoney(Number(r.amount_cents))} · {r.method} · {r.destination}
@@ -432,9 +460,45 @@ function Withdrawals() {
               <p className="text-[11px] text-muted-foreground">
                 {profiles?.get(r.user_id)?.display_name ?? profiles?.get(r.user_id)?.username ?? "Player"} ·{" "}
                 {r.status} · {new Date(r.created_at).toLocaleString()}
+                {held ? ` · ${onHold ? "holds until" : "released"} ${held.toLocaleString()}` : ""}
+                {row.provider ? ` · via ${row.provider}` : ""}
               </p>
-              {r.status === "pending" && (
-                <div className="flex gap-2">
+              {(row.risk_flags?.length ?? 0) > 0 && (
+                <p className="text-[11px] font-semibold text-destructive">
+                  Flags: {row.risk_flags!.join(", ")}
+                </p>
+              )}
+              {row.failure_reason && (
+                <p className="text-[11px] text-destructive">Last error: {row.failure_reason}</p>
+              )}
+              {r.status !== "paid" && r.status !== "rejected" && (
+                <div className="flex flex-wrap gap-2">
+                  {r.status === "pending" && (
+                    <button
+                      className={btn}
+                      disabled={approve.isPending}
+                      onClick={() =>
+                        approve.mutate(
+                          { requestId: r.id },
+                          { onSuccess: () => toast.success("Approved"), onError: err },
+                        )
+                      }
+                    >
+                      Approve
+                    </button>
+                  )}
+                  <button
+                    className={btn}
+                    disabled={releaseNow.isPending}
+                    onClick={() =>
+                      releaseNow.mutate(
+                        { requestId: r.id },
+                        { onSuccess: () => toast.success("Hold cleared — sends on next run"), onError: err },
+                      )
+                    }
+                  >
+                    Release now
+                  </button>
                   <button
                     className={btn}
                     disabled={markPaid.isPending}
@@ -445,7 +509,7 @@ function Withdrawals() {
                       )
                     }
                   >
-                    Mark sent
+                    Mark sent by hand
                   </button>
                   <button
                     className={btn}
@@ -464,7 +528,8 @@ function Withdrawals() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>
