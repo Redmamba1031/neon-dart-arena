@@ -1117,3 +1117,82 @@ export function useServiceFeeEarnings() {
     },
   });
 }
+
+/* ---------- Automatic payouts ---------- */
+export function usePayoutAccount() {
+  return useQuery({
+    queryKey: ["payout-account"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("payout_accounts")
+        .select("stripe_account_id, details_submitted, payouts_enabled")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useStartPayoutSetup() {
+  return useMutation({
+    mutationFn: async () => {
+      const { startPayoutAccountSetup } = await import("@/lib/payouts.functions");
+      const res = await startPayoutAccountSetup({
+        data: { returnUrl: `${window.location.origin}/shop` },
+      });
+      if (res.error || !res.url) throw new Error(res.error ?? "Could not start setup");
+      return res.url;
+    },
+  });
+}
+
+export function useRefreshPayoutAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { refreshPayoutAccount } = await import("@/lib/payouts.functions");
+      const res = await refreshPayoutAccount();
+      if (res.error) throw new Error(res.error);
+      return res;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["payout-account"] }),
+  });
+}
+
+export function useAdminApproveWithdrawal() {
+  return useAdminMutation(async (args: { requestId: string; note?: string }) => {
+    const { error } = await supabase.rpc("admin_approve_withdrawal", {
+      _request_id: args.requestId, _note: args.note,
+    });
+    if (error) throw error;
+  }, ["admin-withdrawals"]);
+}
+
+export function useAdminReleaseWithdrawalNow() {
+  return useAdminMutation(async (args: { requestId: string }) => {
+    const { error } = await supabase.rpc("admin_release_withdrawal_now", {
+      _request_id: args.requestId,
+    });
+    if (error) throw error;
+  }, ["admin-withdrawals"]);
+}
+
+export function useRunDuePayouts() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { releaseDuePayouts } = await import("@/lib/payouts.functions");
+      const res = await releaseDuePayouts();
+      if (res.error) throw new Error(res.error);
+      return res;
+    },
+    onSuccess: () => {
+      ["admin-withdrawals", "admin-ops", "wallet"].forEach((k) =>
+        qc.invalidateQueries({ queryKey: [k] }),
+      );
+    },
+  });
+}

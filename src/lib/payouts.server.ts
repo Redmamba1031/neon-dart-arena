@@ -13,7 +13,7 @@ export type WithdrawalRow = {
 };
 
 let _admin: ReturnType<typeof createClient> | null = null;
-export function adminDb() {
+export function adminDb(): any {
   if (!_admin) {
     _admin = createClient(
       process.env["SUPABASE_URL"]!,
@@ -106,7 +106,7 @@ export function stripeEnv(): "sandbox" | "live" {
 }
 
 async function sendStripePayout(row: WithdrawalRow): Promise<string> {
-  const { data, error } = await adminDb()
+  const { data, error } = await (adminDb() as any)
     .from("payout_accounts")
     .select("stripe_account_id, payouts_enabled")
     .eq("user_id", row.user_id)

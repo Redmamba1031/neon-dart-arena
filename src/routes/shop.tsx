@@ -11,6 +11,9 @@ import {
   formatMoney,
   useMyWithdrawals,
   useRequestWithdrawal,
+  usePayoutAccount,
+  useStartPayoutSetup,
+  useRefreshPayoutAccount,
 } from "@/lib/api";
 
 export const Route = createFileRoute("/shop")({
@@ -156,14 +159,18 @@ function Field({ label, ...props }: { label: string } & React.InputHTMLAttribute
 
 const METHODS = [
   { id: "paypal", label: "PayPal", hint: "PayPal email" },
+  { id: "venmo", label: "Venmo", hint: "Venmo phone number" },
+  { id: "bank", label: "Bank / Card", hint: "" },
   { id: "cashapp", label: "Cash App", hint: "$cashtag" },
-  { id: "venmo", label: "Venmo", hint: "@venmo-username" },
 ] as const;
 
 function CashOutPanel() {
   const { data: wallet } = useWallet();
   const { data: history = [] } = useMyWithdrawals();
+  const { data: payoutAccount } = usePayoutAccount();
   const request = useRequestWithdrawal();
+  const startSetup = useStartPayoutSetup();
+  const refreshAccount = useRefreshPayoutAccount();
 
   const [method, setMethod] = useState<(typeof METHODS)[number]["id"]>("paypal");
   const [destination, setDestination] = useState("");
@@ -173,6 +180,9 @@ function CashOutPanel() {
   const cents = Math.round(amount * 100);
   const tooMuch = cents > balance;
   const active = METHODS.find((m) => m.id === method)!;
+  const isBank = method === "bank";
+  const bankReady = Boolean(payoutAccount?.payouts_enabled);
+  const destinationOk = isBank ? bankReady : destination.trim().length >= 3;
 
   return (
     <div className="space-y-6">
@@ -180,17 +190,18 @@ function CashOutPanel() {
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Available to cash out</p>
         <p className="mt-1 font-display text-2xl font-bold text-gradient-neon">{formatMoney(balance)}</p>
         <p className="mt-1 text-[10px] text-muted-foreground">
-          $5.00 minimum. Payouts are reviewed and sent within 1–2 business days.
+          $5.00 minimum. Every cash out is held 72 hours for fraud review, then PayPal, Venmo and
+          bank/card payouts send automatically. Cash App is sent by hand.
         </p>
       </div>
 
       <div className="space-y-3 rounded-xl bg-surface ring-1 ring-border p-4">
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {METHODS.map((m) => (
             <button
               key={m.id}
               onClick={() => setMethod(m.id)}
-              className={`flex-1 rounded-lg py-2 text-[10px] font-bold uppercase tracking-widest ring-1 transition-all ${
+              className={`rounded-lg py-2 text-[10px] font-bold uppercase tracking-widest ring-1 transition-all ${
                 method === m.id ? "bg-primary/10 ring-primary text-primary" : "ring-border text-muted-foreground"
               }`}
             >
@@ -199,12 +210,51 @@ function CashOutPanel() {
           ))}
         </div>
 
-        <Field
-          label={active.label + " destination"}
-          placeholder={active.hint}
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-        />
+        {isBank ? (
+          <div className="space-y-2 rounded-lg bg-background p-3 ring-1 ring-border">
+            <p className="text-[11px] text-muted-foreground">
+              {bankReady
+                ? "Your bank or debit card is connected — payouts send automatically."
+                : "Connect a bank account or debit card once, then cash outs send straight to it."}
+            </p>
+            {!bankReady && (
+              <div className="flex gap-2">
+                <button
+                  className="flex-1 rounded-lg bg-primary/10 py-2 text-[10px] font-bold uppercase tracking-widest text-primary ring-1 ring-primary disabled:opacity-60"
+                  disabled={startSetup.isPending}
+                  onClick={() =>
+                    startSetup.mutate(undefined, {
+                      onSuccess: (url) => { window.location.href = url; },
+                      onError: (e: Error) => toast.error(e.message),
+                    })
+                  }
+                >
+                  {payoutAccount ? "Finish setup" : "Connect payout account"}
+                </button>
+                <button
+                  className="rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ring-1 ring-border disabled:opacity-60"
+                  disabled={refreshAccount.isPending}
+                  onClick={() =>
+                    refreshAccount.mutate(undefined, {
+                      onSuccess: (r) =>
+                        toast.success(r.payoutsEnabled ? "Payout account ready" : "Setup still incomplete"),
+                      onError: (e: Error) => toast.error(e.message),
+                    })
+                  }
+                >
+                  Refresh
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Field
+            label={active.label + " destination"}
+            placeholder={active.hint}
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+          />
+        )}
         <Field
           label="Amount (USD)"
           type="number"
@@ -221,10 +271,10 @@ function CashOutPanel() {
         <button
           onClick={() =>
             request.mutate(
-              { amountCents: cents, method, destination: destination.trim() },
+              { amountCents: cents, method, destination: isBank ? "Connected bank / card" : destination.trim() },
               {
                 onSuccess: () => {
-                  toast.success("Payout requested — we will send it shortly.");
+                  toast.success("Cash out requested — it releases after the 72 hour review hold.");
                   setDestination("");
                   setAmount(5);
                 },
@@ -232,7 +282,7 @@ function CashOutPanel() {
               },
             )
           }
-          disabled={request.isPending || tooMuch || cents < 500 || destination.trim().length < 3}
+          disabled={request.isPending || tooMuch || cents < 500 || !destinationOk}
           className="w-full rounded-xl bg-gradient-neon py-3.5 font-display text-sm font-bold uppercase tracking-[0.15em] text-background disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {request.isPending && <Loader2 className="size-4 animate-spin" />}
