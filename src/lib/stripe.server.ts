@@ -79,3 +79,20 @@ export async function verifyWebhook(
 
   return JSON.parse(body);
 }
+
+export function getStripeErrorMessage(error: unknown): string {
+  if (error && typeof error === "object") {
+    const e = error as {
+      message?: string;
+      type?: string;
+      code?: string;
+      raw?: { message?: string; type?: string; code?: string };
+    };
+    const message = e.raw?.message ?? e.message;
+    if (message) {
+      const details = [e.raw?.type ?? e.type, e.raw?.code ?? e.code].filter(Boolean);
+      return details.length ? `${message} (${details.join(", ")})` : message;
+    }
+  }
+  return "Stripe request failed";
+}
