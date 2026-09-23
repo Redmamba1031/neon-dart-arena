@@ -546,12 +546,16 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age_verified: boolean
+          age_verified_at: string | null
           avatar_url: string | null
           city: string | null
           country: string | null
           created_at: string
+          date_of_birth: string | null
           display_name: string | null
           id: string
+          legal_name: string | null
           location_source: string | null
           location_updated_at: string | null
           losses: number
@@ -563,12 +567,16 @@ export type Database = {
           wins: number
         }
         Insert: {
+          age_verified?: boolean
+          age_verified_at?: string | null
           avatar_url?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           display_name?: string | null
           id: string
+          legal_name?: string | null
           location_source?: string | null
           location_updated_at?: string | null
           losses?: number
@@ -580,12 +588,16 @@ export type Database = {
           wins?: number
         }
         Update: {
+          age_verified?: boolean
+          age_verified_at?: string | null
           avatar_url?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           display_name?: string | null
           id?: string
+          legal_name?: string | null
           location_source?: string | null
           location_updated_at?: string | null
           losses?: number
@@ -1116,6 +1128,23 @@ export type Database = {
         Args: { _reason: string; _user_id: string }
         Returns: undefined
       }
+      admin_list_players: {
+        Args: never
+        Returns: {
+          age: number
+          age_verified: boolean
+          banned: boolean
+          created_at: string
+          date_of_birth: string
+          display_name: string
+          email: string
+          legal_name: string
+          losses: number
+          user_id: string
+          username: string
+          wins: number
+        }[]
+      }
       admin_mark_withdrawal_paid: {
         Args: { _note?: string; _request_id: string }
         Returns: undefined
@@ -1134,6 +1163,10 @@ export type Database = {
       }
       admin_resolve_dispute: {
         Args: { _match_id: string; _note?: string; _winner_id: string }
+        Returns: undefined
+      }
+      admin_set_age_verified: {
+        Args: { _user_id: string; _verified: boolean }
         Returns: undefined
       }
       admin_set_role: {
@@ -1301,6 +1334,10 @@ export type Database = {
       }
       respond_challenge: {
         Args: { _accept: boolean; _challenge_id: string }
+        Returns: undefined
+      }
+      set_my_identity: {
+        Args: { _date_of_birth: string; _legal_name: string }
         Returns: undefined
       }
       settle_match: {
