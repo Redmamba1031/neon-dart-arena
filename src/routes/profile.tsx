@@ -312,6 +312,39 @@ function EditProfile({
   const [username, setUsername] = useState(initial.username);
   const [displayName, setDisplayName] = useState(initial.display_name);
   const [avatar, setAvatar] = useState(initial.avatar_url);
+  const [uploading, setUploading] = useState(false);
+
+  const pickPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) {
+      toast.error("Photos only — JPG, PNG, WebP or GIF");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Photo must be under 5 MB");
+      return;
+    }
+    setUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Sign in to change your photo");
+      const ext = file.type.split("/")[1].replace("jpeg", "jpg");
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, file, {
+        cacheControl: "3600",
+        contentType: file.type,
+      });
+      if (error) throw error;
+      setAvatar(`/api/avatars/${path}?v=${Date.now()}`);
+      toast.success("Photo ready — save to apply it");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not upload photo");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -335,9 +368,29 @@ function EditProfile({
 
   return (
     <form onSubmit={save} className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3 animate-fade-in-up">
+      <div className="flex items-center gap-3">
+        <div className="size-16 rounded-xl bg-secondary grid place-items-center font-display text-lg font-bold text-primary overflow-hidden shrink-0">
+          {avatar ? <img src={avatar} alt="Profile" className="size-full object-cover" /> : "P"}
+        </div>
+        <label
+          className={`flex-1 rounded-xl bg-accent/15 text-accent py-3 text-xs font-bold uppercase tracking-wider text-center cursor-pointer flex items-center justify-center gap-2 ${uploading ? "opacity-60 pointer-events-none" : ""}`}
+        >
+          {uploading ? <Loader2 className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}
+          {avatar ? "Change photo" : "Add photo"}
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={pickPhoto} />
+        </label>
+        {avatar && (
+          <button
+            type="button"
+            onClick={() => setAvatar("")}
+            className="text-[10px] font-bold uppercase tracking-wider text-destructive"
+          >
+            Remove
+          </button>
+        )}
+      </div>
       <EditField label="Username" value={username} onChange={setUsername} placeholder="viperx" />
       <EditField label="Display name" value={displayName} onChange={setDisplayName} placeholder="Viper X" />
-      <EditField label="Avatar image URL" value={avatar} onChange={setAvatar} placeholder="https://…" />
       <button
         type="submit"
         disabled={update.isPending}
