@@ -289,30 +289,138 @@ function CashOutPanel() {
         </button>
       </div>
 
-      <div>
-        <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">Payout history</h3>
-        {history.length === 0 ? (
-          <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">
-            No payouts yet.
-          </div>
-        ) : (
-          <div className="rounded-xl bg-surface ring-1 ring-border divide-y divide-border/60">
-            {history.map((r) => (
-              <div key={r.id} className="flex items-center gap-3 px-4 py-3">
-                <Banknote className="size-4 text-primary shrink-0" />
-                <div className="flex-1 min-w-0">
+      <PayoutTracker history={history} />
+      <PayoutHelp />
+    </div>
+  );
+}
+
+// ---------- Payout status tracker ----------
+
+type TrackedPayout = {
+  id: string;
+  amount_cents: number;
+  method: string;
+  destination: string;
+  status: string;
+  created_at: string;
+  [key: string]: unknown;
+};
+
+function payoutState(r: TrackedPayout) {
+  const failure = (r["failure_reason"] as string | null) ?? null;
+  const review = Boolean(r["requires_review"]);
+  const holdUntil = (r["hold_until"] as string | null) ?? null;
+  const onHold = holdUntil ? new Date(holdUntil).getTime() > Date.now() : false;
+
+  if (r.status === "paid") {
+    return { label: "Completed", tone: "text-primary", detail: "Sent to your account. Bank transfers can take 1-2 business days to appear." };
+  }
+  if (r.status === "rejected") {
+    return { label: "Returned", tone: "text-destructive", detail: failure ?? "This cash out was cancelled and the money is back in your SMYD balance." };
+  }
+  if (r.status === "failed") {
+    return { label: "Needs attention", tone: "text-destructive", detail: failure ?? "We could not send this one. Check your payout details." };
+  }
+  if (review) {
+    return { label: "Needs attention", tone: "text-destructive", detail: "Waiting on a staff review before it can send." };
+  }
+  if (r.status === "processing") {
+    return { label: "Sending", tone: "text-primary", detail: "On its way now." };
+  }
+  if (onHold) {
+    return {
+      label: "Pending",
+      tone: "text-muted-foreground",
+      detail: `On the 72 hour review hold until ${new Date(holdUntil!).toLocaleString()}.`,
+    };
+  }
+  return { label: "Pending", tone: "text-muted-foreground", detail: "Queued — it sends on the next payout run." };
+}
+
+function PayoutTracker({ history }: { history: TrackedPayout[] }) {
+  return (
+    <div>
+      <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">Payout status</h3>
+      {history.length === 0 ? (
+        <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">
+          No payouts yet.
+        </div>
+      ) : (
+        <div className="rounded-xl bg-surface ring-1 ring-border divide-y divide-border/60">
+          {history.map((r) => {
+            const s = payoutState(r);
+            return (
+              <div key={r.id} className="flex items-start gap-3 px-4 py-3">
+                <Banknote className="mt-0.5 size-4 text-primary shrink-0" />
+                <div className="flex-1 min-w-0 space-y-0.5">
                   <p className="text-sm font-medium truncate">
                     {formatMoney(Number(r.amount_cents))} → {r.destination}
                   </p>
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    {r.method} • {r.status} • {new Date(r.created_at).toLocaleDateString()}
+                    {r.method} • {new Date(r.created_at).toLocaleDateString()}
                   </p>
+                  <p className={`text-[11px] font-semibold ${s.tone}`}>{s.label}</p>
+                  <p className="text-[11px] text-muted-foreground">{s.detail}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
+
+// ---------- AI payout help ----------
+
+function PayoutHelp() {
+  const help = usePayoutHelp();
+  const [question, setQuestion] = useState("");
+  const answer = help.data;
+
+  return (
+    <div className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
+      <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        Trouble with a payout?
+      </h3>
+      <textarea
+        rows={3}
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        placeholder="Describe what happened — e.g. my Venmo cash out has not arrived after 3 days"
+        className="w-full rounded-lg bg-background border border-border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/60"
+      />
+      <button
+        onClick={() =>
+          help.mutate(question.trim(), { onError: (e: Error) => toast.error(e.message) })
+        }
+        disabled={help.isPending || question.trim().length < 5}
+        className="w-full rounded-xl bg-gradient-neon py-3 font-display text-sm font-bold uppercase tracking-[0.15em] text-background disabled:opacity-60 flex items-center justify-center gap-2"
+      >
+        {help.isPending && <Loader2 className="size-4 animate-spin" />}
+        Get help
+      </button>
+
+      {answer?.error && <p className="text-[11px] text-destructive">{answer.error}</p>}
+      {answer && !answer.error && (
+        <div className="space-y-2 rounded-lg bg-background p-3 ring-1 ring-border">
+          <p className="text-sm text-foreground">{answer.cause}</p>
+          {answer.steps.length > 0 && (
+            <ul className="list-disc space-y-1 pl-4 text-[12px] text-muted-foreground">
+              {answer.steps.map((s, i) => (
+                <li key={i}>{s}</li>
+              ))}
+            </ul>
+          )}
+          {answer.needsStaff && (
+            <p className="text-[11px] text-muted-foreground">
+              Still stuck? Email redmond1031@gmail.com with the amount and date.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
