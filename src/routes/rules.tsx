@@ -58,14 +58,14 @@ function RulesPage() {
           </p>
         </Rule>
 
-        <Rule n="3" title="Reporting the winner — 45 minutes">
+        <Rule n="3" title="Completing and reporting — 2 hours">
           <p>
-            You have <span className="font-semibold text-foreground">45 minutes</span> from the start of the
-            match to post the winner. Both players must report. When both report the same winner, the funds
-            are released immediately.
+            You have <span className="font-semibold text-foreground">2 hours</span> from the start of the
+            match to play it and post the winner. Both players must report. When both report the same winner,
+            the funds are released immediately.
           </p>
           <p>
-            If your opponent never reports, you can claim the result once the 45 minutes are up.
+            If your opponent never reports, you can claim the result once the 2 hours are up.
           </p>
         </Rule>
 
@@ -81,8 +81,9 @@ function RulesPage() {
         <Rule n="5" title="Disputes">
           <p>
             If the two players report different winners, the match is flagged as disputed and the funds stay
-            held. SMYD staff review the match and any submitted evidence, then settle it to the rightful
-            winner. Staff decisions on disputes are final.
+            held — this applies even if the 2 hours have already expired. No payout is released on a
+            conflicting result. SMYD staff review the match and any submitted evidence, then settle it to the
+            rightful winner. Staff decisions on disputes are final.
           </p>
         </Rule>
 

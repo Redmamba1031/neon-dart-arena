@@ -113,7 +113,7 @@ export function MatchReportPanel({
       )}
       {!m.reported_by && (
         <p className="text-[11px] text-muted-foreground">
-          You have 45 minutes from the start of the match to post the winner. Both players must agree.
+          You have 2 hours from the start of the match to complete it and post the winner. Both players must agree.
         </p>
       )}
 
