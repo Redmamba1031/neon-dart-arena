@@ -471,6 +471,18 @@ function Withdrawals() {
           Send due now
         </button>
       </div>
+      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+        <button className={btn} disabled={checking} onClick={checkProviders}>
+          {checking ? "Checking…" : "Check PayPal"}
+        </button>
+        {providers ? (
+          <span className={providers.paypal ? "text-primary" : "text-destructive"}>
+            {providers.paypal ? "PayPal & Venmo ready" : providers.paypalError ?? "PayPal not connected"}
+          </span>
+        ) : (
+          <span>PayPal &amp; Venmo send automatically · bank/debit via Stripe · Cash App by hand</span>
+        )}
+      </div>
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">No payout requests.</p>
       ) : (
