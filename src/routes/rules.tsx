@@ -52,7 +52,7 @@ function RulesPage() {
 
         <Rule n="2" title="Game formats">
           <p>
-            Matches are played on your own boards — 501, Cricket, Medley, or Piddle, with the options shown
+            Matches are played on your own boards — 501, Cricket, or Medley, with the options shown
             on the match (Double In, finish rule, best-of legs). SMYD does not score your game in-app; you
             play it live and report the winner.
           </p>
