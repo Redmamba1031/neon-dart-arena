@@ -1036,6 +1036,7 @@ export type Database = {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined
       }
+      _assert_age_verified: { Args: { _user_id: string }; Returns: undefined }
       _assert_not_banned: { Args: { _user_id: string }; Returns: undefined }
       _assert_region_allowed: { Args: { _user_id: string }; Returns: undefined }
       _build_bracket_4: {

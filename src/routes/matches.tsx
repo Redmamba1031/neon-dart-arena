@@ -127,6 +127,13 @@ function Matches() {
             Turn on your location in your profile to find players near you.
           </p>
         )}
+        {me && !me.age_verified && (
+          <div className="rounded-xl bg-destructive/10 ring-1 ring-destructive/30 p-3 text-[11px] text-destructive">
+            Age verification required. Add your legal name and date of birth in your profile — SMYD staff must verify
+            you're 18+ before you can create or join a paid match.
+          </div>
+        )}
+
 
         {loading ? (
           <div className="rounded-xl bg-surface ring-1 ring-border p-6 text-center text-sm text-muted-foreground">Loading…</div>
