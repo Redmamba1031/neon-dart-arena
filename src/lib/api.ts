@@ -1196,3 +1196,52 @@ export function useRunDuePayouts() {
     },
   });
 }
+
+/* ---------- player identity & age verification ---------- */
+export type AdminPlayer = {
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  legal_name: string | null;
+  date_of_birth: string | null;
+  age: number | null;
+  age_verified: boolean;
+  email: string | null;
+  banned: boolean;
+  wins: number;
+  losses: number;
+  created_at: string;
+};
+
+export function useAdminPlayers() {
+  return useQuery({
+    queryKey: ["admin-players"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_players");
+      if (error) throw error;
+      return (data ?? []) as AdminPlayer[];
+    },
+  });
+}
+
+export function useAdminSetAgeVerified() {
+  return useAdminMutation(async (args: { userId: string; verified: boolean }) => {
+    const { error } = await supabase.rpc("admin_set_age_verified", {
+      _user_id: args.userId, _verified: args.verified,
+    });
+    if (error) throw error;
+  }, ["admin-players"]);
+}
+
+export function useSetMyIdentity() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { legalName: string; dateOfBirth: string }) => {
+      const { error } = await supabase.rpc("set_my_identity", {
+        _legal_name: args.legalName, _date_of_birth: args.dateOfBirth,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-profile"] }),
+  });
+}
