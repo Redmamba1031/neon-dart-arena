@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Activity, AlertTriangle, Ban, Banknote, Coins, Shield, ShieldCheck, TrendingUp } from "lucide-react";
+import { Activity, AlertTriangle, Ban, Banknote, Coins, Shield, ShieldCheck, TrendingUp, Users } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   formatMoney,
@@ -82,6 +82,19 @@ function AdminPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Control room</p>
           <h1 className="font-display text-3xl font-bold mt-1">Admin</h1>
         </div>
+
+        <Link
+          to="/admin-players"
+          className="flex items-center gap-3 rounded-xl bg-surface ring-1 ring-border p-4 hover:ring-primary/40 transition-all"
+        >
+          <div className="size-10 rounded-lg bg-primary/15 grid place-items-center text-primary">
+            <Users className="size-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold">Players & verification</p>
+            <p className="text-[11px] text-muted-foreground">Real names, ages and age-verification status</p>
+          </div>
+        </Link>
 
         <EarningsPanel />
         <OpsPanel />
