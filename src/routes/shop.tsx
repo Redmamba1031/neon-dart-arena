@@ -14,6 +14,7 @@ import {
   usePayoutAccount,
   useStartPayoutSetup,
   useRefreshPayoutAccount,
+  usePayoutHelp,
 } from "@/lib/api";
 
 export const Route = createFileRoute("/shop")({
