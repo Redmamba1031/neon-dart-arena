@@ -36,6 +36,19 @@ export const refreshPayoutAccount = createServerFn({ method: "POST" })
     }
   });
 
+export const checkPayoutProviders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context as { userId: string };
+    const { adminDb, verifyPaypal, stripeEnv } = await import("@/lib/payouts.server");
+
+    const { data: staff } = await adminDb().rpc("is_staff", { _user_id: userId });
+    if (!staff) return { paypal: false, paypalError: "Staff only", stripe: "unknown" as string };
+
+    const paypal = await verifyPaypal();
+    return { paypal: paypal.ok, paypalError: paypal.error, stripe: stripeEnv() };
+  });
+
 export const releaseDuePayouts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

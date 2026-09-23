@@ -55,6 +55,16 @@ async function paypalToken(): Promise<string> {
   return json.access_token;
 }
 
+export async function verifyPaypal(): Promise<{ ok: boolean; error: string | null }> {
+  if (!paypalConfigured()) return { ok: false, error: "PayPal credentials are not saved" };
+  try {
+    await paypalToken();
+    return { ok: true, error: null };
+  } catch (e) {
+    return { ok: false, error: (e as { message?: string })?.message ?? "PayPal authentication failed" };
+  }
+}
+
 async function sendPaypalPayout(row: WithdrawalRow): Promise<string> {
   const token = await paypalToken();
   const isVenmo = row.method === "venmo";
