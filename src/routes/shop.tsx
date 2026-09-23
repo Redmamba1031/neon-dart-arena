@@ -409,7 +409,7 @@ function PayoutHelp() {
           <p className="text-sm text-foreground">{answer.cause}</p>
           {answer.steps.length > 0 && (
             <ul className="list-disc space-y-1 pl-4 text-[12px] text-muted-foreground">
-              {answer.steps.map((s, i) => (
+              {answer.steps.map((s: string, i: number) => (
                 <li key={i}>{s}</li>
               ))}
             </ul>
