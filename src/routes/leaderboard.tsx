@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Trophy } from "lucide-react";
-import { useLeaderboard, useMyProfile, useProfilesByIds, formatUsd, type LeaderboardRow } from "@/lib/api";
+import { useLeaderboard, useMyProfile, useProfilesByIds, type LeaderboardRow } from "@/lib/api";
 import { locationLabel } from "@/lib/geo";
 
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
       { title: "Leaderboard — SMYD" },
-      { name: "description", content: "Top earning darts players on SMYD this season." },
+      { name: "description", content: "Top darts players on SMYD ranked by wins and games played." },
     ],
   }),
   component: Leaderboard,
@@ -72,11 +72,11 @@ function Leaderboard() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate">{nameOf(you)} (you)</p>
                 <p className="text-[11px] text-muted-foreground">
-                  {you.wins} wins • {you.matches_played} played
+                  {you.matches_played} games played
                 </p>
               </div>
               <span className="font-display text-sm font-bold text-success">
-                {formatUsd(Number(you.total_winnings_cents))}
+                {you.wins} wins
               </span>
             </div>
           </div>
@@ -107,7 +107,7 @@ function Podium({
       </div>
       <p className="text-[10px] font-semibold truncate max-w-[80px] text-center">{name}</p>
       <p className="text-[10px] font-display font-bold text-success">
-        {formatUsd(Number(player.total_winnings_cents))}
+        {player.wins} W • {player.matches_played} played
       </p>
       <div className={`w-full ${height} rounded-t-lg ring-1 ${tint} grid place-items-center font-display text-xl font-bold`}>
         {player.rank}
@@ -130,11 +130,11 @@ function Row({ p, place }: { p: Ranked; place?: string | null }) {
           {p.isYou && <span className="ml-1 text-[10px] text-primary">(you)</span>}
         </p>
         <p className="text-[10px] text-muted-foreground">
-          {p.wins} W • {p.matches_played} played{place ? ` • ${place}` : ""}
+          {p.matches_played} played{place ? ` • ${place}` : ""}
         </p>
       </div>
       <span className="font-display text-sm font-semibold text-success">
-        {formatUsd(Number(p.total_winnings_cents))}
+        {p.wins} W
       </span>
     </div>
   );

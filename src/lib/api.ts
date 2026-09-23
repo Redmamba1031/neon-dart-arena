@@ -363,7 +363,8 @@ export function useLeaderboard(limit = 50) {
       const { data, error } = await supabase
         .from("leaderboard_view")
         .select("*")
-        .order("total_winnings_cents", { ascending: false })
+        .order("wins", { ascending: false })
+        .order("matches_played", { ascending: false })
         .limit(limit);
       if (error) throw error;
       return (data ?? []) as LeaderboardRow[];
