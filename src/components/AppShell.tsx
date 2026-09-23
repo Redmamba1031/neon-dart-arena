@@ -84,6 +84,7 @@ export function LegalFooter() {
     { to: "/terms", label: "Terms" },
     { to: "/privacy", label: "Privacy" },
     { to: "/refunds", label: "Refunds" },
+    { to: "/payout-faq", label: "Payouts" },
     { to: "/support", label: "Support" },
   ] as const;
   return (
