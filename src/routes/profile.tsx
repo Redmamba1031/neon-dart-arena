@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2, MapPin, Crosshair } from "lucide-react";
-import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney, useUpdateLocation, useRestrictedRegions, useMyCoords } from "@/lib/api";
+import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2, MapPin, Crosshair, BadgeCheck } from "lucide-react";
+import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney, useUpdateLocation, useRestrictedRegions, useMyCoords, useSetMyIdentity } from "@/lib/api";
 import { US_STATES, getDeviceLocation, locationLabel, stateName } from "@/lib/geo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -105,6 +105,8 @@ function Profile() {
         </div>
 
         <LocationCard profile={profile} />
+
+        <IdentityCard profile={profile} />
 
         {editing && <EditProfile onDone={() => setEditing(false)} initial={{ username: profile?.username ?? "", display_name: profile?.display_name ?? "", avatar_url: profile?.avatar_url ?? "" }} />}
 
@@ -345,6 +347,67 @@ function EditProfile({
         Save changes
       </button>
     </form>
+  );
+}
+
+function IdentityCard({ profile }: { profile: ReturnType<typeof useMyProfile>["data"] }) {
+  const save = useSetMyIdentity();
+  const [legalName, setLegalName] = useState(profile?.legal_name ?? "");
+  const [dob, setDob] = useState(profile?.date_of_birth ?? "");
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await save.mutateAsync({ legalName: legalName.trim(), dateOfBirth: dob });
+      toast.success("Identity saved — staff will verify your age");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save identity");
+    }
+  };
+
+  return (
+    <div className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
+      <div className="flex items-center gap-3">
+        <div className="size-10 rounded-lg bg-primary/15 grid place-items-center text-primary">
+          <BadgeCheck className="size-5" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold">Age verification</p>
+          <p className="text-[11px] text-muted-foreground">
+            {profile?.age_verified
+              ? "Verified — you're confirmed 18 or older."
+              : "Real name and date of birth are required for paid play. You must be 18+."}
+          </p>
+        </div>
+        {profile?.age_verified && (
+          <span className="rounded-full bg-primary/15 text-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+            Verified
+          </span>
+        )}
+      </div>
+      {!profile?.age_verified && (
+        <form onSubmit={submit} className="space-y-3">
+          <EditField label="Real (legal) name" value={legalName} onChange={setLegalName} placeholder="Jane Doe" />
+          <label className="block">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Date of birth</span>
+            <input
+              type="date"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              className="mt-1 w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={save.isPending || !legalName.trim() || !dob}
+            className="w-full rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-60"
+          >
+            {save.isPending && <Loader2 className="size-4 animate-spin" />}
+            Submit for verification
+          </button>
+        </form>
+      )}
+    </div>
   );
 }
 
