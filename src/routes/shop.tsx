@@ -20,7 +20,7 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Cashier — SMYD" },
-      { name: "description", content: "Add funds to your SMYD account or cash out to PayPal, Cash App or Venmo." },
+      { name: "description", content: "Add funds to your SMYD account or cash out to PayPal, Venmo or your bank." },
       { property: "og:title", content: "Cashier — SMYD" },
       { property: "og:description", content: "Add funds or cash out on SMYD." },
       { property: "og:type", content: "website" },
@@ -161,7 +161,6 @@ const METHODS = [
   { id: "paypal", label: "PayPal", hint: "PayPal email" },
   { id: "venmo", label: "Venmo", hint: "Venmo phone number" },
   { id: "bank", label: "Bank / Card", hint: "" },
-  { id: "cashapp", label: "Cash App", hint: "$cashtag" },
 ] as const;
 
 function CashOutPanel() {
@@ -191,7 +190,7 @@ function CashOutPanel() {
         <p className="mt-1 font-display text-2xl font-bold text-gradient-neon">{formatMoney(balance)}</p>
         <p className="mt-1 text-[10px] text-muted-foreground">
           $5.00 minimum. Every cash out is held 72 hours for fraud review, then PayPal, Venmo and
-          bank/card payouts send automatically. Cash App is sent by hand.
+          bank/card payouts send automatically.
         </p>
       </div>
 

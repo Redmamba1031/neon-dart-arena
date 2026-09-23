@@ -480,7 +480,7 @@ function Withdrawals() {
             {providers.paypal ? "PayPal & Venmo ready" : providers.paypalError ?? "PayPal not connected"}
           </span>
         ) : (
-          <span>PayPal &amp; Venmo send automatically · bank/debit via Stripe · Cash App by hand</span>
+          <span>PayPal &amp; Venmo send automatically · bank/debit via Stripe</span>
         )}
       </div>
       {rows.length === 0 ? (
