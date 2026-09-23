@@ -29,7 +29,7 @@ export const Route = createFileRoute("/matches")({
   head: () => ({
     meta: [
       { title: "1v1 Matches — SMYD" },
-      { name: "description", content: "Create or join head-to-head darts matches and pay a fixed entry and play for the full prize pot on 501, Cricket, Medley or Piddle." },
+      { name: "description", content: "Create or join head-to-head darts matches and pay a fixed entry and play for the full prize pot on 501, Cricket or Medley." },
       { property: "og:title", content: "1v1 Matches — SMYD" },
       { property: "og:description", content: "Head-to-head darts matches with real cash prize pots on SMYD." },
       { property: "og:type", content: "website" },
@@ -264,7 +264,7 @@ function finishLabel(rule: Match["finish_rule"]) {
   return rule === "straight" ? "Straight Out" : rule === "double" ? "Double Out" : rule === "master" ? "Master Out" : "Double or Master Out";
 }
 
-const MODES = ["501", "Cricket", "Medley", "Piddle"] as const;
+const MODES = ["501", "Cricket", "Medley"] as const;
 
 function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
   const create = useCreateMatch();
@@ -333,7 +333,7 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       {isMedley && (
         <div className="rounded-lg bg-background ring-1 ring-border px-3 py-2 text-[11px] text-muted-foreground">
           <span className="font-bold uppercase tracking-widest text-foreground">Medley</span> ·{" "}
-          {bestOf === 5 ? "501 → Cricket → Cricket → 501 → Choice" : "501 → Cricket → Choice"} (choice picked by the piddle winner)
+          {bestOf === 5 ? "501 → Cricket → Cricket → 501 → Choice" : "501 → Cricket → Choice"} (choice picked by the practice-throw winner)
         </div>
       )}
 
