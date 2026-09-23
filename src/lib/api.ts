@@ -1031,12 +1031,31 @@ export function useAllWithdrawals() {
         .from("withdrawal_requests")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(200);
       if (error) throw error;
       return data ?? [];
     },
   });
 }
+
+export function useAdminRetryWithdrawal() {
+  return useAdminMutation(async (args: { requestId: string }) => {
+    const { error } = await (supabase.rpc as any)("admin_retry_withdrawal", {
+      _request_id: args.requestId,
+    });
+    if (error) throw error;
+  }, ["admin-withdrawals"]);
+}
+
+export function usePayoutHelp() {
+  return useMutation({
+    mutationFn: async (question: string) => {
+      const { explainPayoutIssue } = await import("@/lib/payout-help.functions");
+      return await explainPayoutIssue({ data: { question } });
+    },
+  });
+}
+
 
 export function useAdminMarkWithdrawalPaid() {
   return useAdminMutation(async (args: { requestId: string; note?: string }) => {

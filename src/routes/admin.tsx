@@ -12,6 +12,8 @@ import {
   useAdminRejectWithdrawal,
   useAdminApproveWithdrawal,
   useAdminReleaseWithdrawalNow,
+  useAdminRetryWithdrawal,
+
   useRunDuePayouts,
   useAdminBanPlayer,
   useAdminResolveDispute,
@@ -425,16 +427,24 @@ function CoinTool() {
 }
 
 /* ---------- withdrawals ---------- */
+const PAYOUT_STATUSES = ["all", "pending", "approved", "processing", "paid", "failed", "rejected"] as const;
+const PAYOUT_METHODS = ["all", "paypal", "venmo", "bank", "cashapp"] as const;
+
 function Withdrawals() {
   const { data: rows = [] } = useAllWithdrawals();
   const markPaid = useAdminMarkWithdrawalPaid();
   const reject = useAdminRejectWithdrawal();
   const approve = useAdminApproveWithdrawal();
   const releaseNow = useAdminReleaseWithdrawalNow();
+  const retry = useAdminRetryWithdrawal();
   const runPayouts = useRunDuePayouts();
   const { data: profiles } = useProfilesByIds(rows.map((r) => r.user_id));
   const [providers, setProviders] = useState<{ paypal: boolean; paypalError: string | null } | null>(null);
   const [checking, setChecking] = useState(false);
+  const [status, setStatus] = useState<(typeof PAYOUT_STATUSES)[number]>("all");
+  const [methodFilter, setMethodFilter] = useState<(typeof PAYOUT_METHODS)[number]>("all");
+  const [search, setSearch] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const checkProviders = async () => {
     setChecking(true);
@@ -450,6 +460,52 @@ function Withdrawals() {
       setChecking(false);
     }
   };
+
+  const nameOf = (userId: string) =>
+    profiles?.get(userId)?.display_name ?? profiles?.get(userId)?.username ?? "Player";
+
+  const q = search.trim().toLowerCase();
+  const filtered = rows.filter((r) => {
+    if (status !== "all" && r.status !== status) return false;
+    if (methodFilter !== "all" && r.method !== methodFilter) return false;
+    if (!q) return true;
+    return (
+      nameOf(r.user_id).toLowerCase().includes(q) ||
+      String(r.destination ?? "").toLowerCase().includes(q) ||
+      r.id.toLowerCase().includes(q)
+    );
+  });
+
+  const totalCents = filtered.reduce((s, r) => s + Number(r.amount_cents ?? 0), 0);
+
+  const exportCsv = () => {
+    const head = [
+      "id", "player", "amount_usd", "method", "destination", "status",
+      "provider", "provider_payout_id", "attempts", "requires_review",
+      "risk_flags", "failure_reason", "hold_until", "created_at", "processed_at",
+    ];
+    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const body = filtered.map((r) => {
+      const row = r as Record<string, any>;
+      return [
+        r.id, nameOf(r.user_id), (Number(r.amount_cents) / 100).toFixed(2), r.method, r.destination,
+        r.status, row.provider, row.provider_payout_id, row.attempts, row.requires_review,
+        (row.risk_flags ?? []).join(" | "), row.failure_reason, row.hold_until, r.created_at, row.processed_at,
+      ].map(esc).join(",");
+    });
+    const blob = new Blob([[head.join(","), ...body].join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `smyd-payouts-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const chip = (on: boolean) =>
+    `rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ring-1 ${
+      on ? "bg-primary/10 ring-primary text-primary" : "ring-border text-muted-foreground"
+    }`;
 
   return (
     <section className={card}>
@@ -483,96 +539,171 @@ function Withdrawals() {
           <span>PayPal &amp; Venmo send automatically · bank/debit via Stripe</span>
         )}
       </div>
-      {rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No payout requests.</p>
+
+      {/* filters */}
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-1.5">
+          {PAYOUT_STATUSES.map((s) => (
+            <button key={s} className={chip(status === s)} onClick={() => setStatus(s)}>
+              {s === "all" ? "All statuses" : s}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {PAYOUT_METHODS.map((m) => (
+            <button key={m} className={chip(methodFilter === m)} onClick={() => setMethodFilter(m)}>
+              {m === "all" ? "All methods" : m}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            className={inputCls}
+            placeholder="Search player, destination or request id"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button className={btn} onClick={exportCsv} disabled={filtered.length === 0}>
+            Export CSV
+          </button>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          {filtered.length} of {rows.length} requests · {formatMoney(totalCents)} total
+        </p>
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No payout requests match these filters.</p>
       ) : (
         <div className="space-y-2">
-          {rows.map((r) => {
+          {filtered.map((r) => {
             const row = r as typeof r & {
               hold_until?: string | null;
               risk_flags?: string[] | null;
               requires_review?: boolean | null;
               failure_reason?: string | null;
               provider?: string | null;
+              provider_payout_id?: string | null;
+              attempts?: number | null;
+              processed_at?: string | null;
+              approved_at?: string | null;
+              note?: string | null;
             };
             const held = row.hold_until ? new Date(row.hold_until) : null;
             const onHold = held ? held.getTime() > Date.now() : false;
+            const open = openId === r.id;
+            const retryable =
+              ["failed", "processing"].includes(r.status) ||
+              (r.status === "approved" && (row.attempts ?? 0) > 0);
             return (
-            <div key={r.id} className="rounded-lg bg-background ring-1 ring-border p-3 space-y-2">
-              <p className="text-sm font-semibold">
-                {formatMoney(Number(r.amount_cents))} · {r.method} · {r.destination}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                {profiles?.get(r.user_id)?.display_name ?? profiles?.get(r.user_id)?.username ?? "Player"} ·{" "}
-                {r.status} · {new Date(r.created_at).toLocaleString()}
-                {held ? ` · ${onHold ? "holds until" : "released"} ${held.toLocaleString()}` : ""}
-                {row.provider ? ` · via ${row.provider}` : ""}
-              </p>
-              {(row.risk_flags?.length ?? 0) > 0 && (
-                <p className="text-[11px] font-semibold text-destructive">
-                  Flags: {row.risk_flags!.join(", ")}
-                </p>
-              )}
-              {row.failure_reason && (
-                <p className="text-[11px] text-destructive">Last error: {row.failure_reason}</p>
-              )}
-              {r.status !== "paid" && r.status !== "rejected" && (
+              <div key={r.id} className="rounded-lg bg-background ring-1 ring-border p-3 space-y-2">
+                <button className="w-full text-left" onClick={() => setOpenId(open ? null : r.id)}>
+                  <p className="text-sm font-semibold">
+                    {formatMoney(Number(r.amount_cents))} · {r.method} · {r.destination}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {nameOf(r.user_id)} · {r.status} · {new Date(r.created_at).toLocaleString()}
+                    {held ? ` · ${onHold ? "holds until" : "released"} ${held.toLocaleString()}` : ""}
+                    {row.provider ? ` · via ${row.provider}` : ""}
+                  </p>
+                </button>
+                {(row.risk_flags?.length ?? 0) > 0 && (
+                  <p className="text-[11px] font-semibold text-destructive">
+                    Flags: {row.risk_flags!.join(", ")}
+                    {row.requires_review ? " · needs approval" : ""}
+                  </p>
+                )}
+                {row.failure_reason && (
+                  <p className="text-[11px] text-destructive">Last error: {row.failure_reason}</p>
+                )}
+
+                {open && (
+                  <dl className="grid grid-cols-2 gap-x-3 gap-y-1 rounded-lg bg-surface/60 p-2 text-[11px] text-muted-foreground">
+                    <dt>Request id</dt><dd className="truncate text-foreground">{r.id}</dd>
+                    <dt>Player id</dt><dd className="truncate text-foreground">{r.user_id}</dd>
+                    <dt>Provider ref</dt><dd className="truncate text-foreground">{row.provider_payout_id ?? "—"}</dd>
+                    <dt>Send attempts</dt><dd className="text-foreground">{row.attempts ?? 0}</dd>
+                    <dt>Approved</dt>
+                    <dd className="text-foreground">{row.approved_at ? new Date(row.approved_at).toLocaleString() : "—"}</dd>
+                    <dt>Processed</dt>
+                    <dd className="text-foreground">{row.processed_at ? new Date(row.processed_at).toLocaleString() : "—"}</dd>
+                    <dt>Note</dt><dd className="text-foreground">{row.note ?? "—"}</dd>
+                  </dl>
+                )}
+
                 <div className="flex flex-wrap gap-2">
-                  {r.status === "pending" && (
+                  {retryable && (
                     <button
                       className={btn}
-                      disabled={approve.isPending}
+                      disabled={retry.isPending}
                       onClick={() =>
-                        approve.mutate(
+                        retry.mutate(
                           { requestId: r.id },
-                          { onSuccess: () => toast.success("Approved"), onError: err },
+                          { onSuccess: () => toast.success("Queued for another send"), onError: err },
                         )
                       }
                     >
-                      Approve
+                      Retry payout
                     </button>
                   )}
-                  <button
-                    className={btn}
-                    disabled={releaseNow.isPending}
-                    onClick={() =>
-                      releaseNow.mutate(
-                        { requestId: r.id },
-                        { onSuccess: () => toast.success("Hold cleared — sends on next run"), onError: err },
-                      )
-                    }
-                  >
-                    Release now
-                  </button>
-                  <button
-                    className={btn}
-                    disabled={markPaid.isPending}
-                    onClick={() =>
-                      markPaid.mutate(
-                        { requestId: r.id },
-                        { onSuccess: () => toast.success("Marked as sent"), onError: err },
-                      )
-                    }
-                  >
-                    Mark sent by hand
-                  </button>
-                  <button
-                    className={btn}
-                    disabled={reject.isPending}
-                    onClick={() => {
-                      const reason = window.prompt("Reason for rejecting this payout?");
-                      if (!reason) return;
-                      reject.mutate(
-                        { requestId: r.id, reason },
-                        { onSuccess: () => toast.success("Rejected and refunded"), onError: err },
-                      );
-                    }}
-                  >
-                    Reject &amp; refund
-                  </button>
+                  {r.status !== "paid" && r.status !== "rejected" && (
+                    <>
+                      {r.status === "pending" && (
+                        <button
+                          className={btn}
+                          disabled={approve.isPending}
+                          onClick={() =>
+                            approve.mutate(
+                              { requestId: r.id },
+                              { onSuccess: () => toast.success("Approved"), onError: err },
+                            )
+                          }
+                        >
+                          Approve
+                        </button>
+                      )}
+                      <button
+                        className={btn}
+                        disabled={releaseNow.isPending}
+                        onClick={() =>
+                          releaseNow.mutate(
+                            { requestId: r.id },
+                            { onSuccess: () => toast.success("Hold cleared — sends on next run"), onError: err },
+                          )
+                        }
+                      >
+                        Release now
+                      </button>
+                      <button
+                        className={btn}
+                        disabled={markPaid.isPending}
+                        onClick={() =>
+                          markPaid.mutate(
+                            { requestId: r.id },
+                            { onSuccess: () => toast.success("Marked as sent"), onError: err },
+                          )
+                        }
+                      >
+                        Mark sent by hand
+                      </button>
+                      <button
+                        className={btn}
+                        disabled={reject.isPending}
+                        onClick={() => {
+                          const reason = window.prompt("Reason for rejecting this payout?");
+                          if (!reason) return;
+                          reject.mutate(
+                            { requestId: r.id, reason },
+                            { onSuccess: () => toast.success("Rejected and refunded"), onError: err },
+                          );
+                        }}
+                      >
+                        Reject &amp; refund
+                      </button>
+                    </>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
             );
           })}
         </div>
@@ -580,6 +711,7 @@ function Withdrawals() {
     </section>
   );
 }
+
 
 
 /* ---------- staff ---------- */

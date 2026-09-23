@@ -1166,6 +1166,10 @@ export type Database = {
         Args: { _match_id: string; _note?: string; _winner_id: string }
         Returns: undefined
       }
+      admin_retry_withdrawal: {
+        Args: { _request_id: string }
+        Returns: undefined
+      }
       admin_set_age_verified: {
         Args: { _user_id: string; _verified: boolean }
         Returns: undefined
