@@ -1265,3 +1265,109 @@ export function useSetMyIdentity() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-profile"] }),
   });
 }
+
+// ---------- Direct messages ----------
+export type DirectMessage = Database["public"]["Tables"]["direct_messages"]["Row"];
+
+export type ConversationSummary = {
+  peerId: string;
+  lastMessage: DirectMessage;
+  unread: number;
+};
+
+function useDirectMessagesRealtime() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    const channel = supabase
+      .channel(`dm-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "direct_messages" }, () => {
+        qc.invalidateQueries({ queryKey: ["dm"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [qc]);
+}
+
+/** All conversations for the signed-in player, newest first. */
+export function useConversations() {
+  useDirectMessagesRealtime();
+  return useQuery({
+    queryKey: ["dm", "conversations"],
+    queryFn: async (): Promise<{ me: string | null; items: ConversationSummary[] }> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return { me: null, items: [] };
+      const { data, error } = await supabase
+        .from("direct_messages")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(400);
+      if (error) throw error;
+      const map = new Map<string, ConversationSummary>();
+      (data ?? []).forEach((m) => {
+        const peerId = m.sender_id === user.id ? m.recipient_id : m.sender_id;
+        const entry = map.get(peerId);
+        if (!entry) {
+          map.set(peerId, { peerId, lastMessage: m, unread: 0 });
+        }
+        if (m.recipient_id === user.id && !m.read_at) {
+          map.get(peerId)!.unread += 1;
+        }
+      });
+      return { me: user.id, items: Array.from(map.values()) };
+    },
+  });
+}
+
+/** Full message thread with one other player. */
+export function useThread(peerId: string | undefined) {
+  useDirectMessagesRealtime();
+  return useQuery({
+    queryKey: ["dm", "thread", peerId],
+    enabled: !!peerId,
+    queryFn: async (): Promise<{ me: string | null; messages: DirectMessage[] }> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return { me: null, messages: [] };
+      const { data, error } = await supabase
+        .from("direct_messages")
+        .select("*")
+        .or(`and(sender_id.eq.${user.id},recipient_id.eq.${peerId}),and(sender_id.eq.${peerId},recipient_id.eq.${user.id})`)
+        .order("created_at", { ascending: true })
+        .limit(500);
+      if (error) throw error;
+      return { me: user.id, messages: data ?? [] };
+    },
+  });
+}
+
+export function useSendMessage() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ recipientId, body }: { recipientId: string; body: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Please sign in to send messages.");
+      const { error } = await supabase
+        .from("direct_messages")
+        .insert({ sender_id: user.id, recipient_id: recipientId, body });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dm"] }),
+  });
+}
+
+export function useMarkThreadRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (peerId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { error } = await supabase
+        .from("direct_messages")
+        .update({ read_at: new Date().toISOString() })
+        .eq("sender_id", peerId)
+        .eq("recipient_id", user.id)
+        .is("read_at", null);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dm"] }),
+  });
+}
