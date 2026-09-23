@@ -8,7 +8,7 @@ export const Route = createFileRoute("/play/$id")({
   head: () => ({
     meta: [
       { title: "Post Match Winner — SMYD" },
-      { name: "description", content: "Post the winner of your SMYD darts match within the 45 minute reporting window." },
+      { name: "description", content: "Post the winner of your SMYD darts match within the 2 hour reporting window." },
       { property: "og:title", content: "Post Match Winner — SMYD" },
       { property: "og:description", content: "Report and confirm your darts match result on SMYD." },
       { property: "og:type", content: "website" },
@@ -71,9 +71,10 @@ function PlayMatch() {
         </div>
 
         <div className="rounded-xl bg-surface/60 ring-1 ring-border p-4 text-[11px] text-muted-foreground leading-relaxed">
-          Play your match on your board, then post the winner here. You get <span className="text-foreground font-semibold">45 minutes</span> from
-          the start of the match. Funds are released as soon as both players post the same winner. If you disagree, the match is flagged
-          for review. If your opponent never posts, you can claim the result once the 45 minutes are up.
+          Play your match on your board, then post the winner here. You get <span className="text-foreground font-semibold">2 hours</span> from
+          the start of the match to complete it and post the result. Funds are released as soon as both players post the same winner.
+          If you post different winners, the match is flagged for review and the payout stays held — even after the 2 hours are up.
+          If your opponent never posts at all, you can claim the result once the 2 hours have passed.
           <span className="block mt-2 text-destructive font-semibold">
             Camera rule: your camera must show the full board from more than 8 feet away for the whole match. If your opponent
             flags you and proves it, you take an automatic loss.

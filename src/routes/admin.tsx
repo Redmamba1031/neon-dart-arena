@@ -188,7 +188,7 @@ function OpsPanel() {
 
           {data.stuckMatches.length > 0 && (
             <div className="space-y-1">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Past the 45-minute window</p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Past the 2-hour window</p>
               {data.stuckMatches.map((m) => (
                 <div key={m.id} className="flex items-center justify-between rounded-lg bg-background ring-1 ring-border px-3 py-2 text-xs">
                   <span className="font-medium uppercase">{m.mode}</span>
