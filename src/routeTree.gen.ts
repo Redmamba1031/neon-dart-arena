@@ -18,6 +18,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PayoutFaqRouteImport } from './routes/payout-faq'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MatchesRouteImport } from './routes/matches'
@@ -83,6 +84,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayoutFaqRoute = PayoutFaqRouteImport.update({
+  id: '/payout-faq',
+  path: '/payout-faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesRoute = MessagesRouteImport.update({
@@ -205,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/matches': typeof MatchesRoute
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
+  '/payout-faq': typeof PayoutFaqRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/refunds': typeof RefundsRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/matches': typeof MatchesRoute
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
+  '/payout-faq': typeof PayoutFaqRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/refunds': typeof RefundsRoute
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/matches': typeof MatchesRoute
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
+  '/payout-faq': typeof PayoutFaqRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/refunds': typeof RefundsRoute
@@ -304,6 +313,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mcp'
     | '/messages'
+    | '/payout-faq'
     | '/privacy'
     | '/profile'
     | '/refunds'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mcp'
     | '/messages'
+    | '/payout-faq'
     | '/privacy'
     | '/profile'
     | '/refunds'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mcp'
     | '/messages'
+    | '/payout-faq'
     | '/privacy'
     | '/profile'
     | '/refunds'
@@ -401,6 +413,7 @@ export interface RootRouteChildren {
   MatchesRoute: typeof MatchesRoute
   McpRoute: typeof McpRoute
   MessagesRoute: typeof MessagesRoute
+  PayoutFaqRoute: typeof PayoutFaqRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RefundsRoute: typeof RefundsRoute
@@ -487,6 +500,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payout-faq': {
+      id: '/payout-faq'
+      path: '/payout-faq'
+      fullPath: '/payout-faq'
+      preLoaderRoute: typeof PayoutFaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages': {
@@ -649,6 +669,7 @@ const rootRouteChildren: RootRouteChildren = {
   MatchesRoute: MatchesRoute,
   McpRoute: McpRoute,
   MessagesRoute: MessagesRoute,
+  PayoutFaqRoute: PayoutFaqRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RefundsRoute: RefundsRoute,
