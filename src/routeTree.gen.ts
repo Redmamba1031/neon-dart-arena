@@ -32,6 +32,7 @@ import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as ApiAvatarsSplatRouteImport } from './routes/api/avatars/$'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -156,6 +157,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAvatarsSplatRoute = ApiAvatarsSplatRouteImport.update({
+  id: '/api/avatars/$',
+  path: '/api/avatars/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/play/$id': typeof PlayIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/avatars/$': typeof ApiAvatarsSplatRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/payouts/run': typeof ApiPublicPayoutsRunRoute
@@ -245,6 +252,7 @@ export interface FileRoutesByTo {
   '/play/$id': typeof PlayIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/avatars/$': typeof ApiAvatarsSplatRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/payouts/run': typeof ApiPublicPayoutsRunRoute
@@ -277,6 +285,7 @@ export interface FileRoutesById {
   '/play/$id': typeof PlayIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/avatars/$': typeof ApiAvatarsSplatRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/payouts/run': typeof ApiPublicPayoutsRunRoute
@@ -310,6 +319,7 @@ export interface FileRouteTypes {
     | '/play/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/avatars/$'
     | '/api/public/health'
     | '/api/public/payments/webhook'
     | '/api/public/payouts/run'
@@ -341,6 +351,7 @@ export interface FileRouteTypes {
     | '/play/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/avatars/$'
     | '/api/public/health'
     | '/api/public/payments/webhook'
     | '/api/public/payouts/run'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/play/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/avatars/$'
     | '/api/public/health'
     | '/api/public/payments/webhook'
     | '/api/public/payouts/run'
@@ -404,6 +416,7 @@ export interface RootRouteChildren {
   PlayIdRoute: typeof PlayIdRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiAvatarsSplatRoute: typeof ApiAvatarsSplatRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicPayoutsRunRoute: typeof ApiPublicPayoutsRunRoute
@@ -574,6 +587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/avatars/$': {
+      id: '/api/avatars/$'
+      path: '/api/avatars/$'
+      fullPath: '/api/avatars/$'
+      preLoaderRoute: typeof ApiAvatarsSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -645,6 +665,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlayIdRoute: PlayIdRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiAvatarsSplatRoute: ApiAvatarsSplatRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicPayoutsRunRoute: ApiPublicPayoutsRunRoute,
