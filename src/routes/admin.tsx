@@ -484,7 +484,12 @@ function Withdrawals() {
       "provider", "provider_payout_id", "attempts", "requires_review",
       "risk_flags", "failure_reason", "hold_until", "created_at", "processed_at",
     ];
-    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const esc = (v: unknown) => {
+      let s = String(v ?? "");
+      // Neutralize spreadsheet formula injection (=, +, -, @, tab, CR)
+      if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+      return `"${s.replace(/"/g, '""')}"`;
+    };
     const body = filtered.map((r) => {
       const row = r as Record<string, any>;
       return [
