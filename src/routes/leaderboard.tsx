@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Trophy } from "lucide-react";
-import { useLeaderboard, useMyProfile, useProfilesByIds, formatUsd, type LeaderboardRow } from "@/lib/api";
+import { useLeaderboard, useMyProfile, useProfilesByIds, type LeaderboardRow } from "@/lib/api";
 import { locationLabel } from "@/lib/geo";
 
 export const Route = createFileRoute("/leaderboard")({
