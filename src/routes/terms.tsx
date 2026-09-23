@@ -63,7 +63,7 @@ function TermsPage() {
         <Section title="Funds and payouts">
           <ul className="list-disc space-y-1 pl-5">
             <li>Account funds are added at face value ($25 in = $25 on your account) and can be used to enter matches or withdrawn.</li>
-            <li>Withdrawals are subject to a $5.00 minimum and are sent to the PayPal, Cash App, or Venmo account you provide.</li>
+            <li>Withdrawals are subject to a $5.00 minimum and are sent to the PayPal, Venmo, or bank account you provide.</li>
             <li>Match entries are held when a match starts and the full prize pot is released to the winner once the result is confirmed.</li>
             <li>Each entry includes a disclosed 10% SMYD service fee, shown before you confirm. No fee is taken out of the prize pot.</li>
           </ul>
