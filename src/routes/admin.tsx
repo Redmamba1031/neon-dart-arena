@@ -433,6 +433,23 @@ function Withdrawals() {
   const releaseNow = useAdminReleaseWithdrawalNow();
   const runPayouts = useRunDuePayouts();
   const { data: profiles } = useProfilesByIds(rows.map((r) => r.user_id));
+  const [providers, setProviders] = useState<{ paypal: boolean; paypalError: string | null } | null>(null);
+  const [checking, setChecking] = useState(false);
+
+  const checkProviders = async () => {
+    setChecking(true);
+    try {
+      const { checkPayoutProviders } = await import("@/lib/payouts.functions");
+      const res = await checkPayoutProviders();
+      setProviders({ paypal: res.paypal, paypalError: res.paypalError ?? null });
+      if (res.paypal) toast.success("PayPal payouts connected");
+      else toast.error(res.paypalError ?? "PayPal not connected");
+    } catch (e) {
+      err(e as Error);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   return (
     <section className={card}>
