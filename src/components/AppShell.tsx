@@ -1,14 +1,26 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Award, Home, Shield, ShoppingBag, Swords, User, Wallet } from "lucide-react";
 import { useEffect } from "react";
 import smydLogo from "@/assets/smyd-logo.png";
 import { formatMoney, useIsStaff, useMyBan, useMyProfile, useWallet } from "@/lib/api";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
+const IDENTITY_EXEMPT = ["/verify-identity", "/rules", "/terms", "/privacy", "/refunds", "/payout-faq", "/support", "/login", "/reset-password"];
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     document.documentElement.classList.add("dark");
   }, []);
+
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { data: myProfile } = useMyProfile();
+  useEffect(() => {
+    if (!myProfile) return;
+    if (myProfile.legal_name && myProfile.date_of_birth) return;
+    if (IDENTITY_EXEMPT.includes(pathname)) return;
+    navigate({ to: "/verify-identity" });
+  }, [myProfile, pathname, navigate]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
