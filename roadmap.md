@@ -1,4 +1,4 @@
 # Roadmap
 
-- [ ] Re-allow owner account (redmond1031@gmail.com) to play paid matches and receive match winnings/refunds; keep blocking deposits and manual credits
-- [ ] Add profit tracker page: total rake profit + amount still in 72-hour payout hold; link from admin
+- [x] Re-allow owner account to play paid matches and receive match winnings/refunds; deposits and manual credits stay blocked
+- [x] Profit tracker page at /profit: total rake profit, available balance, cash-outs in the 72-hour hold, already paid out; linked from Admin
