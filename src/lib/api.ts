@@ -1015,6 +1015,13 @@ export function useRequestWithdrawal() {
         _destination: args.destination,
       });
       if (error) throw error;
+      // Staff cash-outs skip the hold — send them out right away.
+      try {
+        const { releaseDuePayouts } = await import("@/lib/payouts.functions");
+        await releaseDuePayouts();
+      } catch {
+        /* non-staff or provider hiccup: the scheduled run will pick it up */
+      }
     },
     onSuccess: () => {
       ["my-withdrawals", "wallet", "transactions"].forEach((k) =>

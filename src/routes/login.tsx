@@ -41,6 +41,8 @@ function Login() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [accepted, setAccepted] = useState(false);
+  const [legalName, setLegalName] = useState("");
+  const [dob, setDob] = useState("");
   const [busy, setBusy] = useState(false);
   const { next } = Route.useSearch();
   const nextPath = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
@@ -58,6 +60,18 @@ function Login() {
           toast.error(parsed.error.issues[0].message);
           return;
         }
+        if (legalName.trim().length < 3 || !dob) {
+          toast.error("Enter your real name and date of birth");
+          return;
+        }
+        {
+          const d = new Date(dob);
+          const adult = new Date(d.getFullYear() + 18, d.getMonth(), d.getDate()) <= new Date();
+          if (isNaN(d.getTime()) || !adult) {
+            toast.error("You must be 18 or older to join SMYD");
+            return;
+          }
+        }
         if (!accepted) {
           toast.error("You must read and accept the Rules, Terms, Privacy and Refund policy");
           return;
@@ -71,6 +85,8 @@ function Login() {
             data: {
               username: parsed.data.username,
               display_name: parsed.data.username,
+              legal_name: legalName.trim(),
+              date_of_birth: dob,
               terms_accepted_at: new Date().toISOString(),
             },
           },
@@ -167,6 +183,24 @@ function Login() {
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
             />
+          )}
+          {mode === "signup" && (
+            <>
+              <Field
+                label="Real (legal) name"
+                placeholder="Jane Doe"
+                value={legalName}
+                onChange={(e) => setLegalName(e.target.value)}
+                autoComplete="name"
+              />
+              <Field
+                label="Date of birth"
+                type="date"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                autoComplete="bday"
+              />
+            </>
           )}
           <Field
             label="Email"
