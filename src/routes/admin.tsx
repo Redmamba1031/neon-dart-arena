@@ -98,6 +98,19 @@ function AdminPage() {
           </div>
         </Link>
 
+        <Link
+          to="/profit"
+          className="flex items-center gap-3 rounded-xl bg-surface ring-1 ring-border p-4 hover:ring-primary/40 transition-all"
+        >
+          <div className="size-10 rounded-lg bg-primary/15 grid place-items-center text-primary">
+            <TrendingUp className="size-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold">Profit tracker</p>
+            <p className="text-[11px] text-muted-foreground">Total service-fee profit and cash-outs still on hold</p>
+          </div>
+        </Link>
+
         <EarningsPanel />
         <OpsPanel />
         <Disputes />
