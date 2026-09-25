@@ -290,8 +290,8 @@ function CashOutPanel() {
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Available to cash out</p>
         <p className="mt-1 font-display text-2xl font-bold text-gradient-neon">{formatMoney(balance)}</p>
         <p className="mt-1 text-[10px] text-muted-foreground">
-          $5.00 minimum. Every cash out is held 72 hours for fraud review, then PayPal, Venmo and
-          bank/card payouts send automatically.
+          $5.00 minimum. Every cash out is held 72 hours for fraud review, then PayPal and Venmo
+          payouts send automatically.
         </p>
       </div>
 
