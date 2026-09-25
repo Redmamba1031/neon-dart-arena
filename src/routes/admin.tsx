@@ -116,6 +116,7 @@ function AdminPage() {
         <Disputes />
         <BanTool />
         <CoinTool />
+        <FundsCheck />
         <Withdrawals />
         {role.owner && <StaffTool />}
         <ActionLog />
