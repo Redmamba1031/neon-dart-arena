@@ -16,6 +16,7 @@ import {
   useRefreshPayoutAccount,
   usePayoutHelp,
 } from "@/lib/api";
+import { payoutState, type TrackedPayout } from "@/lib/payoutStatus";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
