@@ -32,6 +32,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayIdRouteImport } from './routes/play.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as CheckoutPaypalRouteImport } from './routes/checkout.paypal'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
@@ -158,6 +159,11 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutPaypalRoute = CheckoutPaypalRouteImport.update({
+  id: '/checkout/paypal',
+  path: '/checkout/paypal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -237,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/checkout/paypal': typeof CheckoutPaypalRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/play/$id': typeof PlayIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -272,6 +279,7 @@ export interface FileRoutesByTo {
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/checkout/paypal': typeof CheckoutPaypalRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/play/$id': typeof PlayIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/checkout/paypal': typeof CheckoutPaypalRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/play/$id': typeof PlayIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/checkout/paypal'
     | '/checkout/return'
     | '/play/$id'
     | '/.lovable/oauth/consent'
@@ -380,6 +390,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/checkout/paypal'
     | '/checkout/return'
     | '/play/$id'
     | '/.lovable/oauth/consent'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/checkout/paypal'
     | '/checkout/return'
     | '/play/$id'
     | '/.lovable/oauth/consent'
@@ -451,6 +463,7 @@ export interface RootRouteChildren {
   WalletRoute: typeof WalletRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  CheckoutPaypalRoute: typeof CheckoutPaypalRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   PlayIdRoute: typeof PlayIdRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -626,6 +639,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/paypal': {
+      id: '/checkout/paypal'
+      path: '/checkout/paypal'
+      fullPath: '/checkout/paypal'
+      preLoaderRoute: typeof CheckoutPaypalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -724,6 +744,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  CheckoutPaypalRoute: CheckoutPaypalRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   PlayIdRoute: PlayIdRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
