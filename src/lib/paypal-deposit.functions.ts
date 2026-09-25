@@ -24,8 +24,8 @@ export const createPaypalDeposit = createServerFn({ method: "POST" })
         .from("profiles").select("region_code, country").eq("id", userId).maybeSingle();
       const p = profile as { region_code?: string | null; country?: string | null } | null;
       if (!p?.region_code) return { error: "Set your location in your profile before adding funds" };
-      if ((p.country ?? "US") !== "US" || p.region_code !== "IN") {
-        return { error: "SMYD is currently live in Indiana only — adding funds is not available in your area yet" };
+      if (!isAllowedRegion(p.country, p.region_code)) {
+        return { error: `SMYD is currently live in ${ALLOWED_STATES_LABEL} only — adding funds is not available in your area yet` };
       }
 
       const { data: pack } = await admin
