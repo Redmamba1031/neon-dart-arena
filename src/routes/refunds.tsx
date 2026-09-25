@@ -35,10 +35,11 @@ function RefundsPage() {
 
         <Section title="Deposits">
           <p>
-            Funds you add to your account are available to play with immediately. Unused funds are never
-            "spent" — you can always withdraw your remaining balance to PayPal or Venmo instead
-            of requesting a refund. If a deposit fails but your card was charged, contact support and we
-            will credit or refund it.
+            Funds you add to your account are available to play with immediately. Your first deposit earns
+            a 20% bonus in extra playing funds — bonus funds themselves are not refundable or withdrawable,
+            but winnings earned with them follow the normal withdrawal rules. Unused funds are never
+            "spent" — you can always withdraw your remaining balance instead of requesting a refund.
+            If a deposit fails but your card was charged, contact support and we will credit or refund it.
           </p>
         </Section>
 
@@ -54,9 +55,10 @@ function RefundsPage() {
 
         <Section title="Withdrawals">
           <p>
-            Pending withdrawal requests can be rejected by staff, in which case the full amount is returned
-            to your balance. Once a payout has been sent to your PayPal or Venmo account it
-            cannot be reversed by SMYD.
+            Payouts are sent only to the PayPal or Venmo account you provide — SMYD does not offer bank,
+            card, or other payout methods. Pending withdrawal requests can be rejected by staff, in which
+            case the full amount is returned to your balance. Once a payout has been sent to your PayPal or
+            Venmo account it cannot be reversed by SMYD.
           </p>
         </Section>
 
