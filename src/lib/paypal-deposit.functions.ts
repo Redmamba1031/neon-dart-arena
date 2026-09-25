@@ -10,9 +10,16 @@ async function getAdmin() {
 // Creates a PayPal order for an active amount and returns the approval link.
 export const createPaypalDeposit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { priceId: string; origin: string }) => {
+  .inputValidator((data: { priceId: string; origin: string; amountCents?: number }) => {
     if (!/^[a-zA-Z0-9_]+$/.test(data.priceId)) throw new Error("Invalid amount");
     if (!/^https?:\/\/[^\s/]+$/.test(data.origin)) throw new Error("Invalid origin");
+    if (data.priceId === "custom") {
+      const cents = Math.round(Number(data.amountCents));
+      if (!Number.isFinite(cents) || cents < 500 || cents > 50_000) {
+        throw new Error("Amount must be between $5 and $500");
+      }
+      return { ...data, amountCents: cents };
+    }
     return data;
   })
   .handler(async ({ data, context }) => {

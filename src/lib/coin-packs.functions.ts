@@ -127,3 +127,77 @@ export const createCoinPackCheckout = createServerFn({ method: "POST" })
 
     return session.client_secret;
   });
+
+// Custom amount deposit ($5–$500): player picks the amount, credited 1:1.
+export const CUSTOM_DEPOSIT_MIN_CENTS = 500;
+export const CUSTOM_DEPOSIT_MAX_CENTS = 50_000;
+
+export const createCustomDepositCheckout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { amountCents: number; returnUrl: string; environment: StripeEnv }) => {
+    const cents = Math.round(Number(data.amountCents));
+    if (!Number.isFinite(cents) || cents < CUSTOM_DEPOSIT_MIN_CENTS || cents > CUSTOM_DEPOSIT_MAX_CENTS) {
+      throw new Error("Amount must be between $5 and $500");
+    }
+    if (data.environment !== "sandbox" && data.environment !== "live") {
+      throw new Error("Invalid environment");
+    }
+    if (typeof data.returnUrl !== "string" || !data.returnUrl.startsWith("http")) {
+      throw new Error("Invalid return URL");
+    }
+    return { ...data, amountCents: cents };
+  })
+  .handler(async ({ data, context }) => {
+    const { userId, claims } = context as { userId: string; claims: { email?: string } };
+
+    const { data: profileRow } = await admin()
+      .from("profiles")
+      .select("region_code, country")
+      .eq("id", userId)
+      .maybeSingle();
+    const profile = profileRow as { region_code?: string | null; country?: string | null } | null;
+    if (!profile?.region_code) {
+      throw new Error("Set your location in your profile before adding funds");
+    }
+    if (!isAllowedRegion(profile.country, profile.region_code)) {
+      throw new Error(`SMYD is currently live in ${ALLOWED_STATES_LABEL} only — adding funds is not available in your area yet`);
+    }
+
+    const stripe = createStripeClient(data.environment);
+    const customerId = await resolveOrCreateCustomer(stripe, {
+      userId,
+      email: claims.email,
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: [{
+        price_data: {
+          currency: "usd",
+          product_data: { name: "SMYD account funds" },
+          unit_amount: data.amountCents,
+        },
+        quantity: 1,
+      }],
+      mode: "payment",
+      ui_mode: "embedded_page",
+      return_url: data.returnUrl,
+      customer: customerId,
+      metadata: {
+        userId,
+        kind: "coin_pack",
+        pack_id: "custom",
+        coins_granted: String(data.amountCents),
+      },
+      payment_intent_data: {
+        description: "SMYD account funds",
+        metadata: {
+          userId,
+          kind: "coin_pack",
+          pack_id: "custom",
+          coins_granted: String(data.amountCents),
+        },
+      },
+    });
+
+    return session.client_secret;
+  });
