@@ -13,7 +13,9 @@ export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
       { title: "Profile — SMYD" },
-      { name: "description", content: "Your SMYD player profile and stats." },
+      { name: "description", content: "Manage your SMYD player profile, picture and account, and track your darts wins, games and stats." },
+      { property: "og:title", content: "Player Profile — SMYD" },
+      { property: "og:description", content: "Your SMYD darts profile, stats and account settings." },
     ],
   }),
   component: Profile,

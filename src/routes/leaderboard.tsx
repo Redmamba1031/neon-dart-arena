@@ -8,7 +8,10 @@ export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
       { title: "Leaderboard — SMYD" },
-      { name: "description", content: "Top darts players on SMYD ranked by wins and games played." },
+      { name: "description", content: "See the top GranBoard darts players on SMYD, ranked by total wins and games played in 501 and Cricket." },
+      { property: "og:title", content: "Leaderboard — SMYD Darts Rankings" },
+      { property: "og:description", content: "Top SMYD darts players ranked by wins and games played." },
+      { property: "og:url", content: "https://smyd.online/leaderboard" },
     ],
   }),
   component: Leaderboard,
