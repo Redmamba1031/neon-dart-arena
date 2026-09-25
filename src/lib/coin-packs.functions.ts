@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
+import { ALLOWED_STATES_LABEL, isAllowedRegion } from "@/lib/geo";
 
 let _admin: ReturnType<typeof createClient> | null = null;
 function admin() {
