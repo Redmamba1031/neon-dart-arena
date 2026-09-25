@@ -111,6 +111,19 @@ function AdminPage() {
           </div>
         </Link>
 
+        <Link
+          to="/growth"
+          className="flex items-center gap-3 rounded-xl bg-surface ring-1 ring-border p-4 hover:ring-primary/40 transition-all"
+        >
+          <div className="size-10 rounded-lg bg-accent/15 grid place-items-center text-accent">
+            <TrendingUp className="size-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold">Player growth</p>
+            <p className="text-[11px] text-muted-foreground">New sign-ups, first deposits, bonus claims and sources</p>
+          </div>
+        </Link>
+
         <EarningsPanel />
         <OpsPanel />
         <Disputes />
