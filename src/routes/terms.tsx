@@ -63,7 +63,8 @@ function TermsPage() {
         <Section title="Funds and payouts">
           <ul className="list-disc space-y-1 pl-5">
             <li>Account funds are added at face value ($25 in = $25 on your account) and can be used to enter matches or withdrawn.</li>
-            <li>Withdrawals are subject to a $5.00 minimum and are sent to the PayPal or Venmo account you provide.</li>
+            <li>First-deposit bonus: your first deposit earns an extra 20% in bonus funds (for example, deposit $50 and receive $60 total). Bonus funds are for entering matches and contests; winnings earned from them are withdrawable under the normal rules.</li>
+            <li>Withdrawals are subject to a $5.00 minimum and are sent only to the PayPal or Venmo account you provide. SMYD does not offer bank, card, or other payout methods.</li>
             <li>Match entries are held when a match starts and the full prize is released to the winner once the result is confirmed.</li>
             <li>Each entry includes a disclosed 10% SMYD service fee, shown before you confirm. No fee is taken out of the prize.</li>
           </ul>
