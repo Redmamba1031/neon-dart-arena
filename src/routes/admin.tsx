@@ -443,6 +443,82 @@ function CoinTool() {
 const PAYOUT_STATUSES = ["all", "pending", "approved", "processing", "paid", "failed", "rejected"] as const;
 const PAYOUT_METHODS = ["all", "paypal", "venmo", "bank", "cashapp"] as const;
 
+function FundsCheck() {
+  type Rail = { availableCents: number | null; pendingCents: number | null; error: string | null };
+  const [data, setData] = useState<{ stripe: Rail; paypal: Rail; owed: { stripeCents: number; paypalCents: number } } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const usd = (c: number | null) => (c == null ? "—" : `$${(c / 100).toFixed(2)}`);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { getPayoutFunds } = await import("@/lib/payouts.functions");
+      const res = await getPayoutFunds();
+      if (res.error || !res.stripe || !res.paypal || !res.owed) throw new Error(res.error ?? "Could not load balances");
+      setData({ stripe: res.stripe, paypal: res.paypal, owed: res.owed });
+    } catch (e) {
+      err(e as Error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  const row = (label: string, sub: string, rail: Rail, owed: number) => {
+    const short = rail.availableCents != null && rail.availableCents < owed;
+    const low = !short && rail.availableCents != null && owed === 0 && rail.availableCents < 2500;
+    return (
+      <div className={`rounded-lg p-3 ring-1 ${short ? "ring-destructive bg-destructive/10" : "ring-border"}`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-bold">{label}</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{sub}</div>
+          </div>
+          <div className="text-right">
+            <div className="font-display text-lg font-bold">{usd(rail.availableCents)}</div>
+            <div className="text-[10px] text-muted-foreground">available</div>
+          </div>
+        </div>
+        <div className="mt-2 flex justify-between text-[11px] text-muted-foreground">
+          <span>Still pending: {usd(rail.pendingCents)}</span>
+          <span>Cash-outs waiting: {usd(owed)}</span>
+        </div>
+        {rail.error && <p className="mt-2 text-[11px] text-destructive">{rail.error}</p>}
+        {short && (
+          <p className="mt-2 flex items-center gap-1 text-[11px] font-bold text-destructive">
+            <AlertTriangle className="size-3" /> Short by {usd(owed - (rail.availableCents ?? 0))} — these payouts will fail. Top up before releasing.
+          </p>
+        )}
+        {low && <p className="mt-2 text-[11px] text-muted-foreground">Balance is low — consider adding a float.</p>}
+      </div>
+    );
+  };
+
+  return (
+    <section className={card}>
+      <div className="flex items-center justify-between">
+        <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+          <Coins className="size-4 text-primary" /> Payout funds
+        </h2>
+        <button className={btn} disabled={loading} onClick={load}>
+          {loading ? "Checking…" : "Refresh"}
+        </button>
+      </div>
+      {data ? (
+        <div className="space-y-2">
+          {row("Stripe", "Bank / card cash-outs", data.stripe, data.owed.stripeCents)}
+          {row("PayPal", "PayPal & Venmo cash-outs", data.paypal, data.owed.paypalCents)}
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">{loading ? "Loading balances…" : "Balances unavailable."}</p>
+      )}
+    </section>
+  );
+}
+
 function Withdrawals() {
   const { data: rows = [] } = useAllWithdrawals();
   const markPaid = useAdminMarkWithdrawalPaid();
