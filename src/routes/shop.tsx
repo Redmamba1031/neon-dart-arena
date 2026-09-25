@@ -310,51 +310,12 @@ function CashOutPanel() {
           ))}
         </div>
 
-        {isBank ? (
-          <div className="space-y-2 rounded-lg bg-background p-3 ring-1 ring-border">
-            <p className="text-[11px] text-muted-foreground">
-              {bankReady
-                ? "Your bank or debit card is connected — payouts send automatically."
-                : "Connect a bank account or debit card once, then cash outs send straight to it."}
-            </p>
-            {!bankReady && (
-              <div className="flex gap-2">
-                <button
-                  className="flex-1 rounded-lg bg-primary/10 py-2 text-[10px] font-bold uppercase tracking-widest text-primary ring-1 ring-primary disabled:opacity-60"
-                  disabled={startSetup.isPending}
-                  onClick={() =>
-                    startSetup.mutate(undefined, {
-                      onSuccess: (url) => { window.location.href = url; },
-                      onError: (e: Error) => toast.error(e.message),
-                    })
-                  }
-                >
-                  {payoutAccount ? "Finish setup" : "Connect payout account"}
-                </button>
-                <button
-                  className="rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ring-1 ring-border disabled:opacity-60"
-                  disabled={refreshAccount.isPending}
-                  onClick={() =>
-                    refreshAccount.mutate(undefined, {
-                      onSuccess: (r) =>
-                        toast.success(r.payoutsEnabled ? "Payout account ready" : "Setup still incomplete"),
-                      onError: (e: Error) => toast.error(e.message),
-                    })
-                  }
-                >
-                  Refresh
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <Field
-            label={active.label + " destination"}
-            placeholder={active.hint}
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          />
-        )}
+        <Field
+          label={active.label + " destination"}
+          placeholder={active.hint}
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+        />
         <Field
           label="Amount (USD)"
           type="number"
