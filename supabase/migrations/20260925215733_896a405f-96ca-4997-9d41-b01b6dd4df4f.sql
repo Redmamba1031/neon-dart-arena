@@ -1,0 +1,1 @@
+update public.restricted_regions set active = false where code in ('TX','CO','KS','MO','WI');
