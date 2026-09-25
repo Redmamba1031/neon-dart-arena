@@ -36,7 +36,7 @@ function RefundsPage() {
         <Section title="Deposits">
           <p>
             Funds you add to your account are available to play with immediately. Unused funds are never
-            "spent" — you can always withdraw your remaining balance to PayPal, Venmo, or your bank instead
+            "spent" — you can always withdraw your remaining balance to PayPal or Venmo instead
             of requesting a refund. If a deposit fails but your card was charged, contact support and we
             will credit or refund it.
           </p>
@@ -55,7 +55,7 @@ function RefundsPage() {
         <Section title="Withdrawals">
           <p>
             Pending withdrawal requests can be rejected by staff, in which case the full amount is returned
-            to your balance. Once a payout has been sent to your PayPal, Venmo, or bank account it
+            to your balance. Once a payout has been sent to your PayPal or Venmo account it
             cannot be reversed by SMYD.
           </p>
         </Section>
