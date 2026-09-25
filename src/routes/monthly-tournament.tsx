@@ -12,9 +12,9 @@ export const Route = createFileRoute("/monthly-tournament")({
   head: () => ({
     meta: [
       { title: "Monthly $500 Tournament — SMYD Pro" },
-      { name: "description", content: "Join SMYD Pro for $19.99/month and compete in the monthly $500 skill-based darts tournament in 501 and Cricket." },
+      { name: "description", content: "Join SMYD Pro for $19.99/month — each month up to 16 members are drawn for the $500 skill-based darts tournament in 501 and Cricket." },
       { property: "og:title", content: "Monthly $500 Tournament — SMYD Pro" },
-      { property: "og:description", content: "$19.99/month membership. Compete every month for a $500 prize — decided by darts, not luck." },
+      { property: "og:description", content: "$19.99/month membership. Monthly draw for a 16-player bracket — the $500 prize is decided by darts, not luck." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
