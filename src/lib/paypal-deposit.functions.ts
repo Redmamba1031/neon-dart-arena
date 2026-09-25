@@ -10,9 +10,16 @@ async function getAdmin() {
 // Creates a PayPal order for an active amount and returns the approval link.
 export const createPaypalDeposit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { priceId: string; origin: string }) => {
+  .inputValidator((data: { priceId: string; origin: string; amountCents?: number }) => {
     if (!/^[a-zA-Z0-9_]+$/.test(data.priceId)) throw new Error("Invalid amount");
     if (!/^https?:\/\/[^\s/]+$/.test(data.origin)) throw new Error("Invalid origin");
+    if (data.priceId === "custom") {
+      const cents = Math.round(Number(data.amountCents));
+      if (!Number.isFinite(cents) || cents < 500 || cents > 50_000) {
+        throw new Error("Amount must be between $5 and $500");
+      }
+      return { ...data, amountCents: cents };
+    }
     return data;
   })
   .handler(async ({ data, context }) => {
@@ -29,11 +36,16 @@ export const createPaypalDeposit = createServerFn({ method: "POST" })
         return { error: `SMYD is currently live in ${ALLOWED_STATES_LABEL} only — adding funds is not available in your area yet` };
       }
 
-      const { data: pack } = await admin
-        .from("coin_packs").select("price_id, name, usd_cents, active")
-        .eq("price_id", data.priceId).eq("active", true).maybeSingle();
-      const pk = pack as { price_id: string; name: string; usd_cents: number } | null;
-      if (!pk) return { error: "That amount isn't available" };
+      let pk: { price_id: string; name: string; usd_cents: number };
+      if (data.priceId === "custom") {
+        pk = { price_id: `custom_${data.amountCents}`, name: "Custom amount", usd_cents: data.amountCents! };
+      } else {
+        const { data: pack } = await admin
+          .from("coin_packs").select("price_id, name, usd_cents, active")
+          .eq("price_id", data.priceId).eq("active", true).maybeSingle();
+        if (!pack) return { error: "That amount isn't available" };
+        pk = pack as { price_id: string; name: string; usd_cents: number };
+      }
 
       const token = await paypalToken();
       const res = await fetch(`${paypalBase()}/v2/checkout/orders`, {
@@ -99,11 +111,25 @@ export const capturePaypalDeposit = createServerFn({ method: "POST" })
       if (!capture || capture.status !== "COMPLETED") return { error: "Payment is still pending at PayPal" };
 
       const admin = await getAdmin();
-      const { data: pack } = await admin
-        .from("coin_packs").select("usd_cents, coins_granted").eq("price_id", unit.reference_id).maybeSingle();
-      const pk = pack as { usd_cents: number; coins_granted: number } | null;
       const paidCents = Math.round(Number(capture.amount?.value) * 100);
-      if (!pk || capture.amount?.currency_code !== "USD" || paidCents !== Number(pk.usd_cents)) {
+      let expectedCents: number;
+      let creditCents: number;
+      const ref = String(unit.reference_id ?? "");
+      if (ref.startsWith("custom_")) {
+        expectedCents = Number(ref.slice(7));
+        creditCents = expectedCents;
+        if (!Number.isFinite(expectedCents) || expectedCents < 500 || expectedCents > 50_000) {
+          return { error: "Payment amount didn't match — contact support" };
+        }
+      } else {
+        const { data: pack } = await admin
+          .from("coin_packs").select("usd_cents, coins_granted").eq("price_id", ref).maybeSingle();
+        const pk = pack as { usd_cents: number; coins_granted: number } | null;
+        if (!pk) return { error: "Payment amount didn't match — contact support" };
+        expectedCents = Number(pk.usd_cents);
+        creditCents = Number(pk.coins_granted);
+      }
+      if (capture.amount?.currency_code !== "USD" || paidCents !== expectedCents) {
         return { error: "Payment amount didn't match — contact support" };
       }
 
@@ -111,11 +137,11 @@ export const capturePaypalDeposit = createServerFn({ method: "POST" })
         _user_id: context.userId,
         _session_id: `paypal_${data.orderId}`,
         _payment_intent: `paypal_capture_${capture.id}`,
-        _coins_granted: Number(pk.coins_granted),
+        _coins_granted: creditCents,
         _environment: (process.env["PAYPAL_ENV"] ?? "live") === "sandbox" ? "sandbox" : "live",
       });
       if (error) return { error: error.message };
-      return { ok: true as const, amountCents: Number(pk.coins_granted) };
+      return { ok: true as const, amountCents: creditCents };
     } catch (e) {
       return { error: e instanceof Error ? e.message : "PayPal capture failed" };
     }

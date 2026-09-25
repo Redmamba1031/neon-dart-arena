@@ -12,9 +12,9 @@ export const Route = createFileRoute("/monthly-tournament")({
   head: () => ({
     meta: [
       { title: "Monthly $500 Tournament — SMYD Pro" },
-      { name: "description", content: "Join SMYD Pro for $19.99/month and compete in the monthly $500 skill-based darts tournament in 501 and Cricket." },
+      { name: "description", content: "Join SMYD Pro for $19.99/month — each month up to 16 members are drawn for the $500 skill-based darts tournament in 501 and Cricket." },
       { property: "og:title", content: "Monthly $500 Tournament — SMYD Pro" },
-      { property: "og:description", content: "$19.99/month membership. Compete every month for a $500 prize — decided by darts, not luck." },
+      { property: "og:description", content: "$19.99/month membership. Monthly draw for a 16-player bracket — the $500 prize is decided by darts, not luck." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -70,7 +70,7 @@ function TournamentPage() {
           <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-primary">SMYD Pro exclusive</p>
           <h1 className="mt-1 font-display text-4xl font-bold">$500 Monthly Tournament</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Every month, SMYD Pro members compete head-to-head for a $500 prize. The champion is decided by darts — skill, not luck.
+            Every month, up to 16 SMYD Pro members are drawn for that month's bracket — then they compete head-to-head for a $500 prize. The champion is decided by darts — skill, not luck.
           </p>
           {active ? (
             <div className="mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-xl bg-success/15 px-4 py-3 text-sm font-bold text-success">
@@ -97,7 +97,7 @@ function TournamentPage() {
           {[
             { icon: Crown, t: "$500 prize", d: "Paid to the monthly champion's SMYD balance." },
             { icon: Target, t: "501 & Cricket", d: "Head-to-head bracket rounds on GranBoard." },
-            { icon: Users, t: "Members only", d: "Every active Pro member is entered in that month's bracket." },
+            { icon: Users, t: "16-player draw", d: "Each month, up to 16 active Pro members are drawn at random for the bracket." },
             { icon: Video, t: "Camera rules", d: "Same rules as regular matches — board visible from 8+ feet." },
           ].map(({ icon: I, t, d }) => (
             <div key={t} className="rounded-xl bg-surface p-4 ring-1 ring-border">
@@ -112,12 +112,12 @@ function TournamentPage() {
           <h2 className="font-display text-base font-bold text-foreground">How it works</h2>
           <ol className="list-decimal space-y-1 pl-5">
             <li>Join SMYD Pro for $19.99/month.</li>
-            <li>Active members are placed in that month's bracket. Pairings and schedule are posted in the SMYD group on GranBoard.</li>
+            <li>Each month, up to 16 active members are drawn at random for that month's bracket. The draw only picks who plays — pairings and schedule are posted in the SMYD group on GranBoard.</li>
             <li>Play each round live on camera and report the winner within 2 hours, just like regular matches.</li>
             <li>The last player standing wins $500, credited to their SMYD balance.</li>
           </ol>
           <p className="pt-1 text-xs">
-            No random drawings — the champion is decided only by play. See the{" "}
+            The monthly draw only decides who enters the bracket — the $500 champion is decided only by play. See the{" "}
             <Link to="/rules" className="text-primary underline">Competition Rules</Link>.
           </p>
         </section>
