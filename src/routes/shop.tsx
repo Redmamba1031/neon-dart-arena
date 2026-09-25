@@ -332,7 +332,7 @@ function CashOutPanel() {
         <button
           onClick={() =>
             request.mutate(
-              { amountCents: cents, method, destination: isBank ? "Connected bank / card" : destination.trim() },
+              { amountCents: cents, method, destination: destination.trim() },
               {
                 onSuccess: () => {
                   toast.success("Cash out requested — it releases after the 72 hour review hold.");
