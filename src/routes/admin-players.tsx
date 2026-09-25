@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ArrowLeft, BadgeCheck, Ban, Cake, Search, Shield, ShieldCheck, Users } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { useAdminPlayers, useAdminSetAgeVerified, useIsStaff } from "@/lib/api";
+import { getIdDocumentUrl, useAdminPlayers, useAdminSetAgeVerified, useIsStaff } from "@/lib/api";
 
 export const Route = createFileRoute("/admin-players")({
   head: () => ({
@@ -65,7 +65,7 @@ function Roster() {
   }, [players, q]);
 
   const verifiedCount = players.filter((p) => p.age_verified).length;
-  const missingIdentity = players.filter((p) => !p.legal_name || !p.date_of_birth).length;
+  const missingIdentity = players.filter((p) => !p.id_document_path).length;
 
   const toggle = async (userId: string, verified: boolean) => {
     try {
@@ -73,6 +73,17 @@ function Roster() {
       toast.success(verified ? "Age verified" : "Verification removed");
     } catch (e) {
       toast.error((e as { message?: string })?.message ?? "Something went wrong");
+    }
+  };
+
+  const viewId = async (path: string) => {
+    const w = window.open("", "_blank");
+    try {
+      const url = await getIdDocumentUrl(path);
+      if (w) w.location.href = url; else window.location.href = url;
+    } catch (e) {
+      w?.close();
+      toast.error((e as { message?: string })?.message ?? "Could not open ID");
     }
   };
 
@@ -154,8 +165,18 @@ function Roster() {
                   <span>{p.wins}W · {p.losses}L</span>
                 </div>
 
+                {p.id_document_path ? (
+                  <button
+                    onClick={() => viewId(p.id_document_path!)}
+                    className="w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-xs font-bold uppercase tracking-widest"
+                  >
+                    View photo ID — check name &amp; DOB match
+                  </button>
+                ) : (
+                  <p className="text-[10px] text-accent text-center">No photo ID uploaded yet.</p>
+                )}
                 <button
-                  disabled={verify.isPending || !p.legal_name || !p.date_of_birth}
+                  disabled={verify.isPending || (!p.age_verified && (!p.legal_name || !p.date_of_birth || !p.id_document_path))}
                   onClick={() => toggle(p.user_id, !p.age_verified)}
                   className="w-full rounded-lg bg-primary px-3 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground disabled:opacity-40 inline-flex items-center justify-center gap-2"
                 >

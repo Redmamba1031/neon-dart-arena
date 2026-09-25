@@ -618,6 +618,8 @@ export type Database = {
           date_of_birth: string | null
           display_name: string | null
           id: string
+          id_document_path: string | null
+          id_document_uploaded_at: string | null
           legal_name: string | null
           location_source: string | null
           location_updated_at: string | null
@@ -639,6 +641,8 @@ export type Database = {
           date_of_birth?: string | null
           display_name?: string | null
           id: string
+          id_document_path?: string | null
+          id_document_uploaded_at?: string | null
           legal_name?: string | null
           location_source?: string | null
           location_updated_at?: string | null
@@ -660,6 +664,8 @@ export type Database = {
           date_of_birth?: string | null
           display_name?: string | null
           id?: string
+          id_document_path?: string | null
+          id_document_uploaded_at?: string | null
           legal_name?: string | null
           location_source?: string | null
           location_updated_at?: string | null
@@ -1202,6 +1208,8 @@ export type Database = {
           date_of_birth: string
           display_name: string
           email: string
+          id_document_path: string
+          id_document_uploaded_at: string
           legal_name: string
           losses: number
           user_id: string
@@ -1404,6 +1412,7 @@ export type Database = {
         Args: { _accept: boolean; _challenge_id: string }
         Returns: undefined
       }
+      set_my_id_document: { Args: { _path: string }; Returns: undefined }
       set_my_identity: {
         Args: { _date_of_birth: string; _legal_name: string }
         Returns: undefined

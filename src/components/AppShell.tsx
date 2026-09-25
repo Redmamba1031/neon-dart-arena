@@ -15,12 +15,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { data: myProfile } = useMyProfile();
+  const { data: staffRole, isLoading: staffLoading } = useIsStaff();
   useEffect(() => {
-    if (!myProfile) return;
-    if (myProfile.legal_name && myProfile.date_of_birth) return;
+    if (!myProfile || staffLoading) return;
+    const hasId = !!myProfile.id_document_path || !!staffRole?.staff;
+    if (myProfile.legal_name && myProfile.date_of_birth && hasId) return;
     if (IDENTITY_EXEMPT.includes(pathname)) return;
     navigate({ to: "/verify-identity" });
-  }, [myProfile, pathname, navigate]);
+  }, [myProfile, staffRole, staffLoading, pathname, navigate]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

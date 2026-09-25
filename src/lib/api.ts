@@ -1238,7 +1238,34 @@ export type AdminPlayer = {
   wins: number;
   losses: number;
   created_at: string;
+  id_document_path: string | null;
+  id_document_uploaded_at: string | null;
 };
+
+export function useUploadMyIdDocument() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (file: File) => {
+      if (!file.type.startsWith("image/")) throw new Error("Upload a photo (JPG, PNG, WebP or HEIC)");
+      if (file.size > 10 * 1024 * 1024) throw new Error("Photo must be 10 MB or smaller");
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) throw new Error("Not signed in");
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = `${u.user.id}/id-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("id-documents").upload(path, file, { contentType: file.type });
+      if (upErr) throw upErr;
+      const { error } = await supabase.rpc("set_my_id_document", { _path: path });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-profile"] }),
+  });
+}
+
+export async function getIdDocumentUrl(path: string) {
+  const { data, error } = await supabase.storage.from("id-documents").createSignedUrl(path, 300);
+  if (error) throw error;
+  return data.signedUrl;
+}
 
 export function useAdminPlayers() {
   return useQuery({
