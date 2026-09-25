@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Coins, Swords, History, ArrowDownLeft, Trophy } from "lucide-react";
+import { Coins, Swords, History, ArrowDownLeft, Trophy, Banknote } from "lucide-react";
 import {
   formatMoney,
   useWallet,
@@ -9,8 +9,10 @@ import {
   useMyProfile,
   useTransactions,
   useProfilesByIds,
+  useMyWithdrawals,
   type Match,
 } from "@/lib/api";
+import { payoutState } from "@/lib/payoutStatus";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -49,6 +51,7 @@ function DashboardPage() {
   const { data: active = [] } = useMyMatches();
   const { data: history = [] } = useMatchHistory(25);
   const { data: txns = [] } = useTransactions(100);
+  const { data: withdrawals = [] } = useMyWithdrawals();
 
   const deposits = txns.filter((t) => t.kind === "deposit");
   const depositTotal = deposits.reduce((s, t) => s + Number(t.amount_cents), 0);
@@ -108,6 +111,35 @@ function DashboardPage() {
           <Mini label="Played" value={String(history.length)} tint="text-accent" />
           <Mini label="Deposited" value={formatMoney(depositTotal)} tint="text-success" />
         </div>
+
+        <Section icon={Banknote} title="Cash outs">
+          {withdrawals.length === 0 ? (
+            <Empty text="No cash outs yet. Cash out from the Cashier." />
+          ) : (
+            <List>
+              {withdrawals.map((r) => {
+                const s = payoutState(r);
+                return (
+                  <div key={r.id} className="flex items-start gap-3 px-4 py-3">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                      <Banknote className="size-4" />
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <p className="truncate text-sm font-medium">
+                        {formatMoney(Number(r.amount_cents))} → {r.destination}
+                      </p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                        {r.method} · {fmtDate(r.created_at)}
+                      </p>
+                      <p className={`text-[11px] font-semibold ${s.tone}`}>{s.label}</p>
+                      <p className="text-[11px] text-muted-foreground">{s.detail}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </List>
+          )}
+        </Section>
 
         <Section icon={Swords} title="Active matches">
           {active.length === 0 ? (
