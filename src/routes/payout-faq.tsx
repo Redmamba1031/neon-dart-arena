@@ -5,7 +5,7 @@ export const Route = createFileRoute("/payout-faq")({
   head: () => ({
     meta: [
       { title: "Payout FAQ — SMYD" },
-      { name: "description", content: "How SMYD cash-outs work: PayPal, Venmo, and bank/card payouts, hold times, fees, and why a payout can fail." },
+      { name: "description", content: "How SMYD cash-outs work: PayPal and Venmo payouts, hold times, fees, and why a payout can fail." },
       { property: "og:title", content: "Payout FAQ — SMYD" },
       { property: "og:description", content: "Payout methods, hold times, fees, and troubleshooting for SMYD cash-outs." },
       { property: "og:type", content: "website" },
@@ -35,11 +35,9 @@ function PayoutFaqPage() {
 
         <QA q="How do I cash out?">
           <p>
-            Open the Cashier and choose <strong className="text-foreground">PayPal</strong>,{" "}
-            <strong className="text-foreground">Venmo</strong>, or{" "}
-            <strong className="text-foreground">Bank / Card</strong>. Enter your PayPal email,
-            Venmo handle, or connect your bank/debit card through our payment partner, and submit
-            the request. The minimum cash-out is $5.00.
+            Open the Cashier and choose <strong className="text-foreground">PayPal</strong> or{" "}
+            <strong className="text-foreground">Venmo</strong>. Enter your PayPal email or Venmo
+            handle and submit the request. The minimum cash-out is $5.00.
           </p>
         </QA>
 
@@ -51,16 +49,15 @@ function PayoutFaqPage() {
           </p>
           <ul className="list-disc space-y-1 pl-5">
             <li><strong className="text-foreground">PayPal & Venmo:</strong> sent automatically once the hold clears, usually minutes after.</li>
-            <li><strong className="text-foreground">Bank / Card:</strong> sent through our payment partner once the hold clears; banks typically post it within 1–5 business days.</li>
             <li>Payouts flagged for extra review stay on hold until staff approve them.</li>
           </ul>
         </QA>
 
         <QA q="Are there any fees on payouts?">
           <p>
-            SMYD does not charge a fee to cash out — you receive the amount you requested. Your bank,
-            card issuer, PayPal, or Venmo may apply their own standard receiving or transfer fees,
-            which are outside our control.
+            SMYD does not charge a fee to cash out — you receive the amount you requested. PayPal
+            or Venmo may apply their own standard receiving or transfer fees, which are outside our
+            control.
           </p>
         </QA>
 
@@ -69,7 +66,6 @@ function PayoutFaqPage() {
           <ul className="list-disc space-y-1 pl-5">
             <li>A typo in the PayPal email or Venmo handle, or an account that doesn't match the name on your SMYD profile.</li>
             <li>An unconfirmed PayPal/Venmo account, or one that can't receive payments.</li>
-            <li>A closed, expired, or unsupported bank account or card.</li>
             <li>A review flag — unusually large or rapid requests may be held for staff approval.</li>
           </ul>
           <p>
@@ -84,7 +80,7 @@ function PayoutFaqPage() {
         <QA q="Can I cancel a cash-out?">
           <p>
             While a request is still Pending, staff can reject it and the full amount returns to your
-            balance — email us quickly. Once a payout has been sent to PayPal, Venmo, or your bank it
+            balance — email us quickly. Once a payout has been sent to PayPal or Venmo it
             cannot be reversed by SMYD.
           </p>
         </QA>
