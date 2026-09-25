@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
+import { ALLOWED_STATES_LABEL, isAllowedRegion } from "@/lib/geo";
 
 let _admin: ReturnType<typeof createClient> | null = null;
 function admin() {
@@ -61,7 +62,7 @@ export const createCoinPackCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId, claims } = context as { userId: string; claims: { email?: string } };
 
-    // Indiana-only launch: block purchases from anywhere else
+    // Limited-state launch: block purchases from anywhere else
     const { data: profileRow } = await admin()
       .from("profiles")
       .select("region_code, country")
@@ -71,8 +72,8 @@ export const createCoinPackCheckout = createServerFn({ method: "POST" })
     if (!profile?.region_code) {
       throw new Error("Set your location in your profile before adding funds");
     }
-    if ((profile.country ?? "US") !== "US" || profile.region_code !== "IN") {
-      throw new Error("SMYD is currently live in Indiana only — adding funds is not available in your area yet");
+    if (!isAllowedRegion(profile.country, profile.region_code)) {
+      throw new Error(`SMYD is currently live in ${ALLOWED_STATES_LABEL} only — adding funds is not available in your area yet`);
     }
 
 

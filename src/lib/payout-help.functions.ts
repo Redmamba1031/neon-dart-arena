@@ -54,7 +54,7 @@ export const explainPayoutIssue = createServerFn({ method: "POST" })
       "- Minimum cash out is $5.00.",
       "- A payout marked 'requires review' waits for staff approval.",
       "- A failed payout returns the money to the player's SMYD balance after 3 attempts.",
-      "- Players must be age verified and located in Indiana for paid play.",
+      "- Players must be age verified and located in Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin for paid play.",
       "Explain the single most likely cause in plain, friendly language (2-3 sentences, no jargon, no internal table or field names).",
       "Give 2-4 short next steps the player can take. Set needsStaff true only when staff must act.",
       "Support email: redmond1031@gmail.com.",

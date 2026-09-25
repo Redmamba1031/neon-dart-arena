@@ -21,6 +21,14 @@ export const US_STATES: { code: string; name: string }[] = [
 export const stateName = (code: string | null | undefined) =>
   US_STATES.find((s) => s.code === code)?.name ?? code ?? "";
 
+/** States where SMYD paid play is live. */
+export const ALLOWED_STATES = ["IN", "TX", "CO", "KS", "MO", "WI"] as const;
+
+export const ALLOWED_STATES_LABEL = "Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin";
+
+export const isAllowedRegion = (country: string | null | undefined, regionCode: string | null | undefined) =>
+  (country ?? "US") === "US" && !!regionCode && (ALLOWED_STATES as readonly string[]).includes(regionCode);
+
 /** Great-circle distance in miles between two coordinates. */
 export function distanceMiles(
   aLat: number | null | undefined,
