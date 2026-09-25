@@ -43,6 +43,26 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   }
 }
 
+async function handleSubscription(sub: any, env: StripeEnv) {
+  const userId = sub.metadata?.userId;
+  if (!userId || sub.metadata?.kind !== "membership") return;
+  const periodEnd = sub.items?.data?.[0]?.current_period_end ?? sub.current_period_end;
+  const { error } = await (getSupabase().from("memberships") as any).upsert({
+    user_id: userId,
+    stripe_subscription_id: sub.id,
+    stripe_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer?.id,
+    status: sub.status,
+    current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    cancel_at_period_end: !!sub.cancel_at_period_end,
+    environment: env,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) {
+    console.error("membership upsert failed", error);
+    throw error;
+  }
+}
+
 export const Route = createFileRoute("/api/public/payments/webhook")({
   server: {
     handlers: {
@@ -59,6 +79,11 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
             case "checkout.session.completed":
             case "checkout.session.async_payment_succeeded":
               await handleCheckoutCompleted(event.data.object, env);
+              break;
+            case "customer.subscription.created":
+            case "customer.subscription.updated":
+            case "customer.subscription.deleted":
+              await handleSubscription(event.data.object, env);
               break;
             default:
               console.log("Unhandled event:", event.type);

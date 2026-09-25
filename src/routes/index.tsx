@@ -24,6 +24,7 @@ function Dashboard() {
         <QuickAction to="/dashboard" icon={LayoutDashboard} label="My Dashboard" tint="primary" />
         <QuickAction to="/wallet" icon={Trophy} label="Wallet" tint="muted" />
         <QuickAction to="/messages" icon={MessageSquare} label="Messages" tint="primary" />
+        <QuickAction to="/monthly-tournament" icon={Trophy} label="$500 Monthly" tint="accent" />
       </section>
 
       <section className="px-5">
