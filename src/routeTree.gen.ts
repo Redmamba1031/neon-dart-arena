@@ -27,6 +27,8 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as HowToPlayDartsOnlineRouteImport } from './routes/how-to-play-darts-online'
+import { Route as GrowthRouteImport } from './routes/growth'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminPlayersRouteImport } from './routes/admin-players'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -135,6 +137,16 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HowToPlayDartsOnlineRoute = HowToPlayDartsOnlineRouteImport.update({
+  id: '/how-to-play-darts-online',
+  path: '/how-to-play-darts-online',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GrowthRoute = GrowthRouteImport.update({
+  id: '/growth',
+  path: '/growth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -230,6 +242,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/admin-players': typeof AdminPlayersRoute
   '/dashboard': typeof DashboardRoute
+  '/growth': typeof GrowthRoute
+  '/how-to-play-darts-online': typeof HowToPlayDartsOnlineRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/matches': typeof MatchesRoute
@@ -267,6 +281,8 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/admin-players': typeof AdminPlayersRoute
   '/dashboard': typeof DashboardRoute
+  '/growth': typeof GrowthRoute
+  '/how-to-play-darts-online': typeof HowToPlayDartsOnlineRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/matches': typeof MatchesRoute
@@ -305,6 +321,8 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/admin-players': typeof AdminPlayersRoute
   '/dashboard': typeof DashboardRoute
+  '/growth': typeof GrowthRoute
+  '/how-to-play-darts-online': typeof HowToPlayDartsOnlineRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/matches': typeof MatchesRoute
@@ -344,6 +362,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-players'
     | '/dashboard'
+    | '/growth'
+    | '/how-to-play-darts-online'
     | '/leaderboard'
     | '/login'
     | '/matches'
@@ -381,6 +401,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-players'
     | '/dashboard'
+    | '/growth'
+    | '/how-to-play-darts-online'
     | '/leaderboard'
     | '/login'
     | '/matches'
@@ -418,6 +440,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-players'
     | '/dashboard'
+    | '/growth'
+    | '/how-to-play-darts-online'
     | '/leaderboard'
     | '/login'
     | '/matches'
@@ -456,6 +480,8 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AdminPlayersRoute: typeof AdminPlayersRoute
   DashboardRoute: typeof DashboardRoute
+  GrowthRoute: typeof GrowthRoute
+  HowToPlayDartsOnlineRoute: typeof HowToPlayDartsOnlineRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MatchesRoute: typeof MatchesRoute
@@ -617,6 +643,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/how-to-play-darts-online': {
+      id: '/how-to-play-darts-online'
+      path: '/how-to-play-darts-online'
+      fullPath: '/how-to-play-darts-online'
+      preLoaderRoute: typeof HowToPlayDartsOnlineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/growth': {
+      id: '/growth'
+      path: '/growth'
+      fullPath: '/growth'
+      preLoaderRoute: typeof GrowthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -744,6 +784,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AdminPlayersRoute: AdminPlayersRoute,
   DashboardRoute: DashboardRoute,
+  GrowthRoute: GrowthRoute,
+  HowToPlayDartsOnlineRoute: HowToPlayDartsOnlineRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MatchesRoute: MatchesRoute,

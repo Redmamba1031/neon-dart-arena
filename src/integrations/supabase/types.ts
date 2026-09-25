@@ -627,6 +627,7 @@ export type Database = {
           rating: number
           region_code: string | null
           region_name: string | null
+          signup_source: string | null
           updated_at: string
           username: string | null
           wins: number
@@ -650,6 +651,7 @@ export type Database = {
           rating?: number
           region_code?: string | null
           region_name?: string | null
+          signup_source?: string | null
           updated_at?: string
           username?: string | null
           wins?: number
@@ -673,6 +675,7 @@ export type Database = {
           rating?: number
           region_code?: string | null
           region_name?: string | null
+          signup_source?: string | null
           updated_at?: string
           username?: string | null
           wins?: number
@@ -1198,6 +1201,7 @@ export type Database = {
         Args: { _reason: string; _user_id: string }
         Returns: undefined
       }
+      admin_growth_stats: { Args: { _days?: number }; Returns: Json }
       admin_list_players: {
         Args: never
         Returns: {
@@ -1417,6 +1421,7 @@ export type Database = {
         Args: { _date_of_birth: string; _legal_name: string }
         Returns: undefined
       }
+      set_my_signup_source: { Args: { _source: string }; Returns: undefined }
       settle_match: {
         Args: { _match_id: string; _winner_id: string }
         Returns: undefined

@@ -19,7 +19,21 @@ import { Toaster } from "@/components/ui/sonner";
 // Public routes accessible without auth. Everything else requires sign-in.
 // The OAuth consent route runs its own auth check + sign-in redirect (preserving
 // authorization_id), so the gate must not intercept it.
-const PUBLIC_ROUTES = new Set<string>(["/login", "/.lovable/oauth/consent"]);
+const PUBLIC_ROUTES = new Set<string>(["/login", "/.lovable/oauth/consent", "/how-to-play-darts-online"]);
+
+function captureLandingSource() {
+  try {
+    if (localStorage.getItem("smyd_source")) return;
+    const p = new URLSearchParams(window.location.search);
+    const utm = p.get("utm_source");
+    let src = utm ? `${utm}${p.get("utm_campaign") ? "/" + p.get("utm_campaign") : ""}` : p.get("gclid") ? "google-ads" : "";
+    if (!src && document.referrer) {
+      const host = new URL(document.referrer).hostname.replace(/^www\./, "");
+      if (!host.includes("smyd.online") && host !== window.location.hostname) src = host;
+    }
+    localStorage.setItem("smyd_source", src || "direct");
+  } catch { /* ignore */ }
+}
 
 function NotFoundComponent() {
   return (
@@ -145,6 +159,14 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     });
     return () => subscription.unsubscribe();
   }, [router, queryClient]);
+
+  useEffect(() => { captureLandingSource(); }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const src = localStorage.getItem("smyd_source") || "direct";
+    void supabase.rpc("set_my_signup_source" as never, { _source: src } as never);
+  }, [user]);
 
   const isPublic = PUBLIC_ROUTES.has(location.pathname);
 
