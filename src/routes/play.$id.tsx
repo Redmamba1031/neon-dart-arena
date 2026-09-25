@@ -60,7 +60,7 @@ function PlayMatch() {
             {nameOf(match.creator_id)} <span className="text-muted-foreground text-base">vs</span> {nameOf(match.opponent_id)}
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            {match.mode} • Bo{match.best_of} • Stake {formatMoney(match.stake_cents)} • Pot {formatMoney(Number(match.stake_cents) * 2)}
+            {match.mode} • Bo{match.best_of} • Entry {formatMoney(match.stake_cents)} • Prize {formatMoney(Number(match.stake_cents) * 2)}
           </p>
 
           {match.status === "completed" && match.winner_id && (
