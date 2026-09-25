@@ -49,7 +49,7 @@ function HowToPlay() {
         <header className="space-y-3">
           <h1 className="font-display text-3xl font-bold leading-tight">How to play darts online</h1>
           <p className="text-muted-foreground">
-            SMYD lets you play steel-tip style darts online against real people from home. Use your GranBoard,
+            SMYD is a plastic-tip (soft tip) darts platform — play online against real people from home. Use your GranBoard,
             pick 501 or Cricket, and compete in 1v1 skill matches for real cash prizes.
           </p>
           <SignUp />
