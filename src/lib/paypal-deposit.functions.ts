@@ -36,11 +36,16 @@ export const createPaypalDeposit = createServerFn({ method: "POST" })
         return { error: `SMYD is currently live in ${ALLOWED_STATES_LABEL} only — adding funds is not available in your area yet` };
       }
 
-      const { data: pack } = await admin
-        .from("coin_packs").select("price_id, name, usd_cents, active")
-        .eq("price_id", data.priceId).eq("active", true).maybeSingle();
-      const pk = pack as { price_id: string; name: string; usd_cents: number } | null;
-      if (!pk) return { error: "That amount isn't available" };
+      let pk: { price_id: string; name: string; usd_cents: number };
+      if (data.priceId === "custom") {
+        pk = { price_id: `custom_${data.amountCents}`, name: "Custom amount", usd_cents: data.amountCents! };
+      } else {
+        const { data: pack } = await admin
+          .from("coin_packs").select("price_id, name, usd_cents, active")
+          .eq("price_id", data.priceId).eq("active", true).maybeSingle();
+        if (!pack) return { error: "That amount isn't available" };
+        pk = pack as { price_id: string; name: string; usd_cents: number };
+      }
 
       const token = await paypalToken();
       const res = await fetch(`${paypalBase()}/v2/checkout/orders`, {
@@ -106,11 +111,25 @@ export const capturePaypalDeposit = createServerFn({ method: "POST" })
       if (!capture || capture.status !== "COMPLETED") return { error: "Payment is still pending at PayPal" };
 
       const admin = await getAdmin();
-      const { data: pack } = await admin
-        .from("coin_packs").select("usd_cents, coins_granted").eq("price_id", unit.reference_id).maybeSingle();
-      const pk = pack as { usd_cents: number; coins_granted: number } | null;
       const paidCents = Math.round(Number(capture.amount?.value) * 100);
-      if (!pk || capture.amount?.currency_code !== "USD" || paidCents !== Number(pk.usd_cents)) {
+      let expectedCents: number;
+      let creditCents: number;
+      const ref = String(unit.reference_id ?? "");
+      if (ref.startsWith("custom_")) {
+        expectedCents = Number(ref.slice(7));
+        creditCents = expectedCents;
+        if (!Number.isFinite(expectedCents) || expectedCents < 500 || expectedCents > 50_000) {
+          return { error: "Payment amount didn't match — contact support" };
+        }
+      } else {
+        const { data: pack } = await admin
+          .from("coin_packs").select("usd_cents, coins_granted").eq("price_id", ref).maybeSingle();
+        const pk = pack as { usd_cents: number; coins_granted: number } | null;
+        if (!pk) return { error: "Payment amount didn't match — contact support" };
+        expectedCents = Number(pk.usd_cents);
+        creditCents = Number(pk.coins_granted);
+      }
+      if (capture.amount?.currency_code !== "USD" || paidCents !== expectedCents) {
         return { error: "Payment amount didn't match — contact support" };
       }
 
