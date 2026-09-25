@@ -19,6 +19,9 @@ import {
 import { payoutState, type TrackedPayout } from "@/lib/payoutStatus";
 import { useServerFn } from "@tanstack/react-start";
 import { createPaypalDeposit } from "@/lib/paypal-deposit.functions";
+import { createCustomDepositCheckout } from "@/lib/coin-packs.functions";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
