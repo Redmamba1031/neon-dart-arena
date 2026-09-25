@@ -104,6 +104,9 @@ function BuyCoinsPanel({ onSelect }: { onSelect: (priceId: string) => void }) {
 
   return (
     <div className="space-y-3">
+      <div className="rounded-xl bg-primary/10 ring-1 ring-primary/40 px-3 py-2 text-xs font-bold text-primary text-center">
+        First deposit bonus: get an extra 20% on your first deposit
+      </div>
       <div className="grid grid-cols-2 gap-3">
         {packs.map((p) => (
           <button
