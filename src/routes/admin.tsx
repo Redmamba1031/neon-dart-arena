@@ -510,7 +510,7 @@ function FundsCheck() {
       </div>
       {data ? (
         <div className="space-y-2">
-          {row("Stripe", "Bank / card cash-outs", data.stripe, data.owed.stripeCents)}
+          {row("Stripe", "Card deposits & any older bank cash-outs", data.stripe, data.owed.stripeCents)}
           {row("PayPal", "PayPal & Venmo cash-outs", data.paypal, data.owed.paypalCents)}
         </div>
       ) : (
@@ -631,7 +631,7 @@ function Withdrawals() {
             {providers.paypal ? "PayPal & Venmo ready" : providers.paypalError ?? "PayPal not connected"}
           </span>
         ) : (
-          <span>PayPal &amp; Venmo send automatically · bank/debit via Stripe</span>
+          <span>PayPal &amp; Venmo send automatically</span>
         )}
       </div>
 
