@@ -137,14 +137,22 @@ function BuyCoinsPanel({ onSelect }: { onSelect: (priceId: string) => void }) {
 
 function CheckoutModal({ priceId, onClose }: { priceId: string; onClose: () => void }) {
   const returnUrl = `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`;
-  const [method, setMethod] = useState<"choose" | "card">("choose");
+  const isCustom = priceId === "custom";
+  const [step, setStep] = useState<"amount" | "choose" | "card">(isCustom ? "amount" : "choose");
+  const [amountInput, setAmountInput] = useState("");
+  const [amountCents, setAmountCents] = useState<number | null>(null);
   const [paypalBusy, setPaypalBusy] = useState(false);
   const startPaypal = useServerFn(createPaypalDeposit);
 
-  const payWithPaypal = async () => {
+  const parsedCents = Math.round(Number(amountInput) * 100);
+  const amountValid = Number.isFinite(parsedCents) && parsedCents >= 500 && parsedCents <= 50_000;
+
+  const payWithPaypal = async (cents: number | null) => {
     setPaypalBusy(true);
     try {
-      const r = await startPaypal({ data: { priceId, origin: window.location.origin } });
+      const r = await startPaypal({
+        data: { priceId, origin: window.location.origin, ...(cents ? { amountCents: cents } : {}) },
+      });
       if ("error" in r && r.error) throw new Error(r.error);
       window.location.href = (r as { url: string }).url;
     } catch (e) {
@@ -163,28 +171,77 @@ function CheckoutModal({ priceId, onClose }: { priceId: string; onClose: () => v
           </button>
         </div>
         <div className="p-2">
-          {method === "choose" ? (
+          {step === "amount" ? (
             <div className="space-y-3 p-3">
-              <p className="text-xs text-muted-foreground">How do you want to pay?</p>
+              <p className="text-xs text-muted-foreground">How much do you want to add? ($5 – $500)</p>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-muted-foreground">$</span>
+                <input
+                  type="number"
+                  min={5}
+                  max={500}
+                  step="0.01"
+                  value={amountInput}
+                  onChange={(e) => setAmountInput(e.target.value)}
+                  placeholder="25.00"
+                  className="flex-1 rounded-lg bg-surface border border-border px-4 py-3 text-lg font-bold text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/60"
+                />
+              </div>
+              {amountInput && !amountValid && (
+                <p className="text-xs text-destructive">Enter an amount between $5 and $500.</p>
+              )}
               <button
-                onClick={() => setMethod("card")}
+                onClick={() => { setAmountCents(parsedCents); setStep("choose"); }}
+                disabled={!amountValid}
+                className="w-full rounded-xl bg-gradient-neon py-3 font-display font-bold text-background disabled:opacity-40"
+              >
+                Continue
+              </button>
+            </div>
+          ) : step === "choose" ? (
+            <div className="space-y-3 p-3">
+              <p className="text-xs text-muted-foreground">
+                How do you want to pay{amountCents ? ` ${formatMoney(amountCents)}` : ""}?
+              </p>
+              <button
+                onClick={() => setStep("card")}
                 className="w-full rounded-xl bg-surface ring-1 ring-border p-4 text-left font-semibold hover:ring-primary/60"
               >
                 Card / Apple Pay / Google Pay
               </button>
               <button
-                onClick={payWithPaypal}
+                onClick={() => payWithPaypal(amountCents)}
                 disabled={paypalBusy}
                 className="w-full rounded-xl bg-surface ring-1 ring-border p-4 text-left font-semibold hover:ring-primary/60 flex items-center gap-2 disabled:opacity-60"
               >
                 {paypalBusy && <Loader2 className="size-4 animate-spin" />} PayPal
               </button>
             </div>
+          ) : amountCents ? (
+            <CustomAmountCheckout amountCents={amountCents} returnUrl={returnUrl} />
           ) : (
             <CoinPackCheckout priceId={priceId} returnUrl={returnUrl} />
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function CustomAmountCheckout({ amountCents, returnUrl }: { amountCents: number; returnUrl: string }) {
+  const fetchClientSecret = async (): Promise<string> => {
+    const secret = await createCustomDepositCheckout({
+      data: { amountCents, returnUrl, environment: getStripeEnvironment() },
+    });
+    if (!secret) throw new Error("No client secret returned");
+    return secret;
+  };
+
+  return (
+    <div id="checkout">
+      <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
     </div>
   );
 }
