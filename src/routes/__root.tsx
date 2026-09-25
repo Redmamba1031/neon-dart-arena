@@ -76,6 +76,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "BkYWtMt-3EGseiKPw1jh3ix1QWLGR4O-lCE8WbR1ddU" },
       { title: "SMYD — Online GranBoard Darts Esports" },
       { name: "description", content: "Compete in skill-based GranBoard darts contests in 501 and Cricket — win prizes on performance." },
       { property: "og:title", content: "SMYD — Online GranBoard Darts Esports" },
