@@ -49,7 +49,7 @@ export const explainPayoutIssue = createServerFn({ method: "POST" })
       "You are the SMYD darts app payout support assistant.",
       "Rules of the platform:",
       "- Cash outs are held 72 hours for fraud review before sending.",
-      "- PayPal and Venmo cash outs send automatically; Bank/Card sends through Stripe and requires the player to finish connecting a payout account.",
+      "- PayPal and Venmo cash outs send automatically once the 72-hour hold clears.",
       "- Cash App is no longer supported.",
       "- Minimum cash out is $5.00.",
       "- A payout marked 'requires review' waits for staff approval.",

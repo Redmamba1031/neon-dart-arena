@@ -631,7 +631,7 @@ function Withdrawals() {
             {providers.paypal ? "PayPal & Venmo ready" : providers.paypalError ?? "PayPal not connected"}
           </span>
         ) : (
-          <span>PayPal &amp; Venmo send automatically · bank/debit via Stripe</span>
+          <span>PayPal &amp; Venmo send automatically</span>
         )}
       </div>
 
