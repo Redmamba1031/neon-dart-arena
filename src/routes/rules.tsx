@@ -40,12 +40,12 @@ function RulesPage() {
           </p>
         </div>
 
-        <Rule n="1" title="Entry fee & prize pot">
+        <Rule n="1" title="Entry fee & prize">
           <p>
             Each player pays the same entry when they enter a match. Every entry is split into a prize
             contribution (90%) and a disclosed SMYD service fee (10%) that covers running the contest. The
-            prize contributions form the prize pot, and the winner receives 100% of that prize pot — SMYD
-            takes nothing out of the pot. Example: $20 entry each = $18 + $18 prize pot, $2 + $2 service
+            prize contributions form the prize, and the winner receives 100% of that prize — SMYD
+            takes nothing out of the prize. Example: $20 entry each = $18 + $18 toward a $36 prize, $2 + $2 service
             fee, winner is paid $36. Both amounts are shown before you confirm. Minimum entry is $5.00.
           </p>
         </Rule>

@@ -38,7 +38,7 @@ function TermsPage() {
             SMYD™ (Show Me Your Darts) is a platform for skill-based darts competitions. Players match up,
             play their game on their own board, and report the result. Each player pays a fixed entry that
             is split into a prize contribution and a disclosed SMYD service fee. The prize contributions
-            form the prize pot, and 100% of the prize pot is awarded to the winner. Outcomes are determined
+            form the prize, and 100% of the prize is awarded to the winner. Outcomes are determined
             solely by the players' darts performance — SMYD is a contest of skill, not gambling.
           </p>
         </Section>
@@ -64,8 +64,8 @@ function TermsPage() {
           <ul className="list-disc space-y-1 pl-5">
             <li>Account funds are added at face value ($25 in = $25 on your account) and can be used to enter matches or withdrawn.</li>
             <li>Withdrawals are subject to a $5.00 minimum and are sent to the PayPal, Venmo, or bank account you provide.</li>
-            <li>Match entries are held when a match starts and the full prize pot is released to the winner once the result is confirmed.</li>
-            <li>Each entry includes a disclosed 10% SMYD service fee, shown before you confirm. No fee is taken out of the prize pot.</li>
+            <li>Match entries are held when a match starts and the full prize is released to the winner once the result is confirmed.</li>
+            <li>Each entry includes a disclosed 10% SMYD service fee, shown before you confirm. No fee is taken out of the prize.</li>
           </ul>
         </Section>
 

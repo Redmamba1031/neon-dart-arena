@@ -37,7 +37,7 @@ function PrivacyPage() {
           <p>When you use SMYD™ (Show Me Your Darts), we collect:</p>
           <ul className="list-disc space-y-1 pl-5">
             <li>Account information — email address, username, display name, and avatar.</li>
-            <li>Match and game data — matches you create or join, stakes, results you report, wins and losses, and leaderboard stats.</li>
+            <li>Match and game data — matches you create or join, entry fees, results you report, wins and losses, and leaderboard stats.</li>
             <li>Wallet and payment data — account balance, transaction history, and withdrawal requests. Card payments are processed by our payment processor; SMYD does not store full card numbers.</li>
             <li>Messages — in-app messages you send to other players.</li>
             <li>Basic usage data — device and log information needed to run and secure the service.</li>
@@ -46,7 +46,7 @@ function PrivacyPage() {
 
         <Section title="How we use it">
           <ul className="list-disc space-y-1 pl-5">
-            <li>Run matches, wagers, payouts, and leaderboards.</li>
+            <li>Run skill contests, prize payouts, and leaderboards.</li>
             <li>Prevent fraud, cheating, and abuse, including reviewing disputed matches and enforcing bans.</li>
             <li>Communicate with you about your account, transactions, and support requests.</li>
             <li>Comply with legal obligations related to payments and skill-based competition.</li>

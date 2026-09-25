@@ -29,9 +29,9 @@ export const Route = createFileRoute("/matches")({
   head: () => ({
     meta: [
       { title: "1v1 Matches — SMYD" },
-      { name: "description", content: "Create or join head-to-head darts matches and pay a fixed entry and play for the full prize pot on 501, Cricket or Medley." },
+      { name: "description", content: "Create or join head-to-head darts matches and pay a fixed entry and play for the full prize on 501, Cricket or Medley." },
       { property: "og:title", content: "1v1 Matches — SMYD" },
-      { property: "og:description", content: "Head-to-head darts matches with real cash prize pots on SMYD." },
+      { property: "og:description", content: "Head-to-head darts matches with real cash prizes on SMYD." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -399,8 +399,8 @@ function CreateMatchForm({ onCreated }: { onCreated: () => void }) {
       )}
 
       <p className="text-[11px] text-muted-foreground">
-        Entry {formatMoney(toCents(stake))} each = {formatMoney(toCents(stake) - Math.floor(toCents(stake) / 10))} to the prize pot +{" "}
-        {formatMoney(Math.floor(toCents(stake) / 10))} service fee • Winner takes 100% of the prize pot (
+        Entry {formatMoney(toCents(stake))} each = {formatMoney(toCents(stake) - Math.floor(toCents(stake) / 10))} to the prize +{" "}
+        {formatMoney(Math.floor(toCents(stake) / 10))} service fee • Winner takes 100% of the prize (
         {formatMoney((toCents(stake) - Math.floor(toCents(stake) / 10)) * 2)})
       </p>
       <p className={`text-[11px] ${notEnough ? "text-primary font-bold" : "text-muted-foreground"}`}>

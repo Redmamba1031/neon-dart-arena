@@ -91,7 +91,7 @@ function PayoutFaqPage() {
 
         <QA q="Where does my match prize money go?">
           <p>
-            When a match is confirmed, 100% of the prize pot is credited to your SMYD balance
+            When a match is confirmed, 100% of the prize is credited to your SMYD balance
             instantly. From there it stays available to play with or cash out whenever you like.
           </p>
         </QA>
