@@ -17,6 +17,8 @@ import {
   usePayoutHelp,
 } from "@/lib/api";
 import { payoutState, type TrackedPayout } from "@/lib/payoutStatus";
+import { useServerFn } from "@tanstack/react-start";
+import { createPaypalDeposit } from "@/lib/paypal-deposit.functions";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -126,6 +128,21 @@ function BuyCoinsPanel({ onSelect }: { onSelect: (priceId: string) => void }) {
 
 function CheckoutModal({ priceId, onClose }: { priceId: string; onClose: () => void }) {
   const returnUrl = `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`;
+  const [method, setMethod] = useState<"choose" | "card">("choose");
+  const [paypalBusy, setPaypalBusy] = useState(false);
+  const startPaypal = useServerFn(createPaypalDeposit);
+
+  const payWithPaypal = async () => {
+    setPaypalBusy(true);
+    try {
+      const r = await startPaypal({ data: { priceId, origin: window.location.origin } });
+      if ("error" in r && r.error) throw new Error(r.error);
+      window.location.href = (r as { url: string }).url;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "PayPal checkout failed");
+      setPaypalBusy(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-background/90 backdrop-blur-sm flex items-start justify-center overflow-y-auto p-4">
@@ -137,7 +154,26 @@ function CheckoutModal({ priceId, onClose }: { priceId: string; onClose: () => v
           </button>
         </div>
         <div className="p-2">
-          <CoinPackCheckout priceId={priceId} returnUrl={returnUrl} />
+          {method === "choose" ? (
+            <div className="space-y-3 p-3">
+              <p className="text-xs text-muted-foreground">How do you want to pay?</p>
+              <button
+                onClick={() => setMethod("card")}
+                className="w-full rounded-xl bg-surface ring-1 ring-border p-4 text-left font-semibold hover:ring-primary/60"
+              >
+                Card / Apple Pay / Google Pay
+              </button>
+              <button
+                onClick={payWithPaypal}
+                disabled={paypalBusy}
+                className="w-full rounded-xl bg-surface ring-1 ring-border p-4 text-left font-semibold hover:ring-primary/60 flex items-center gap-2 disabled:opacity-60"
+              >
+                {paypalBusy && <Loader2 className="size-4 animate-spin" />} PayPal
+              </button>
+            </div>
+          ) : (
+            <CoinPackCheckout priceId={priceId} returnUrl={returnUrl} />
+          )}
         </div>
       </div>
     </div>

@@ -26,7 +26,7 @@ export function adminDb(): any {
 
 /* ---------------- PayPal (covers PayPal + Venmo) ---------------- */
 
-function paypalBase() {
+export function paypalBase() {
   return (process.env["PAYPAL_ENV"] ?? "live") === "sandbox"
     ? "https://api-m.sandbox.paypal.com"
     : "https://api-m.paypal.com";
@@ -36,7 +36,7 @@ export function paypalConfigured() {
   return Boolean(process.env["PAYPAL_CLIENT_ID"] && process.env["PAYPAL_CLIENT_SECRET"]);
 }
 
-async function paypalToken(): Promise<string> {
+export async function paypalToken(): Promise<string> {
   const id = process.env["PAYPAL_CLIENT_ID"];
   const secret = process.env["PAYPAL_CLIENT_SECRET"];
   if (!id || !secret) throw new Error("PayPal payouts are not configured");
