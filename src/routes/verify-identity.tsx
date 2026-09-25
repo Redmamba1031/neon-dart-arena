@@ -4,14 +4,15 @@ import { BadgeCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useMyProfile, useSetMyIdentity } from "@/lib/api";
+import { IdUpload } from "@/components/IdUpload";
 
 export const Route = createFileRoute("/verify-identity")({
   head: () => ({
     meta: [
       { title: "Verify your identity — SMYD" },
-      { name: "description", content: "Add your real name and date of birth to play on SMYD." },
+      { name: "description", content: "Add your real name, date of birth and photo ID to play on SMYD." },
       { property: "og:title", content: "Verify your identity — SMYD" },
-      { property: "og:description", content: "Add your real name and date of birth to play on SMYD." },
+      { property: "og:description", content: "Add your real name, date of birth and photo ID to play on SMYD." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -27,15 +28,14 @@ function VerifyIdentity() {
   const [dob, setDob] = useState("");
 
   useEffect(() => {
-    if (profile?.legal_name && profile?.date_of_birth) navigate({ to: "/" });
+    if (profile?.legal_name && profile?.date_of_birth && profile?.id_document_path) navigate({ to: "/" });
   }, [profile, navigate]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await save.mutateAsync({ legalName: legalName.trim(), dateOfBirth: dob });
-      toast.success("Saved — staff will verify your age");
-      navigate({ to: "/" });
+      toast.success("Saved — now upload your photo ID");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save");
     }
@@ -53,6 +53,12 @@ function VerifyIdentity() {
             <p className="text-xs text-muted-foreground">Required before you can use SMYD. You must be 18+.</p>
           </div>
         </div>
+        {profile?.legal_name && profile?.date_of_birth ? (
+          <div className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
+            <p className="text-sm">Name: <b>{profile.legal_name}</b> · Born {profile.date_of_birth}</p>
+            <IdUpload hasId={!!profile.id_document_path} />
+          </div>
+        ) : (
         <form onSubmit={submit} className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
           <label className="block">
             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Real (legal) name</span>
@@ -81,6 +87,7 @@ function VerifyIdentity() {
             Save and continue
           </button>
         </form>
+        )}
       </div>
     </AppShell>
   );

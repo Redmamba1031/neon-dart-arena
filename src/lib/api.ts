@@ -1254,7 +1254,7 @@ export function useUploadMyIdDocument() {
       const path = `${u.user.id}/id-${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("id-documents").upload(path, file, { contentType: file.type });
       if (upErr) throw upErr;
-      const { error } = await (supabase.rpc as any)("set_my_id_document", { _path: path });
+      const { error } = await supabase.rpc("set_my_id_document", { _path: path });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-profile"] }),

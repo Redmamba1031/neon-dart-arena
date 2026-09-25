@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { IdUpload } from "@/components/IdUpload";
 import { AppShell } from "@/components/AppShell";
 import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2, MapPin, Crosshair, BadgeCheck, ImagePlus } from "lucide-react";
 import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney, useUpdateLocation, useRestrictedRegions, useMyCoords, useSetMyIdentity } from "@/lib/api";
@@ -429,7 +430,7 @@ function IdentityCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
           <p className="text-[11px] text-muted-foreground">
             {profile?.age_verified
               ? "Verified — you're confirmed 18 or older."
-              : "Real name and date of birth are required for paid play. You must be 18+."}
+              : "Real name, date of birth and a photo ID are required for paid play. You must be 18+."}
           </p>
         </div>
         {profile?.age_verified && (
@@ -460,6 +461,7 @@ function IdentityCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
           </button>
         </form>
       )}
+      {!profile?.age_verified && profile?.legal_name && <IdUpload hasId={!!profile?.id_document_path} />}
     </div>
   );
 }
