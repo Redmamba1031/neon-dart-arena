@@ -137,11 +137,11 @@ export const capturePaypalDeposit = createServerFn({ method: "POST" })
         _user_id: context.userId,
         _session_id: `paypal_${data.orderId}`,
         _payment_intent: `paypal_capture_${capture.id}`,
-        _coins_granted: Number(pk.coins_granted),
+        _coins_granted: creditCents,
         _environment: (process.env["PAYPAL_ENV"] ?? "live") === "sandbox" ? "sandbox" : "live",
       });
       if (error) return { error: error.message };
-      return { ok: true as const, amountCents: Number(pk.coins_granted) };
+      return { ok: true as const, amountCents: creditCents };
     } catch (e) {
       return { error: e instanceof Error ? e.message : "PayPal capture failed" };
     }
