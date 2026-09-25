@@ -510,7 +510,7 @@ function FundsCheck() {
       </div>
       {data ? (
         <div className="space-y-2">
-          {row("Stripe", "Bank / card cash-outs", data.stripe, data.owed.stripeCents)}
+          {row("Stripe", "Card deposits & any older bank cash-outs", data.stripe, data.owed.stripeCents)}
           {row("PayPal", "PayPal & Venmo cash-outs", data.paypal, data.owed.paypalCents)}
         </div>
       ) : (
