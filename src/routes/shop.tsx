@@ -117,6 +117,15 @@ function BuyCoinsPanel({ onSelect }: { onSelect: (priceId: string) => void }) {
             <p className="mt-2 text-sm font-semibold">{formatMoney(Number(p.usd_cents))}</p>
           </button>
         ))}
+        <button
+          onClick={() => onSelect("custom")}
+          className="relative rounded-2xl bg-surface ring-1 ring-dashed ring-primary/50 p-4 text-left transition-all hover:ring-primary hover:scale-[1.02]"
+        >
+          <Coins className="size-5 text-accent" />
+          <p className="mt-2 font-display text-xl font-bold">Custom</p>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">any amount</p>
+          <p className="mt-2 text-sm font-semibold">$5 – $500</p>
+        </button>
       </div>
       <p className="text-[10px] text-muted-foreground text-center">
         You get exactly what you pay — $25 in, $25 on your account.
