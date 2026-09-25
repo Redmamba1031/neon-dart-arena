@@ -260,3 +260,59 @@ export async function syncConnectAccount(userId: string) {
     throw new Error(getStripeErrorMessage(e));
   }
 }
+
+/* ---------------- Funds check (Stripe + PayPal balances) ---------------- */
+
+export type RailFunds = { availableCents: number | null; pendingCents: number | null; error: string | null };
+
+export async function getStripeFunds(): Promise<RailFunds> {
+  try {
+    const { createStripeClient } = await import("@/lib/stripe.server");
+    const bal = await createStripeClient(stripeEnv()).balance.retrieve();
+    const sum = (arr: { amount: number; currency: string }[]) =>
+      arr.filter((b) => b.currency === "usd").reduce((s, b) => s + b.amount, 0);
+    return { availableCents: sum(bal.available), pendingCents: sum(bal.pending), error: null };
+  } catch (e) {
+    return { availableCents: null, pendingCents: null, error: (e as { message?: string })?.message ?? "Stripe balance unavailable" };
+  }
+}
+
+export async function getPaypalFunds(): Promise<RailFunds> {
+  try {
+    const token = await paypalToken();
+    const res = await fetch(`${paypalBase()}/v1/reporting/balances?currency_code=USD`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const json = (await res.json()) as any;
+    if (!res.ok) {
+      throw new Error(
+        res.status === 403
+          ? "PayPal won't share your balance — enable 'Transaction Search / Balances' on your PayPal app"
+          : json?.message ?? "PayPal balance unavailable",
+      );
+    }
+    const usd = (json.balances ?? []).find((b: any) => b.currency === "USD") ?? json.balances?.[0];
+    const toCents = (v?: { value?: string }) => (v?.value ? Math.round(Number(v.value) * 100) : 0);
+    return {
+      availableCents: toCents(usd?.available_balance ?? usd?.total_balance),
+      pendingCents: toCents(usd?.withheld_balance),
+      error: null,
+    };
+  } catch (e) {
+    return { availableCents: null, pendingCents: null, error: (e as { message?: string })?.message ?? "PayPal balance unavailable" };
+  }
+}
+
+export async function getOwedByRail(): Promise<{ stripeCents: number; paypalCents: number }> {
+  const { data } = await adminDb()
+    .from("withdrawal_requests")
+    .select("amount_cents, method, status")
+    .in("status", ["pending", "approved", "processing"]);
+  let stripeCents = 0;
+  let paypalCents = 0;
+  for (const r of (data ?? []) as { amount_cents: number; method: string }[]) {
+    if (r.method === "bank") stripeCents += Number(r.amount_cents);
+    else if (r.method === "paypal" || r.method === "venmo") paypalCents += Number(r.amount_cents);
+  }
+  return { stripeCents, paypalCents };
+}

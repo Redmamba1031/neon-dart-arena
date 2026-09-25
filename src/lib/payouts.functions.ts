@@ -71,3 +71,14 @@ export const releaseDuePayouts = createServerFn({ method: "POST" })
       };
     }
   });
+
+export const getPayoutFunds = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context as { userId: string };
+    const { adminDb, getStripeFunds, getPaypalFunds, getOwedByRail } = await import("@/lib/payouts.server");
+    const { data: staff } = await adminDb().rpc("is_staff", { _user_id: userId });
+    if (!staff) return { error: "Staff only" as string | null, stripe: null, paypal: null, owed: null };
+    const [stripe, paypal, owed] = await Promise.all([getStripeFunds(), getPaypalFunds(), getOwedByRail()]);
+    return { error: null as string | null, stripe, paypal, owed };
+  });
