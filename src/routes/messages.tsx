@@ -16,7 +16,9 @@ export const Route = createFileRoute("/messages")({
   head: () => ({
     meta: [
       { title: "Messages — SMYD" },
-      { name: "description", content: "Chat with other SMYD players in real time." },
+      { name: "description", content: "Message other SMYD darts players in real time to set up and coordinate your 1v1 matches." },
+      { property: "og:title", content: "Messages — SMYD" },
+      { property: "og:description", content: "Chat with SMYD players in real time to coordinate matches." },
     ],
   }),
   component: Messages,

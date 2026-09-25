@@ -6,9 +6,13 @@ import { useMyProfile } from "@/lib/api";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Lobby — SMYD" },
-      { name: "description", content: "Your darts arena. Quick play and 1v1 matches." },
+      { title: "SMYD — Online GranBoard Darts Arena" },
+      { name: "description", content: "Your online darts arena: 1v1 skill matches in 501 and Cricket, leaderboards and a $500 monthly contest." },
+      { property: "og:title", content: "SMYD — Online GranBoard Darts Arena" },
+      { property: "og:description", content: "1v1 skill matches in 501 and Cricket, leaderboards and a $500 monthly contest." },
+      { property: "og:url", content: "https://smyd.online/" },
     ],
+    links: [{ rel: "canonical", href: "https://smyd.online/" }],
   }),
   component: Dashboard,
 });
@@ -18,6 +22,7 @@ function Dashboard() {
 
   return (
     <AppShell>
+      <h1 className="sr-only">SMYD — Your Online Darts Arena</h1>
       <section className="px-5 pt-6 grid grid-cols-2 gap-3 mb-6 animate-fade-in-up">
         <QuickAction to="/matches" icon={Swords} label="1v1 Matches" tint="primary" />
         <QuickAction to="/leaderboard" icon={Award} label="Leaderboard" tint="accent" />
