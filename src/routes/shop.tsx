@@ -11,9 +11,6 @@ import {
   formatMoney,
   useMyWithdrawals,
   useRequestWithdrawal,
-  usePayoutAccount,
-  useStartPayoutSetup,
-  useRefreshPayoutAccount,
   usePayoutHelp,
 } from "@/lib/api";
 import { payoutState, type TrackedPayout } from "@/lib/payoutStatus";
@@ -27,7 +24,7 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Cashier — SMYD" },
-      { name: "description", content: "Add funds to your SMYD account or cash out to PayPal, Venmo or your bank." },
+      { name: "description", content: "Add funds to your SMYD account or cash out to PayPal or Venmo." },
       { property: "og:title", content: "Cashier — SMYD" },
       { property: "og:description", content: "Add funds or cash out on SMYD." },
       { property: "og:type", content: "website" },
