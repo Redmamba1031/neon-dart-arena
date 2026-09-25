@@ -21,6 +21,7 @@ import { Route as ProfitRouteImport } from './routes/profit'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PayoutFaqRouteImport } from './routes/payout-faq'
+import { Route as MonthlyTournamentRouteImport } from './routes/monthly-tournament'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MatchesRouteImport } from './routes/matches'
@@ -102,6 +103,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PayoutFaqRoute = PayoutFaqRouteImport.update({
   id: '/payout-faq',
   path: '/payout-faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MonthlyTournamentRoute = MonthlyTournamentRouteImport.update({
+  id: '/monthly-tournament',
+  path: '/monthly-tournament',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesRoute = MessagesRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/matches': typeof MatchesRoute
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
+  '/monthly-tournament': typeof MonthlyTournamentRoute
   '/payout-faq': typeof PayoutFaqRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/matches': typeof MatchesRoute
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
+  '/monthly-tournament': typeof MonthlyTournamentRoute
   '/payout-faq': typeof PayoutFaqRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/matches': typeof MatchesRoute
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
+  '/monthly-tournament': typeof MonthlyTournamentRoute
   '/payout-faq': typeof PayoutFaqRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mcp'
     | '/messages'
+    | '/monthly-tournament'
     | '/payout-faq'
     | '/privacy'
     | '/profile'
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mcp'
     | '/messages'
+    | '/monthly-tournament'
     | '/payout-faq'
     | '/privacy'
     | '/profile'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mcp'
     | '/messages'
+    | '/monthly-tournament'
     | '/payout-faq'
     | '/privacy'
     | '/profile'
@@ -449,6 +461,7 @@ export interface RootRouteChildren {
   MatchesRoute: typeof MatchesRoute
   McpRoute: typeof McpRoute
   MessagesRoute: typeof MessagesRoute
+  MonthlyTournamentRoute: typeof MonthlyTournamentRoute
   PayoutFaqRoute: typeof PayoutFaqRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
@@ -560,6 +573,13 @@ declare module '@tanstack/react-router' {
       path: '/payout-faq'
       fullPath: '/payout-faq'
       preLoaderRoute: typeof PayoutFaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monthly-tournament': {
+      id: '/monthly-tournament'
+      path: '/monthly-tournament'
+      fullPath: '/monthly-tournament'
+      preLoaderRoute: typeof MonthlyTournamentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages': {
@@ -729,6 +749,7 @@ const rootRouteChildren: RootRouteChildren = {
   MatchesRoute: MatchesRoute,
   McpRoute: McpRoute,
   MessagesRoute: MessagesRoute,
+  MonthlyTournamentRoute: MonthlyTournamentRoute,
   PayoutFaqRoute: PayoutFaqRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
