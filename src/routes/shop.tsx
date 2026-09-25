@@ -267,16 +267,12 @@ function Field({ label, ...props }: { label: string } & React.InputHTMLAttribute
 const METHODS = [
   { id: "paypal", label: "PayPal", hint: "PayPal email" },
   { id: "venmo", label: "Venmo", hint: "Venmo phone number" },
-  { id: "bank", label: "Bank / Card", hint: "" },
 ] as const;
 
 function CashOutPanel() {
   const { data: wallet } = useWallet();
   const { data: history = [] } = useMyWithdrawals();
-  const { data: payoutAccount } = usePayoutAccount();
   const request = useRequestWithdrawal();
-  const startSetup = useStartPayoutSetup();
-  const refreshAccount = useRefreshPayoutAccount();
 
   const [method, setMethod] = useState<(typeof METHODS)[number]["id"]>("paypal");
   const [destination, setDestination] = useState("");
@@ -286,9 +282,7 @@ function CashOutPanel() {
   const cents = Math.round(amount * 100);
   const tooMuch = cents > balance;
   const active = METHODS.find((m) => m.id === method)!;
-  const isBank = method === "bank";
-  const bankReady = Boolean(payoutAccount?.payouts_enabled);
-  const destinationOk = isBank ? bankReady : destination.trim().length >= 3;
+  const destinationOk = destination.trim().length >= 3;
 
   return (
     <div className="space-y-6">
