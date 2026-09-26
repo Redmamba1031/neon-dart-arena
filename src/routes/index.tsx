@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Trophy, Flame, MessageSquare, Award, Swords, LayoutDashboard } from "lucide-react";
 import { useMyProfile } from "@/lib/api";
+import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +21,12 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const { data: me } = useMyProfile();
+
+  useEffect(() => {
+    if (sessionStorage.getItem("smyd_dv")) return;
+    sessionStorage.setItem("smyd_dv", "1");
+    trackEvent("dashboard_view", "/");
+  }, []);
 
   return (
     <AppShell>
