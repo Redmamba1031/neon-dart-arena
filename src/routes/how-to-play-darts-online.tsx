@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Camera, MapPin, Target, Trophy, UserCheck, Users } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { trackEvent } from "@/lib/analytics";
 
 const TITLE = "How to Play Darts Online for Real Prizes — SMYD";
 const DESC =
@@ -35,6 +36,7 @@ function SignUp() {
   return (
     <Link
       to="/login"
+      onClick={() => trackEvent("howto_signup_click", "/how-to-play-darts-online")}
       className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-6 py-4 font-display text-lg font-bold text-primary-foreground shadow-lg transition hover:opacity-90"
     >
       Sign up free & play
