@@ -7,6 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
+import posterAsset from "@/assets/smyd-500-tournament-poster.png.asset.json";
 
 const TITLE = "GranBoard Tournaments — SMYD";
 const DESC =
@@ -140,6 +141,15 @@ function TournamentPage() {
             </button>
           )}
           <p className="mt-2 text-[11px] text-muted-foreground">Cancel anytime. Must be 18+, age-verified, and in an eligible state.</p>
+        </section>
+
+        <section className="overflow-hidden rounded-2xl ring-1 ring-primary/40">
+          <img
+            src={posterAsset.url}
+            alt="SMYD $500 Tournament each month — 16 players drawn for Pro members, $500 prize pool. First tournament Oct. 30, drawing October 28th."
+            className="block w-full"
+            loading="lazy"
+          />
         </section>
 
         <section className="grid grid-cols-2 gap-3">
