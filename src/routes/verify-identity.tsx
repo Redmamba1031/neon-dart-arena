@@ -27,9 +27,12 @@ function VerifyIdentity() {
   const [legalName, setLegalName] = useState("");
   const [dob, setDob] = useState("");
 
+  const [idStatus, setIdStatus] = useState<"idle" | "busy" | "done">("idle");
+
   useEffect(() => {
+    if (idStatus !== "idle") return;
     if (profile?.legal_name && profile?.date_of_birth && profile?.id_document_path) navigate({ to: "/" });
-  }, [profile, navigate]);
+  }, [profile, navigate, idStatus]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +59,11 @@ function VerifyIdentity() {
         {profile?.legal_name && profile?.date_of_birth ? (
           <div className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
             <p className="text-sm">Name: <b>{profile.legal_name}</b> · Born {profile.date_of_birth}</p>
-            <IdUpload hasId={!!profile.id_document_path} />
+            <IdUpload
+              hasId={!!profile.id_document_path}
+              onStatusChange={setIdStatus}
+              onDone={() => navigate({ to: "/" })}
+            />
           </div>
         ) : (
         <form onSubmit={submit} className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
