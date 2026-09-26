@@ -11,13 +11,14 @@ function sessionId(): string {
 
 /** Fire-and-forget page event tracking (anonymous-friendly). */
 export function trackEvent(event: "howto_signup_click" | "dashboard_view", path?: string) {
-  console.log("trackEvent", event);
   try {
-    void supabase.rpc("track_page_event" as never, {
-      _event: event,
-      _path: path ?? window.location.pathname,
-      _session: sessionId(),
-    } as never);
+    void (async () => {
+      await supabase.rpc("track_page_event" as never, {
+        _event: event,
+        _path: path ?? window.location.pathname,
+        _session: sessionId(),
+      } as never);
+    })();
   } catch {
     // tracking must never break the app
   }
