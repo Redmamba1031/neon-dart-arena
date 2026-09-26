@@ -538,6 +538,30 @@ export type Database = {
         }
         Relationships: []
       }
+      page_events: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          path: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          path?: string
+          session_id?: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          path?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       payout_accounts: {
         Row: {
           created_at: string
@@ -1432,6 +1456,10 @@ export type Database = {
           _match_id: string
         }
         Returns: string
+      }
+      track_page_event: {
+        Args: { _event: string; _path: string; _session: string }
+        Returns: undefined
       }
       update_my_location: {
         Args: {
