@@ -7,6 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
+import posterAsset from "@/assets/smyd-500-tournament-poster.png.asset.json";
 
 const TITLE = "GranBoard Tournaments — SMYD";
 const DESC =
