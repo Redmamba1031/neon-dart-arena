@@ -11,6 +11,7 @@ function sessionId(): string {
 
 /** Fire-and-forget page event tracking (anonymous-friendly). */
 export function trackEvent(event: "howto_signup_click" | "dashboard_view", path?: string) {
+  console.log("trackEvent", event);
   try {
     void supabase.rpc("track_page_event" as never, {
       _event: event,
