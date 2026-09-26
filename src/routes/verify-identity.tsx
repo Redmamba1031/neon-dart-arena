@@ -27,9 +27,12 @@ function VerifyIdentity() {
   const [legalName, setLegalName] = useState("");
   const [dob, setDob] = useState("");
 
+  const [idStatus, setIdStatus] = useState<"idle" | "busy" | "done">("idle");
+
   useEffect(() => {
+    if (idStatus !== "idle") return;
     if (profile?.legal_name && profile?.date_of_birth && profile?.id_document_path) navigate({ to: "/" });
-  }, [profile, navigate]);
+  }, [profile, navigate, idStatus]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
