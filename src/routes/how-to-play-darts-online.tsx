@@ -68,6 +68,22 @@ function HowToPlay() {
           <p className="text-xs text-muted-foreground">Your location is checked before every paid match.</p>
         </section>
 
+        <section className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-2">
+          <h2 className="font-display text-xl font-bold flex items-center gap-2">
+            <Trophy className="size-5 text-accent" /> GranBoard tournaments
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Once you're playing 1v1s, SMYD Pro members can enter the monthly GranBoard tournament — a 16-player
+            bracket in 501 and Cricket with a $500 prize decided by skill, not luck.
+          </p>
+          <Link
+            to="/monthly-tournament"
+            className="inline-flex w-full items-center justify-center rounded-xl bg-primary/15 px-4 py-3 text-sm font-bold text-primary ring-1 ring-primary/40"
+          >
+            See the GranBoard tournament
+          </Link>
+        </section>
+
         <section className="space-y-3">
           <h2 className="font-display text-xl font-bold">Getting started in 4 steps</h2>
           <ol className="space-y-3">

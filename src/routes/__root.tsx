@@ -19,7 +19,7 @@ import { Toaster } from "@/components/ui/sonner";
 // Public routes accessible without auth. Everything else requires sign-in.
 // The OAuth consent route runs its own auth check + sign-in redirect (preserving
 // authorization_id), so the gate must not intercept it.
-const PUBLIC_ROUTES = new Set<string>(["/login", "/.lovable/oauth/consent", "/how-to-play-darts-online"]);
+const PUBLIC_ROUTES = new Set<string>(["/login", "/.lovable/oauth/consent", "/how-to-play-darts-online", "/monthly-tournament"]);
 
 function captureLandingSource() {
   try {

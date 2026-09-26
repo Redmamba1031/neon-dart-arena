@@ -1,0 +1,1 @@
+- SMYD's canonical host is https://smyd.online (the www address redirects to it). Both are verified in Search Console, but submit sitemaps and per-site requests against https://smyd.online/ so feeds resolve.
