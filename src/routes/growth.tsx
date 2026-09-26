@@ -24,6 +24,7 @@ type Stats = {
   signups: number; first_deposits: number; bonus_claims: number; bonus_cents: number;
   sources: { source: string; signups: number; deposited: number }[];
   daily: { day: string; signups: number; first_deposits: number; bonuses: number }[];
+  funnel?: { howto_clicks: number; reached_dashboard: number; pct: number };
 };
 
 const card = "rounded-xl bg-surface ring-1 ring-border p-4 space-y-3";
@@ -83,6 +84,21 @@ function GrowthPage() {
               <Stat label="Bonus paid" value={formatMoney(data.bonus_cents)} />
               <Stat label="Sign-up → deposit" value={`${conv}%`} />
             </section>
+            {data.funnel && (
+              <section className={card}>
+                <h2 className="font-semibold">How to play page funnel</h2>
+                <div className="grid grid-cols-3 gap-3">
+                  <Stat label="Sign-up taps" value={data.funnel.howto_clicks} />
+                  <Stat label="Reached dashboard" value={data.funnel.reached_dashboard} />
+                  <Stat label="Tap → dashboard" value={`${data.funnel.pct}%`} />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Visitors are matched by an anonymous browser code, so "reached dashboard" counts only
+                  visitors who tapped the sign-up button on the How to play page and later loaded the dashboard
+                  in the same browser.
+                </p>
+              </section>
+            )}
             <section className={card}>
               <h2 className="font-semibold">How players found SMYD</h2>
               {data.sources.length === 0 ? <p className="text-sm text-muted-foreground">No sign-ups yet.</p> : (
