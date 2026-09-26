@@ -6,7 +6,15 @@ import { useServerFn } from "@tanstack/react-start";
 import { useUploadMyIdDocument } from "@/lib/api";
 import { checkMyIdDocument } from "@/lib/id-verify.functions";
 
-export function IdUpload({ hasId }: { hasId: boolean }) {
+export function IdUpload({
+  hasId,
+  onStatusChange,
+  onDone,
+}: {
+  hasId: boolean;
+  onStatusChange?: (status: "idle" | "busy" | "done") => void;
+  onDone?: () => void;
+}) {
   const upload = useUploadMyIdDocument();
   const check = useServerFn(checkMyIdDocument);
   const qc = useQueryClient();
@@ -19,6 +27,7 @@ export function IdUpload({ hasId }: { hasId: boolean }) {
     e.target.value = "";
     if (!file) return;
     setResult(null);
+    onStatusChange?.("busy");
     try {
       await upload.mutateAsync(file);
       setChecking(true);
@@ -26,8 +35,11 @@ export function IdUpload({ hasId }: { hasId: boolean }) {
       setResult({ ok: r.verified, text: r.reason });
       if (r.verified) toast.success("You're 18+ verified");
       qc.invalidateQueries();
+      onStatusChange?.("done");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
+      setResult({ ok: false, text: err instanceof Error ? err.message : "Upload failed" });
+      onStatusChange?.("done");
     } finally {
       setChecking(false);
     }
@@ -52,7 +64,23 @@ export function IdUpload({ hasId }: { hasId: boolean }) {
         {checking ? "Checking your ID…" : hasId ? "ID uploaded — replace photo" : "Upload photo ID"}
       </button>
       {result && (
-        <p className={`text-[11px] font-semibold ${result.ok ? "text-primary" : "text-destructive"}`}>{result.text}</p>
+        <div className="space-y-2">
+          <p className={`text-[11px] font-semibold ${result.ok ? "text-primary" : "text-destructive"}`}>{result.text}</p>
+          {result.ok && onDone && (
+            <button
+              type="button"
+              onClick={onDone}
+              className="w-full rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground"
+            >
+              Continue
+            </button>
+          )}
+          {!result.ok && (
+            <p className="text-[11px] text-muted-foreground">
+              Take a new photo in good light with the whole ID in frame, and make sure the name and date of birth match your profile.
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
