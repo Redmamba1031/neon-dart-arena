@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Award, Home, Shield, ShoppingBag, Swords, User, Wallet } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { refreshRates, setLocalCurrencyForCountry } from "@/lib/currency";
 import smydLogo from "@/assets/smyd-logo.png";
 import { formatMoney, useIsStaff, useMyBan, useMyProfile, useWallet } from "@/lib/api";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -24,9 +25,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     navigate({ to: "/verify-identity" });
   }, [myProfile, staffRole, staffLoading, pathname, navigate]);
 
+  // Local-currency display: bump a key so amounts re-render once known.
+  const [moneyKey, setMoneyKey] = useState(0);
+  useEffect(() => {
+    if (setLocalCurrencyForCountry(myProfile?.country)) setMoneyKey((k) => k + 1);
+    if (myProfile?.country && myProfile.country !== "US") {
+      void refreshRates().then((ch) => ch && setMoneyKey((k) => k + 1));
+    }
+  }, [myProfile?.country]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen max-w-[480px] flex-col border-x border-border/60 relative">
+      <div key={moneyKey} className="mx-auto flex min-h-screen max-w-[480px] flex-col border-x border-border/60 relative">
         <PaymentTestModeBanner />
         <BanBanner />
         <Header />
