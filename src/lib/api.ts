@@ -12,11 +12,13 @@ export type TournamentParticipant = Database["public"]["Tables"]["tournament_par
 export type TournamentMatch = Database["public"]["Tables"]["tournament_matches"]["Row"];
 
 // Balances are stored in cents (100 stored units = $1.00).
-export const formatMoney = (cents: number | null | undefined) =>
-  (Math.round(cents ?? 0) / 100).toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-  });
+// Players outside the US also see their local-currency equivalent.
+export const formatMoney = (cents: number | null | undefined) => {
+  const c = Math.round(cents ?? 0);
+  const usd = (c / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
+  const local = localEquivalent(c);
+  return local ? `${usd} (${local})` : usd;
+};
 
 // Back-compat aliases used across routes — all render real money now.
 export const formatCoins = formatMoney;
