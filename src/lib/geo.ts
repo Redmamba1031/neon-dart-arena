@@ -24,10 +24,25 @@ export const stateName = (code: string | null | undefined) =>
 /** States where SMYD paid play is live. */
 export const ALLOWED_STATES = ["IN", "TX", "CO", "KS", "MO", "WI"] as const;
 
-export const ALLOWED_STATES_LABEL = "Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin";
+/** Countries outside the US where SMYD paid play is live. */
+export const ALLOWED_COUNTRIES = ["GB", "IE", "SE"] as const;
 
-export const isAllowedRegion = (country: string | null | undefined, regionCode: string | null | undefined) =>
-  (country ?? "US") === "US" && !!regionCode && (ALLOWED_STATES as readonly string[]).includes(regionCode);
+export const COUNTRIES: { code: string; name: string }[] = [
+  { code: "US", name: "United States" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "IE", name: "Ireland" },
+  { code: "SE", name: "Sweden" },
+];
+
+export const ALLOWED_STATES_LABEL =
+  "Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin (US), the United Kingdom, Ireland or Sweden";
+
+export const isAllowedRegion = (country: string | null | undefined, regionCode: string | null | undefined) => {
+  const c = country ?? "US";
+  if (!regionCode) return false;
+  if (c === "US") return (ALLOWED_STATES as readonly string[]).includes(regionCode);
+  return (ALLOWED_COUNTRIES as readonly string[]).includes(c);
+};
 
 /** Great-circle distance in miles between two coordinates. */
 export function distanceMiles(
