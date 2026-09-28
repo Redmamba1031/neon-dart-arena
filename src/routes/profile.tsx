@@ -4,7 +4,7 @@ import { IdUpload } from "@/components/IdUpload";
 import { AppShell } from "@/components/AppShell";
 import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2, MapPin, Crosshair, BadgeCheck, ImagePlus } from "lucide-react";
 import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney, useUpdateLocation, useRestrictedRegions, useMyCoords, useSetMyIdentity } from "@/lib/api";
-import { US_STATES, getDeviceLocation, locationLabel, stateName } from "@/lib/geo";
+import { COUNTRIES, US_STATES, getDeviceLocation, locationLabel, stateName } from "@/lib/geo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -148,6 +148,7 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
   const update = useUpdateLocation();
   const { data: restricted = [] } = useRestrictedRegions();
   const { data: myCoords } = useMyCoords();
+  const [country, setCountry] = useState(profile?.country ?? "US");
   const [state, setState] = useState(profile?.region_code ?? "");
   const [city, setCity] = useState(profile?.city ?? "");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
@@ -174,11 +175,15 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
   };
 
   const save = async () => {
-    if (!state) return toast.error("Pick your state first");
+    if (country === "US" && !state) return toast.error("Pick your state first");
+    const regionCode = country === "US" ? state : country;
+    const regionName =
+      country === "US" ? stateName(state) : COUNTRIES.find((c) => c.code === country)?.name ?? country;
     try {
       await update.mutateAsync({
-        region_code: state,
-        region_name: stateName(state),
+        country,
+        region_code: regionCode,
+        region_name: regionName,
         city,
         lat: savedCoords?.lat ?? null,
         lng: savedCoords?.lng ?? null,
@@ -215,18 +220,33 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
       </button>
 
       <label className="block">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">State</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Country</span>
         <select
-          value={state}
-          onChange={(e) => { setState(e.target.value); setTouched(true); }}
+          value={country}
+          onChange={(e) => { setCountry(e.target.value); setTouched(true); }}
           className="mt-1 w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
         >
-          <option value="">Select your state…</option>
-          {US_STATES.map((s) => (
-            <option key={s.code} value={s.code}>{s.name}</option>
+          {COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>{c.name}</option>
           ))}
         </select>
       </label>
+
+      {country === "US" && (
+        <label className="block">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">State</span>
+          <select
+            value={state}
+            onChange={(e) => { setState(e.target.value); setTouched(true); }}
+            className="mt-1 w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
+          >
+            <option value="">Select your state…</option>
+            {US_STATES.map((s) => (
+              <option key={s.code} value={s.code}>{s.name}</option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <EditField label="City" value={city} onChange={setCity} placeholder="Indianapolis" />
 

@@ -5,7 +5,7 @@ import { trackEvent } from "@/lib/analytics";
 
 const TITLE = "How to Play Darts Online for Real Prizes — SMYD";
 const DESC =
-  "Play darts online with your GranBoard: 1v1 skill matches in 501 and Cricket for real cash prizes. Open in Indiana, Texas, Colorado, Kansas, Missouri and Wisconsin.";
+  "Play darts online with your GranBoard: 1v1 skill matches in 501 and Cricket for real cash prizes. Open in Indiana, Texas, Colorado, Kansas, Missouri and Wisconsin (US), plus the United Kingdom, Ireland and Sweden.";
 
 export const Route = createFileRoute("/how-to-play-darts-online")({
   head: () => ({
@@ -23,7 +23,10 @@ export const Route = createFileRoute("/how-to-play-darts-online")({
   component: HowToPlay,
 });
 
-const STATES = ["Indiana", "Texas", "Colorado", "Kansas", "Missouri", "Wisconsin"];
+const STATES = [
+  "Indiana", "Texas", "Colorado", "Kansas", "Missouri", "Wisconsin",
+  "United Kingdom", "Ireland", "Sweden",
+];
 
 const STEPS = [
   { icon: UserCheck, t: "Create your free account", d: "Sign up with your real name and date of birth, then verify your age with a photo ID. You must be 18+." },
