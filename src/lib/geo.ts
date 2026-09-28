@@ -88,5 +88,9 @@ export const locationLabel = (p: {
   region_code?: string | null;
 } | null | undefined) => {
   if (!p?.region_code) return null;
-  return p.city ? `${p.city}, ${p.region_code}` : stateName(p.region_code);
+  const regionName =
+    stateName(p.region_code) !== p.region_code
+      ? stateName(p.region_code)
+      : (COUNTRIES.find((c) => c.code === p.region_code)?.name ?? p.region_code);
+  return p.city ? `${p.city}, ${regionName}` : regionName;
 };
