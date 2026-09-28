@@ -4,7 +4,7 @@ import { IdUpload } from "@/components/IdUpload";
 import { AppShell } from "@/components/AppShell";
 import { MessageSquare, Settings, LogOut, Target, ChevronRight, Coins, KeyRound, Loader2, MapPin, Crosshair, BadgeCheck, ImagePlus } from "lucide-react";
 import { useMyProfile, useLeaderboard, useUpdateProfile, useWallet, formatMoney, useUpdateLocation, useRestrictedRegions, useMyCoords, useSetMyIdentity } from "@/lib/api";
-import { US_STATES, getDeviceLocation, locationLabel, stateName } from "@/lib/geo";
+import { COUNTRIES, US_STATES, getDeviceLocation, locationLabel, stateName } from "@/lib/geo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
