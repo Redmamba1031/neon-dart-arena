@@ -70,7 +70,7 @@ const FAQ = [
   },
   {
     q: "Who can enter?",
-    a: "SMYD Pro members ($19.99/month) who are 18 or older, age-verified with a photo ID, and located in Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin (US), the United Kingdom, Ireland or Sweden.",
+    a: "Anyone in the world can become a SMYD Pro member ($19.99/month) and be part of the monthly draw. You must be 18 or older and age-verified with a photo ID. Paid matches themselves are only open in Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin (US), the United Kingdom, Ireland or Sweden.",
   },
   {
     q: "How does the 16-player draw work?",
@@ -140,7 +140,7 @@ function TournamentPage() {
               Join Pro — $19.99/month
             </button>
           )}
-          <p className="mt-2 text-[11px] text-muted-foreground">Cancel anytime. Must be 18+, age-verified, and in an eligible state.</p>
+          <p className="mt-2 text-[11px] text-muted-foreground">Cancel anytime. Open worldwide — must be 18+ and age-verified. Paid matches require an eligible location.</p>
         </section>
 
         <section className="overflow-hidden rounded-2xl ring-1 ring-primary/40">
