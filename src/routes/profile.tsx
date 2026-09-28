@@ -220,18 +220,33 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
       </button>
 
       <label className="block">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">State</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Country</span>
         <select
-          value={state}
-          onChange={(e) => { setState(e.target.value); setTouched(true); }}
+          value={country}
+          onChange={(e) => { setCountry(e.target.value); setTouched(true); }}
           className="mt-1 w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
         >
-          <option value="">Select your state…</option>
-          {US_STATES.map((s) => (
-            <option key={s.code} value={s.code}>{s.name}</option>
+          {COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>{c.name}</option>
           ))}
         </select>
       </label>
+
+      {country === "US" && (
+        <label className="block">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">State</span>
+          <select
+            value={state}
+            onChange={(e) => { setState(e.target.value); setTouched(true); }}
+            className="mt-1 w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
+          >
+            <option value="">Select your state…</option>
+            {US_STATES.map((s) => (
+              <option key={s.code} value={s.code}>{s.name}</option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <EditField label="City" value={city} onChange={setCity} placeholder="Indianapolis" />
 
