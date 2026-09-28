@@ -148,6 +148,7 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
   const update = useUpdateLocation();
   const { data: restricted = [] } = useRestrictedRegions();
   const { data: myCoords } = useMyCoords();
+  const [country, setCountry] = useState(profile?.country ?? "US");
   const [state, setState] = useState(profile?.region_code ?? "");
   const [city, setCity] = useState(profile?.city ?? "");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
