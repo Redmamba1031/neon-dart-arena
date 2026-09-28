@@ -175,11 +175,15 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
   };
 
   const save = async () => {
-    if (!state) return toast.error("Pick your state first");
+    if (country === "US" && !state) return toast.error("Pick your state first");
+    const regionCode = country === "US" ? state : country;
+    const regionName =
+      country === "US" ? stateName(state) : COUNTRIES.find((c) => c.code === country)?.name ?? country;
     try {
       await update.mutateAsync({
-        region_code: state,
-        region_name: stateName(state),
+        country,
+        region_code: regionCode,
+        region_name: regionName,
         city,
         lat: savedCoords?.lat ?? null,
         lng: savedCoords?.lng ?? null,
