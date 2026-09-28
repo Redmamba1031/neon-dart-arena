@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib/stripe.server";
-import { ALLOWED_STATES_LABEL, isAllowedRegion } from "@/lib/geo";
 
 export const MEMBERSHIP_PRICE_ID = "smyd_pro_monthly";
 
