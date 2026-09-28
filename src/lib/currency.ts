@@ -32,6 +32,11 @@ export async function refreshRates(): Promise<boolean> {
   }
 }
 
+/** Current rates (1 USD = x), live if refreshed, else fallbacks. */
+export function getRates(): Record<string, number> {
+  return rates;
+}
+
 /** Approximate local equivalent like "≈ £15.00", or "" for US players. */
 export function localEquivalent(cents: number): string {
   if (!localCurrency) return "";
