@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib/stripe.server";
-import { ALLOWED_STATES_LABEL, isAllowedRegion } from "@/lib/geo";
 
 export const MEMBERSHIP_PRICE_ID = "smyd_pro_monthly";
 
@@ -38,12 +37,7 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
     const { supabase, userId, claims } = context as any;
-    const { data: profile } = await supabase
-      .from("profiles").select("region_code, country").eq("id", userId).maybeSingle();
-    if (!profile?.region_code) return { error: "Set your location in your profile first" };
-    if (!isAllowedRegion(profile.country, profile.region_code)) {
-      return { error: `SMYD is currently live in ${ALLOWED_STATES_LABEL} only` };
-    }
+    // Pro membership (and the monthly draw) is open worldwide; only paid matches are region-restricted.
     const { data: existing } = await supabase
       .from("memberships").select("status, current_period_end").eq("user_id", userId).maybeSingle();
     if (existing && ["active", "trialing", "past_due"].includes(existing.status)) {
