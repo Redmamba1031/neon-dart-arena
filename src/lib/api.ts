@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { localEquivalent } from "@/lib/currency";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";

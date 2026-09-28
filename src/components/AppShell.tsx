@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Award, Home, Shield, ShoppingBag, Swords, User, Wallet } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { refreshRates, setLocalCurrencyForCountry } from "@/lib/currency";
 import smydLogo from "@/assets/smyd-logo.png";
 import { formatMoney, useIsStaff, useMyBan, useMyProfile, useWallet } from "@/lib/api";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
