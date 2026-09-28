@@ -70,7 +70,7 @@ const FAQ = [
   },
   {
     q: "Who can enter?",
-    a: "SMYD Pro members ($19.99/month) who are 18 or older, age-verified with a photo ID, and located in Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin.",
+    a: "SMYD Pro members ($19.99/month) who are 18 or older, age-verified with a photo ID, and located in Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin (US), the United Kingdom, Ireland or Sweden.",
   },
   {
     q: "How does the 16-player draw work?",
