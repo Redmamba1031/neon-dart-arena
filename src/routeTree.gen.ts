@@ -20,6 +20,7 @@ import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as ProfitRouteImport } from './routes/profit'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PlayDartsOnlineUkIrelandSwedenRouteImport } from './routes/play-darts-online-uk-ireland-sweden'
 import { Route as PayoutFaqRouteImport } from './routes/payout-faq'
 import { Route as MonthlyTournamentRouteImport } from './routes/monthly-tournament'
 import { Route as MessagesRouteImport } from './routes/messages'
@@ -102,6 +103,12 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayDartsOnlineUkIrelandSwedenRoute =
+  PlayDartsOnlineUkIrelandSwedenRouteImport.update({
+    id: '/play-darts-online-uk-ireland-sweden',
+    path: '/play-darts-online-uk-ireland-sweden',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PayoutFaqRoute = PayoutFaqRouteImport.update({
   id: '/payout-faq',
   path: '/payout-faq',
@@ -251,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/messages': typeof MessagesRoute
   '/monthly-tournament': typeof MonthlyTournamentRoute
   '/payout-faq': typeof PayoutFaqRoute
+  '/play-darts-online-uk-ireland-sweden': typeof PlayDartsOnlineUkIrelandSwedenRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/profit': typeof ProfitRoute
@@ -290,6 +298,7 @@ export interface FileRoutesByTo {
   '/messages': typeof MessagesRoute
   '/monthly-tournament': typeof MonthlyTournamentRoute
   '/payout-faq': typeof PayoutFaqRoute
+  '/play-darts-online-uk-ireland-sweden': typeof PlayDartsOnlineUkIrelandSwedenRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/profit': typeof ProfitRoute
@@ -330,6 +339,7 @@ export interface FileRoutesById {
   '/messages': typeof MessagesRoute
   '/monthly-tournament': typeof MonthlyTournamentRoute
   '/payout-faq': typeof PayoutFaqRoute
+  '/play-darts-online-uk-ireland-sweden': typeof PlayDartsOnlineUkIrelandSwedenRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/profit': typeof ProfitRoute
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/monthly-tournament'
     | '/payout-faq'
+    | '/play-darts-online-uk-ireland-sweden'
     | '/privacy'
     | '/profile'
     | '/profit'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/monthly-tournament'
     | '/payout-faq'
+    | '/play-darts-online-uk-ireland-sweden'
     | '/privacy'
     | '/profile'
     | '/profit'
@@ -449,6 +461,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/monthly-tournament'
     | '/payout-faq'
+    | '/play-darts-online-uk-ireland-sweden'
     | '/privacy'
     | '/profile'
     | '/profit'
@@ -489,6 +502,7 @@ export interface RootRouteChildren {
   MessagesRoute: typeof MessagesRoute
   MonthlyTournamentRoute: typeof MonthlyTournamentRoute
   PayoutFaqRoute: typeof PayoutFaqRoute
+  PlayDartsOnlineUkIrelandSwedenRoute: typeof PlayDartsOnlineUkIrelandSwedenRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ProfitRoute: typeof ProfitRoute
@@ -592,6 +606,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/play-darts-online-uk-ireland-sweden': {
+      id: '/play-darts-online-uk-ireland-sweden'
+      path: '/play-darts-online-uk-ireland-sweden'
+      fullPath: '/play-darts-online-uk-ireland-sweden'
+      preLoaderRoute: typeof PlayDartsOnlineUkIrelandSwedenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payout-faq': {
@@ -793,6 +814,7 @@ const rootRouteChildren: RootRouteChildren = {
   MessagesRoute: MessagesRoute,
   MonthlyTournamentRoute: MonthlyTournamentRoute,
   PayoutFaqRoute: PayoutFaqRoute,
+  PlayDartsOnlineUkIrelandSwedenRoute: PlayDartsOnlineUkIrelandSwedenRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ProfitRoute: ProfitRoute,

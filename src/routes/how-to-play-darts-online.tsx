@@ -97,6 +97,12 @@ function HowToPlay() {
             All balances and prizes are in US dollars; local-currency figures are approximate conversions at the
             current exchange rate. Cash-outs go to your PayPal or Venmo account.
           </p>
+          <Link
+            to="/play-darts-online-uk-ireland-sweden"
+            className="inline-flex w-full items-center justify-center rounded-xl bg-primary/15 px-4 py-3 text-sm font-bold text-primary ring-1 ring-primary/40"
+          >
+            UK, Ireland & Sweden: rates, FAQs & sign-up
+          </Link>
         </section>
 
         <section className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-2">
