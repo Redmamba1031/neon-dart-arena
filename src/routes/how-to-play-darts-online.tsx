@@ -23,7 +23,10 @@ export const Route = createFileRoute("/how-to-play-darts-online")({
   component: HowToPlay,
 });
 
-const STATES = ["Indiana", "Texas", "Colorado", "Kansas", "Missouri", "Wisconsin"];
+const STATES = [
+  "Indiana", "Texas", "Colorado", "Kansas", "Missouri", "Wisconsin",
+  "United Kingdom", "Ireland", "Sweden",
+];
 
 const STEPS = [
   { icon: UserCheck, t: "Create your free account", d: "Sign up with your real name and date of birth, then verify your age with a photo ID. You must be 18+." },
