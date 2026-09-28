@@ -73,6 +73,32 @@ function HowToPlay() {
           <p className="text-xs text-muted-foreground">Your location is checked before every paid match.</p>
         </section>
 
+        <section className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-3">
+          <h2 className="font-display text-xl font-bold">Play darts online in the UK, Ireland &amp; Sweden</h2>
+          <p className="text-sm text-muted-foreground">
+            SMYD is open across the United Kingdom, Ireland and Sweden — no state-by-state restrictions. Play 1v1
+            GranBoard matches from home against players in your own country or anywhere SMYD is live.
+          </p>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li className="rounded-lg bg-background ring-1 ring-border px-3 py-2">
+              <span className="font-semibold text-foreground">United Kingdom</span> — play darts online for cash
+              prizes; amounts shown in dollars with an approximate pound (£) equivalent.
+            </li>
+            <li className="rounded-lg bg-background ring-1 ring-border px-3 py-2">
+              <span className="font-semibold text-foreground">Ireland</span> — the same 501 and Cricket skill
+              matches, with an approximate euro (€) equivalent shown next to every dollar amount.
+            </li>
+            <li className="rounded-lg bg-background ring-1 ring-border px-3 py-2">
+              <span className="font-semibold text-foreground">Sweden</span> — full access to matches and the monthly
+              tournament, with an approximate krona (kr) equivalent shown alongside dollars.
+            </li>
+          </ul>
+          <p className="text-xs text-muted-foreground">
+            All balances and prizes are in US dollars; local-currency figures are approximate conversions at the
+            current exchange rate. Cash-outs go to your PayPal or Venmo account.
+          </p>
+        </section>
+
         <section className="rounded-xl bg-surface ring-1 ring-border p-4 space-y-2">
           <h2 className="font-display text-xl font-bold flex items-center gap-2">
             <Trophy className="size-5 text-accent" /> GranBoard tournaments
