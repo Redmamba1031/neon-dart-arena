@@ -175,7 +175,8 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
   };
 
   const save = async () => {
-    if (country === "US" && !state) return toast.error("Pick your state first");
+    if (country === "US" && !US_STATES.some((s) => s.code === state))
+      return toast.error("Pick your state first");
     const regionCode = country === "US" ? state : country;
     const regionName =
       country === "US" ? stateName(state) : COUNTRIES.find((c) => c.code === country)?.name ?? country;
@@ -223,7 +224,15 @@ function LocationCard({ profile }: { profile: ReturnType<typeof useMyProfile>["d
         <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Country</span>
         <select
           value={country}
-          onChange={(e) => { setCountry(e.target.value); setTouched(true); }}
+          onChange={(e) => {
+            const next = e.target.value;
+            setCountry(next);
+            // A saved non-US region_code is a country code (e.g. "GB"), not a
+            // US state — clear it so switching back to the US asks for a state
+            // instead of silently saving the old country code as a state.
+            if (next === "US" && !US_STATES.some((s) => s.code === state)) setState("");
+            setTouched(true);
+          }}
           className="mt-1 w-full rounded-lg bg-background ring-1 ring-border px-3 py-2 text-sm"
         >
           {COUNTRIES.map((c) => (
