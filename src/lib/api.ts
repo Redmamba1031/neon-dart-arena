@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { localEquivalent } from "@/lib/currency";
+import { localEquivalent, setLocalCurrencyForCountry } from "@/lib/currency";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -46,6 +46,9 @@ export function useMyProfile() {
         .eq("id", user.id)
         .maybeSingle();
       if (error) throw error;
+      // Set the local display currency before this data reaches any
+      // component, so money re-renders naturally without remounting screens.
+      setLocalCurrencyForCountry(data?.country);
       return data;
     },
   });
