@@ -4,6 +4,7 @@ import { Trophy, Flame, MessageSquare, Award, Swords, LayoutDashboard } from "lu
 import { useMyProfile } from "@/lib/api";
 import { useEffect } from "react";
 import { trackEvent } from "@/lib/analytics";
+import posterAsset from "@/assets/smyd-500-tournament-poster.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,6 +39,20 @@ function Dashboard() {
         <QuickAction to="/wallet" icon={Trophy} label="Wallet" tint="muted" />
         <QuickAction to="/messages" icon={MessageSquare} label="Messages" tint="primary" />
         <QuickAction to="/monthly-tournament" icon={Trophy} label="$500 Monthly" tint="accent" />
+      </section>
+
+      <section className="px-5 mb-6">
+        <Link
+          to="/monthly-tournament"
+          onClick={() => trackEvent("dashboard_view", "/")}
+          className="block overflow-hidden rounded-2xl ring-1 ring-primary/40 transition-transform active:scale-[0.98]"
+        >
+          <img
+            src={posterAsset.url}
+            alt="SMYD $500 Tournament each month — 16 players drawn for Pro members, $500 prize pool. First tournament Oct. 30, drawing October 28th."
+            className="block w-full"
+          />
+        </Link>
       </section>
 
       <section className="px-5">
