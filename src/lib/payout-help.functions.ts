@@ -57,7 +57,7 @@ export const explainPayoutIssue = createServerFn({ method: "POST" })
       "- Players must be age verified and located in Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin for paid play.",
       "Explain the single most likely cause in plain, friendly language (2-3 sentences, no jargon, no internal table or field names).",
       "Give 2-4 short next steps the player can take. Set needsStaff true only when staff must act.",
-      "Support email: redmond1031@gmail.com.",
+      "Support email: support@smyd.online.",
     ].join("\n");
 
     try {
@@ -99,7 +99,7 @@ export const explainPayoutIssue = createServerFn({ method: "POST" })
           cause: "",
           steps: [],
           needsStaff: true,
-          error: "Could not work out an answer right now. Email redmond1031@gmail.com and we'll look into it.",
+          error: "Could not work out an answer right now. Email support@smyd.online and we'll look into it.",
         };
       }
       return {

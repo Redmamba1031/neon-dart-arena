@@ -438,7 +438,7 @@ function PayoutHelp() {
           )}
           {answer.needsStaff && (
             <p className="text-[11px] text-muted-foreground">
-              Still stuck? Email redmond1031@gmail.com with the amount and date.
+              Still stuck? Email support@smyd.online with the amount and date.
             </p>
           )}
         </div>
