@@ -113,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         type: "application/ld+json",
         children: JSON.stringify([
-          { "@context": "https://schema.org", "@type": "Organization", name: "SMYD", url: "https://smyd.online", email: "redmond1031@gmail.com" },
+          { "@context": "https://schema.org", "@type": "Organization", name: "SMYD", url: "https://smyd.online", email: "support@smyd.online" },
           { "@context": "https://schema.org", "@type": "WebSite", name: "SMYD", url: "https://smyd.online" },
         ]),
       },

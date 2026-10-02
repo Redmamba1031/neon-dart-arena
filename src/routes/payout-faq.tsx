@@ -95,7 +95,7 @@ function PayoutFaqPage() {
         <QA q="Still stuck?">
           <p>
             Email{" "}
-            <a href="mailto:redmond1031@gmail.com" className="text-primary underline">redmond1031@gmail.com</a>{" "}
+            <a href="mailto:support@smyd.online" className="text-primary underline">support@smyd.online</a>{" "}
             with your username and the payout in question, or visit the{" "}
             <a href="/support" className="text-primary underline">Support page</a>.
           </p>
