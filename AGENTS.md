@@ -1,2 +1,4 @@
 - SMYD's canonical host is https://smyd.online (the www address redirects to it). Both are verified in Search Console, but submit sitemaps and per-site requests against https://smyd.online/ so feeds resolve.
 - Apparel design entries pair original product photos with flat front/back assets; the catalog and selected preview use flat assets while design-picker thumbnails retain photos for recognition.
+- Shipping information lives on the public /shipping route, exempt from identity checks, so delivery details are accessible before purchase.
+- Jersey checkout retains its existing stable price lookup key when the amount changes, so publishing replaces the corresponding live price instead of creating a separate logical price.
