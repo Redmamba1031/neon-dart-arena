@@ -21,8 +21,8 @@ export const US_STATES: { code: string; name: string }[] = [
 export const stateName = (code: string | null | undefined) =>
   US_STATES.find((s) => s.code === code)?.name ?? code ?? "";
 
-/** States where SMYD paid play is live. */
-export const ALLOWED_STATES = ["IN", "TX", "CO", "KS", "MO", "WI"] as const;
+/** States where SMYD paid play is live — every US state. */
+export const ALLOWED_STATES = US_STATES.map((s) => s.code);
 
 /** Countries outside the US where SMYD paid play is live. */
 export const ALLOWED_COUNTRIES = ["GB", "IE", "SE"] as const;
@@ -35,7 +35,7 @@ export const COUNTRIES: { code: string; name: string }[] = [
 ];
 
 export const ALLOWED_STATES_LABEL =
-  "Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin (US), the United Kingdom, Ireland or Sweden";
+  "every US state, the United Kingdom, Ireland or Sweden";
 
 export const isAllowedRegion = (country: string | null | undefined, regionCode: string | null | undefined) => {
   const c = country ?? "US";

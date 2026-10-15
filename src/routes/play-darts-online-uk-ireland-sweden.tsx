@@ -53,7 +53,7 @@ const COUNTRIES = [
 const FAQS = [
   {
     q: "Can I play SMYD in the UK, Ireland or Sweden?",
-    a: "Yes. SMYD is open across the whole of the United Kingdom, Ireland and Sweden — there are no region-by-region restrictions like the US states. You must be 18 or over and verify your age with a photo ID.",
+    a: "Yes. SMYD is open across the whole of the United Kingdom, Ireland and Sweden, and in every US state. You must be 18 or over and verify your age with a photo ID.",
   },
   {
     q: "What currency are prizes paid in?",

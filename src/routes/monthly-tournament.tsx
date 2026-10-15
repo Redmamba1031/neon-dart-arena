@@ -12,7 +12,7 @@ import { trackApplovinEvent } from "@/lib/applovin";
 
 const TITLE = "GranBoard Tournaments — SMYD";
 const DESC =
-  "Enter SMYD's monthly GranBoard tournament — a $500 501 & Cricket bracket for up to 16 Pro members, played from home. Open in IN, TX, CO, KS, MO and WI.";
+  "Enter SMYD's monthly GranBoard tournament — a $500 501 & Cricket bracket for up to 16 Pro members, played from home. Open in every US state.";
 
 export const Route = createFileRoute("/monthly-tournament")({
   head: () => ({
@@ -71,7 +71,7 @@ const FAQ = [
   },
   {
     q: "Who can enter?",
-    a: "Anyone in the world can become a SMYD Pro member ($19.99/month) and be part of the monthly draw. You must be 18 or older and age-verified with a photo ID. Paid matches themselves are only open in Indiana, Texas, Colorado, Kansas, Missouri or Wisconsin (US), the United Kingdom, Ireland or Sweden.",
+    a: "Anyone in the world can become a SMYD Pro member ($19.99/month) and be part of the monthly draw. You must be 18 or older and age-verified with a photo ID. Paid matches themselves are open in every US state, the United Kingdom, Ireland and Sweden.",
   },
   {
     q: "How does the 16-player draw work?",
