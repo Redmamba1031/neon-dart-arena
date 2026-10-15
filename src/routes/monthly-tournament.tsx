@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
 import posterAsset from "@/assets/smyd-500-tournament-poster.png.asset.json";
+import { trackApplovinEvent } from "@/lib/applovin";
 
 const TITLE = "GranBoard Tournaments — SMYD";
 const DESC =
@@ -118,6 +119,7 @@ function TournamentPage() {
           {!signedIn ? (
             <Link
               to="/login"
+              onClick={() => trackApplovinEvent("generate_lead")}
               className="mt-5 block w-full rounded-xl bg-primary px-6 py-4 font-display text-lg font-bold uppercase tracking-wider text-primary-foreground shadow-lg"
             >
               Sign up free &amp; enter
@@ -134,7 +136,7 @@ function TournamentPage() {
             </div>
           ) : (
             <button
-              onClick={() => setOpen(true)}
+              onClick={() => { trackApplovinEvent("begin_checkout"); setOpen(true); }}
               className="mt-5 w-full rounded-xl bg-primary px-6 py-4 font-display text-lg font-bold uppercase tracking-wider text-primary-foreground shadow-lg"
             >
               Join Pro — $19.99/month
