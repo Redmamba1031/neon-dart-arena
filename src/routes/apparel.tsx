@@ -9,6 +9,9 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import jerseyNeon from "@/assets/jersey-neon.png";
 import jerseyRed from "@/assets/jersey-red.png";
 import jerseyWhite from "@/assets/jersey-white.png";
+import jerseyNeonFlat from "@/assets/jersey-neon-flat.jpg";
+import jerseyRedFlat from "@/assets/jersey-red-flat.jpg";
+import jerseyWhiteFlat from "@/assets/jersey-white-flat.jpg";
 
 export const Route = createFileRoute("/apparel")({
   head: () => ({
@@ -37,6 +40,7 @@ const DESIGNS = [
     id: "neon",
     name: "Neon Voltage",
     img: jerseyNeon,
+    flat: jerseyNeonFlat,
     blurb: "Black performance fabric with electric blue and purple neon flight pattern.",
     tint: "text-primary",
   },
@@ -44,6 +48,7 @@ const DESIGNS = [
     id: "crimson",
     name: "Crimson Flame",
     img: jerseyRed,
+    flat: jerseyRedFlat,
     blurb: "Black and crimson with SMYD across the chest in white and red.",
     tint: "text-destructive",
   },
@@ -51,6 +56,7 @@ const DESIGNS = [
     id: "tour",
     name: "Tour White",
     img: jerseyWhite,
+    flat: jerseyWhiteFlat,
     blurb: "White and graphite with neon green piping — clean tournament look.",
     tint: "text-accent",
   },
@@ -73,15 +79,15 @@ function Apparel() {
           {DESIGNS.map((d) => (
             <div
               key={d.id}
-              className="rounded-2xl bg-surface ring-1 ring-border overflow-hidden flex"
+              className="rounded-2xl bg-surface ring-1 ring-border overflow-hidden"
             >
               <img
-                src={d.img}
-                alt={`SMYD ${d.name} dart jersey`}
+                src={d.flat}
+                alt={`SMYD ${d.name} jersey — flat 2D front view on the left and back view on the right`}
                 loading="lazy"
-                width={896}
-                height={1152}
-                className="w-36 h-44 object-cover object-top shrink-0"
+                width={1264}
+                height={848}
+                className="w-full aspect-[1264/848] object-contain"
               />
               <div className="flex-1 min-w-0 p-4 flex flex-col">
                 <div className="flex items-center gap-2">
@@ -112,7 +118,7 @@ function JerseyCustomizer() {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
 
-  const activeDesign = DESIGNS.find((d) => d.id === design)!;
+  const activeDesign = DESIGNS.find((d) => d.id === design) ?? DESIGNS[0];
   const nameOk = /^[A-Za-z .'-]{2,14}$/.test(name.trim());
   const numberOk = number === "" || /^([0-9]|[0-9]{2})$/.test(number) && Number(number) <= 99;
   const ready = nameOk && numberOk;
@@ -135,6 +141,20 @@ function JerseyCustomizer() {
         <Sparkles className="size-4 text-primary" />
         <h2 className="font-display text-lg font-bold">Customize Your Jersey</h2>
       </div>
+
+      <figure className="overflow-hidden rounded-lg">
+        <img
+          src={activeDesign.flat}
+          alt={`${activeDesign.name} — 2D front and back jersey views`}
+          width={1264}
+          height={848}
+          className="w-full aspect-[1264/848] object-contain"
+        />
+        <figcaption className="grid grid-cols-2 py-2 text-center text-xs font-semibold text-muted-foreground">
+          <span>Front</span>
+          <span>Back</span>
+        </figcaption>
+      </figure>
 
       <div>
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Design</p>

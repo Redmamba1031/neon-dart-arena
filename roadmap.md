@@ -6,3 +6,4 @@
 - [x] Mark Beauknows as ID/age verified per owner request
 - [x] Jersey $45 in-app checkout
 - [x] Email owner (private Gmail) on each jersey order
+- [x] Add 2D front-and-back views for each jersey design
