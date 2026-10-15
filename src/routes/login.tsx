@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import smydLogo from "@/assets/smyd-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { trackApplovinEvent } from "@/lib/applovin";
 
 
 export const Route = createFileRoute("/login")({
@@ -93,6 +94,7 @@ function Login() {
         });
 
         if (error) throw error;
+        trackApplovinEvent("generate_lead");
         toast.success("Check your email to confirm your account.");
         setMode("signin");
       } else {
