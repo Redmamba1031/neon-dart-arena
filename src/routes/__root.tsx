@@ -16,6 +16,7 @@ import appCss from "../styles.css?url";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { AdConsentBanner, ApplovinPageViews } from "@/components/AdConsentBanner";
 
 // Public routes accessible without auth. Everything else requires sign-in.
 // The OAuth consent route runs its own auth check + sign-in redirect (preserving
@@ -141,6 +142,8 @@ function RootComponent() {
       <AuthGate>
         <Outlet />
       </AuthGate>
+      <ApplovinPageViews />
+      <AdConsentBanner />
       <Toaster position="top-center" />
     </QueryClientProvider>
   );

@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
+import { useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
+import { trackApplovinEvent } from "@/lib/applovin";
 
 export const Route = createFileRoute("/checkout/return")({
   validateSearch: (search: Record<string, unknown>): { session_id?: string } => ({
@@ -12,6 +14,9 @@ export const Route = createFileRoute("/checkout/return")({
 
 function CheckoutReturn() {
   const { session_id } = Route.useSearch();
+  useEffect(() => {
+    if (session_id) trackApplovinEvent("purchase");
+  }, [session_id]);
   return (
     <AppShell>
       <div className="px-5 py-12 text-center space-y-4 animate-fade-in-up">
