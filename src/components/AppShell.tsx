@@ -6,7 +6,7 @@ import smydLogo from "@/assets/smyd-logo.png";
 import { formatMoney, useIsStaff, useMyBan, useMyProfile, useWallet } from "@/lib/api";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
-const IDENTITY_EXEMPT = ["/verify-identity", "/rules", "/terms", "/privacy", "/refunds", "/payout-faq", "/support", "/login", "/reset-password"];
+const IDENTITY_EXEMPT = ["/verify-identity", "/rules", "/terms", "/privacy", "/refunds", "/payout-faq", "/support", "/login", "/reset-password", "/shipping"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Shirt, Sparkles, ChevronDown } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -6,6 +6,7 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createJerseyCheckout } from "@/lib/apparel.functions";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { Button } from "@/components/ui/button";
 import jerseyNeon from "@/assets/jersey-neon.png";
 import jerseyRed from "@/assets/jersey-red.png";
 import jerseyWhite from "@/assets/jersey-white.png";
@@ -71,7 +72,7 @@ function Apparel() {
         <div>
           <h1 className="font-display text-2xl font-bold text-gradient-neon">Custom Apparel</h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Official SMYD dart jerseys — built for the oche.
+            Official SMYD dart jerseys — $60 USD each.
           </p>
         </div>
 
@@ -235,7 +236,7 @@ function JerseyCustomizer() {
           <button onClick={() => setQty((q) => Math.min(10, q + 1))} disabled={checkout} className="size-8 rounded-lg ring-1 ring-border">+</button>
         </div>
       </div>
-      <p className="text-sm font-bold">Total: ${(45 * qty).toFixed(2)} <span className="text-[10px] font-normal text-muted-foreground">($45 per jersey)</span></p>
+      <p className="text-sm font-bold">Total: ${(60 * qty).toFixed(2)} <span className="text-[10px] font-normal text-muted-foreground">($60 USD per jersey)</span></p>
       {done && <p className="text-xs text-primary font-semibold">Order received! We'll email you when your jersey ships.</p>}
       {checkout ? (
         <div className="rounded-xl overflow-hidden bg-background">
@@ -250,13 +251,16 @@ function JerseyCustomizer() {
           disabled={!ready}
           className="block w-full rounded-xl bg-gradient-neon py-3.5 text-center font-display text-sm font-bold uppercase tracking-[0.15em] text-background disabled:opacity-50"
         >
-          Buy Now — ${(45 * qty).toFixed(2)}
+          Buy Now — ${(60 * qty).toFixed(2)}
         </button>
       )}
       <p className="text-[10px] text-muted-foreground flex items-start gap-1.5">
         <ChevronDown className="size-3 mt-0.5 shrink-0" />
         Pay securely in the app. Sign in required. Ships to the US, UK, Ireland and Sweden — enter your address at checkout.
       </p>
+      <Button asChild variant="link" className="h-auto p-0">
+        <Link to="/shipping">Shipping information</Link>
+      </Button>
     </div>
   );
 }

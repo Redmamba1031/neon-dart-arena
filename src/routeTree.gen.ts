@@ -30,6 +30,7 @@ import { Route as ProfitRouteImport } from './routes/profit'
 import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RulesRouteImport } from './routes/rules'
+import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -156,6 +157,11 @@ const RulesRoute = RulesRouteImport.update({
   path: '/rules',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rules': typeof RulesRoute
+  '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rules': typeof RulesRoute
+  '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
@@ -364,6 +372,7 @@ export interface FileRoutesById {
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rules': typeof RulesRoute
+  '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
@@ -408,6 +417,7 @@ export interface FileRouteTypes {
     | '/refunds'
     | '/reset-password'
     | '/rules'
+    | '/shipping'
     | '/shop'
     | '/support'
     | '/terms'
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/refunds'
     | '/reset-password'
     | '/rules'
+    | '/shipping'
     | '/shop'
     | '/support'
     | '/terms'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/refunds'
     | '/reset-password'
     | '/rules'
+    | '/shipping'
     | '/shop'
     | '/support'
     | '/terms'
@@ -535,6 +547,7 @@ export interface RootRouteChildren {
   RefundsRoute: typeof RefundsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RulesRoute: typeof RulesRoute
+  ShippingRoute: typeof ShippingRoute
   ShopRoute: typeof ShopRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
@@ -705,6 +718,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RulesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -863,6 +883,7 @@ const rootRouteChildren: RootRouteChildren = {
   RefundsRoute: RefundsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RulesRoute: RulesRoute,
+  ShippingRoute: ShippingRoute,
   ShopRoute: ShopRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
