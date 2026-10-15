@@ -132,6 +132,7 @@ function BottomNav() {
     { to: "/", label: "Lobby", icon: Home },
     { to: "/matches", label: "1v1", icon: Swords },
     { to: "/shop", label: "Cashier", icon: ShoppingBag },
+    { to: "/apparel", label: "Apparel", icon: Shirt },
     { to: "/leaderboard", label: "Rank", icon: Award },
     { to: "/profile", label: "Profile", icon: User },
   ] as const;
