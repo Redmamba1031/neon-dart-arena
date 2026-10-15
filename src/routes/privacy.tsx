@@ -70,6 +70,16 @@ function PrivacyPage() {
           </p>
         </Section>
 
+        <Section title="Advertising measurement">
+          <p>
+            We use AppLovin to measure how our advertising performs — for example whether someone who
+            saw or clicked a SMYD ad later signed up or made a purchase. AppLovin receives basic device
+            and browsing data for this measurement and ad optimization. In regions that require consent,
+            this tracking only runs if you accept it in the cookie banner. You can change or withdraw
+            your choice anytime from the "Cookies" link in the footer of every page.
+          </p>
+        </Section>
+
         <Section title="Your choices">
           <p>
             You can update your profile details at any time from your profile page. You may request deletion

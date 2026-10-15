@@ -5,6 +5,7 @@ import { refreshRates, setLocalCurrencyForCountry } from "@/lib/currency";
 import smydLogo from "@/assets/smyd-logo.png";
 import { formatMoney, useIsStaff, useMyBan, useMyProfile, useWallet } from "@/lib/api";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { openCookieSettings } from "@/components/AdConsentBanner";
 
 const IDENTITY_EXEMPT = ["/verify-identity", "/rules", "/terms", "/privacy", "/refunds", "/payout-faq", "/support", "/login", "/reset-password", "/shipping"];
 
@@ -118,6 +119,12 @@ export function LegalFooter() {
             {label}
           </Link>
         ))}
+        <button
+          onClick={openCookieSettings}
+          className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          Cookies
+        </button>
       </div>
       <p className="text-center text-[8px] text-muted-foreground/70">
         SMYD™ and the SMYD logo are trademarks of SMYD's owner. All rights reserved.
