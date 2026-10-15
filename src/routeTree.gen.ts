@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminPlayersRouteImport } from './routes/admin-players'
+import { Route as ApparelRouteImport } from './routes/apparel'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as GrowthRouteImport } from './routes/growth'
 import { Route as HowToPlayDartsOnlineRouteImport } from './routes/how-to-play-darts-online'
@@ -61,6 +62,11 @@ const AdminRoute = AdminRouteImport.update({
 const AdminPlayersRoute = AdminPlayersRouteImport.update({
   id: '/admin-players',
   path: '/admin-players',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApparelRoute = ApparelRouteImport.update({
+  id: '/apparel',
+  path: '/apparel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-players': typeof AdminPlayersRoute
+  '/apparel': typeof ApparelRoute
   '/dashboard': typeof DashboardRoute
   '/growth': typeof GrowthRoute
   '/how-to-play-darts-online': typeof HowToPlayDartsOnlineRoute
@@ -288,6 +295,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-players': typeof AdminPlayersRoute
+  '/apparel': typeof ApparelRoute
   '/dashboard': typeof DashboardRoute
   '/growth': typeof GrowthRoute
   '/how-to-play-darts-online': typeof HowToPlayDartsOnlineRoute
@@ -329,6 +337,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-players': typeof AdminPlayersRoute
+  '/apparel': typeof ApparelRoute
   '/dashboard': typeof DashboardRoute
   '/growth': typeof GrowthRoute
   '/how-to-play-darts-online': typeof HowToPlayDartsOnlineRoute
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-players'
+    | '/apparel'
     | '/dashboard'
     | '/growth'
     | '/how-to-play-darts-online'
@@ -411,6 +421,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-players'
+    | '/apparel'
     | '/dashboard'
     | '/growth'
     | '/how-to-play-darts-online'
@@ -451,6 +462,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-players'
+    | '/apparel'
     | '/dashboard'
     | '/growth'
     | '/how-to-play-darts-online'
@@ -492,6 +504,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AdminPlayersRoute: typeof AdminPlayersRoute
+  ApparelRoute: typeof ApparelRoute
   DashboardRoute: typeof DashboardRoute
   GrowthRoute: typeof GrowthRoute
   HowToPlayDartsOnlineRoute: typeof HowToPlayDartsOnlineRoute
@@ -550,6 +563,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-players'
       fullPath: '/admin-players'
       preLoaderRoute: typeof AdminPlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apparel': {
+      id: '/apparel'
+      path: '/apparel'
+      fullPath: '/apparel'
+      preLoaderRoute: typeof ApparelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -804,6 +824,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AdminPlayersRoute: AdminPlayersRoute,
+  ApparelRoute: ApparelRoute,
   DashboardRoute: DashboardRoute,
   GrowthRoute: GrowthRoute,
   HowToPlayDartsOnlineRoute: HowToPlayDartsOnlineRoute,
