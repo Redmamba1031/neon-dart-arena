@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Shirt, Sparkles, ChevronDown } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { createJerseyCheckout } from "@/lib/apparel.functions";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import jerseyNeon from "@/assets/jersey-neon.png";
 import jerseyRed from "@/assets/jersey-red.png";
 import jerseyWhite from "@/assets/jersey-white.png";
@@ -113,20 +117,17 @@ function JerseyCustomizer() {
   const numberOk = number === "" || /^([0-9]|[0-9]{2})$/.test(number) && Number(number) <= 99;
   const ready = nameOk && numberOk;
 
-  const mailto = useMemo(() => {
-    const subject = encodeURIComponent("SMYD custom jersey request");
-    const body = encodeURIComponent(
-      [
-        `Design: ${activeDesign.name}`,
-        `Size: ${size}`,
-        `Jersey name: ${name.trim()}`,
-        `Number: ${number === "" ? "(none)" : number}`,
-        "",
-        "My SMYD username: ",
-      ].join("\n"),
-    );
-    return `mailto:support@smyd.online?subject=${subject}&body=${body}`;
-  }, [activeDesign.name, size, name, number]);
+  const [qty, setQty] = useState(1);
+  const [checkout, setCheckout] = useState(false);
+  const fetchClientSecret = async () => {
+    const r = await createJerseyCheckout({
+      data: { design, size, name: name.trim(), number, quantity: qty,
+        returnUrl: `${window.location.origin}/apparel?order=done`, environment: getStripeEnvironment() },
+    });
+    if ("error" in r) throw new Error(r.error);
+    return r.clientSecret;
+  };
+  const done = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("order") === "done";
 
   return (
     <div className="rounded-2xl bg-surface ring-1 ring-primary/40 p-4 space-y-4">
@@ -206,18 +207,35 @@ function JerseyCustomizer() {
         </p>
       </div>
 
-      <a
-        href={mailto}
-        aria-disabled={!ready}
-        className={`block w-full rounded-xl bg-gradient-neon py-3.5 text-center font-display text-sm font-bold uppercase tracking-[0.15em] text-background ${
-          ready ? "" : "pointer-events-none opacity-50"
-        }`}
-      >
-        Send My Jersey Request
-      </a>
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Quantity</span>
+        <div className="flex items-center gap-3">
+          <button onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={checkout} className="size-8 rounded-lg ring-1 ring-border">−</button>
+          <span className="font-bold w-4 text-center">{qty}</span>
+          <button onClick={() => setQty((q) => Math.min(10, q + 1))} disabled={checkout} className="size-8 rounded-lg ring-1 ring-border">+</button>
+        </div>
+      </div>
+      <p className="text-sm font-bold">Total: ${(45 * qty).toFixed(2)} <span className="text-[10px] font-normal text-muted-foreground">($45 per jersey)</span></p>
+      {done && <p className="text-xs text-primary font-semibold">Order received! We'll email you when your jersey ships.</p>}
+      {checkout ? (
+        <div className="rounded-xl overflow-hidden bg-background">
+          <PaymentTestModeBanner />
+          <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
+            <EmbeddedCheckout />
+          </EmbeddedCheckoutProvider>
+        </div>
+      ) : (
+        <button
+          onClick={() => setCheckout(true)}
+          disabled={!ready}
+          className="block w-full rounded-xl bg-gradient-neon py-3.5 text-center font-display text-sm font-bold uppercase tracking-[0.15em] text-background disabled:opacity-50"
+        >
+          Buy Now — ${(45 * qty).toFixed(2)}
+        </button>
+      )}
       <p className="text-[10px] text-muted-foreground flex items-start gap-1.5">
         <ChevronDown className="size-3 mt-0.5 shrink-0" />
-        Opens your email app with your design, size, name and number filled in — send it to support@smyd.online and we will reply with pricing and payment.
+        Pay securely in the app. Sign in required. Ships to the US, UK, Ireland and Sweden — enter your address at checkout.
       </p>
     </div>
   );
