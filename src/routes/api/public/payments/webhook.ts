@@ -13,7 +13,27 @@ function getSupabase() {
   return _supabase;
 }
 
+async function handleJerseyOrder(session: any) {
+  if (session.payment_status === "unpaid") return;
+  const to = process.env.ORDER_NOTIFY_EMAIL;
+  if (!to) { console.error("ORDER_NOTIFY_EMAIL not set"); return; }
+  const m = session.metadata ?? {};
+  const ship = session.collected_information?.shipping_details ?? session.shipping_details;
+  const a = ship?.address;
+  const shipping = a ? [ship.name, a.line1, a.line2, a.city, a.state, a.postal_code, a.country].filter(Boolean).join(", ") : "";
+  const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+  await sendTemplateEmail("jersey-order", to, {
+    templateData: {
+      design: m.design, size: m.size, jerseyName: m.jersey_name, number: m.number, quantity: m.quantity,
+      amount: `$${((session.amount_total ?? 0) / 100).toFixed(2)}`,
+      buyerEmail: session.customer_details?.email, shipping, sessionId: session.id,
+    },
+    idempotencyKey: `jersey-order-${session.id}`,
+  });
+}
+
 async function handleCheckoutCompleted(session: any, env: StripeEnv) {
+  if (session.metadata?.kind === "jersey") return handleJerseyOrder(session);
   if (session.metadata?.kind !== "coin_pack") {
     console.log("Skipping non-coin-pack session", session.id, session.metadata?.kind);
     return;
