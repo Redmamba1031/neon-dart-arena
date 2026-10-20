@@ -71,7 +71,19 @@ export async function needsConsentBanner(): Promise<boolean> {
   return inConsentRegion && getSavedConsent() === null;
 }
 
+const allowedListeners: Array<() => void> = [];
+let trackingAllowed = false;
+/** Run fn once tracking is allowed (same consent rule as the AppLovin pixel). */
+export function onTrackingAllowed(fn: () => void) {
+  if (trackingAllowed) fn();
+  else allowedListeners.push(fn);
+}
+
 function loadPixel() {
+  if (!trackingAllowed) {
+    trackingAllowed = true;
+    allowedListeners.splice(0).forEach((fn) => fn());
+  }
   if (loaded || typeof window === "undefined" || window.axon) return;
   loaded = true;
   const w = window;
