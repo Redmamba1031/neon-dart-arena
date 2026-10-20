@@ -157,6 +157,7 @@ function JerseyCustomizer() {
         </figcaption>
       </figure>
 
+      <fieldset disabled={checkout} className="contents disabled:[&_*]:cursor-not-allowed">
       <div>
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Design</p>
         <div className="grid grid-cols-3 gap-2">
@@ -218,6 +219,7 @@ function JerseyCustomizer() {
         <p className="text-[10px] text-destructive">Name: 2–14 letters, no numbers or symbols.</p>
       )}
       {!numberOk && <p className="text-[10px] text-destructive">Number: 0–99.</p>}
+      </fieldset>
 
       <div className="rounded-lg bg-background ring-1 ring-border p-3">
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Your jersey</p>
@@ -240,6 +242,13 @@ function JerseyCustomizer() {
       {done && <p className="text-xs text-primary font-semibold">Order received! We'll email you when your jersey ships.</p>}
       {checkout ? (
         <div className="rounded-xl overflow-hidden bg-background">
+          <button
+            type="button"
+            onClick={() => setCheckout(false)}
+            className="mb-2 w-full rounded-lg py-2 text-[10px] font-bold uppercase tracking-widest ring-1 ring-border text-muted-foreground"
+          >
+            Edit jersey
+          </button>
           <PaymentTestModeBanner />
           <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
             <EmbeddedCheckout />
