@@ -7,6 +7,7 @@ import {
   trackApplovinEvent,
 } from "@/lib/applovin";
 import { useLocation } from "@tanstack/react-router";
+import { initGoogleTag, trackGaPageView } from "@/lib/google-tag";
 
 /** Opens the banner again from the footer "Cookies" link. */
 export function openCookieSettings() {
@@ -18,6 +19,7 @@ export function AdConsentBanner() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    initGoogleTag();
     void initApplovin();
     void needsConsentBanner().then(setShow);
     const reopen = () => setShow(true);
@@ -67,6 +69,7 @@ export function ApplovinPageViews() {
   const { pathname } = useLocation();
   useEffect(() => {
     trackApplovinEvent("page_view");
+    trackGaPageView(pathname);
   }, [pathname]);
   return null;
 }
