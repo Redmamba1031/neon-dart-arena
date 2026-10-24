@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Trophy, Flame, MessageSquare, Award, Swords, LayoutDashboard } from "lucide-react";
+import { Trophy, Flame, MessageSquare, Award, Swords, LayoutDashboard, ShieldAlert } from "lucide-react";
 import { useMyProfile } from "@/lib/api";
 import { useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { trackEvent } from "@/lib/analytics";
+import { sendMyVerificationReminder } from "@/lib/verify-reminder.functions";
 import posterAsset from "@/assets/smyd-500-tournament-poster.png.asset.json";
 
 export const Route = createFileRoute("/")({
