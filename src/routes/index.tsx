@@ -24,6 +24,7 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const { data: me } = useMyProfile();
+  const sendReminder = useServerFn(sendMyVerificationReminder);
 
   useEffect(() => {
     if (sessionStorage.getItem("smyd_dv")) return;
@@ -31,9 +32,36 @@ function Dashboard() {
     trackEvent("dashboard_view", "/");
   }, []);
 
+  // Unverified players get one reminder email per account, triggered by
+  // their own visit here. Guarded per session so we don't call it repeatedly.
+  useEffect(() => {
+    if (!me || me.age_verified) return;
+    if (sessionStorage.getItem("smyd_vr")) return;
+    sessionStorage.setItem("smyd_vr", "1");
+    sendReminder({ data: {} }).catch(() => {});
+  }, [me, sendReminder]);
+
   return (
     <AppShell>
       <h1 className="sr-only">SMYD — Your Online Darts Arena</h1>
+      {me && !me.age_verified && (
+        <section className="px-5 pt-4">
+          <Link
+            to="/verify-identity"
+            className="flex items-center gap-3 rounded-xl bg-primary/10 ring-1 ring-primary/40 p-4 transition-transform active:scale-[0.98]"
+          >
+            <div className="size-10 rounded-lg bg-primary/15 grid place-items-center text-primary shrink-0">
+              <ShieldAlert className="size-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">Verify your age &amp; ID</p>
+              <p className="text-[11px] text-muted-foreground">
+                Required before you can play paid matches. Tap to verify now.
+              </p>
+            </div>
+          </Link>
+        </section>
+      )}
       <section className="px-5 pt-6 grid grid-cols-2 gap-3 mb-6 animate-fade-in-up">
         <QuickAction to="/matches" icon={Swords} label="1v1 Matches" tint="primary" />
         <QuickAction to="/leaderboard" icon={Award} label="Leaderboard" tint="accent" />
