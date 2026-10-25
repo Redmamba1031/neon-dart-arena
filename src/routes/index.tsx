@@ -38,7 +38,7 @@ function Dashboard() {
     if (!me || me.age_verified) return;
     if (sessionStorage.getItem("smyd_vr")) return;
     sessionStorage.setItem("smyd_vr", "1");
-    sendReminder({ data: {} }).catch(() => {});
+    sendReminder().catch(() => {});
   }, [me, sendReminder]);
 
   return (
