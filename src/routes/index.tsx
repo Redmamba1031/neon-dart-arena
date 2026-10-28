@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { trackEvent } from "@/lib/analytics";
 import { sendMyVerificationReminder } from "@/lib/verify-reminder.functions";
-import posterAsset from "@/assets/smyd-500-tournament-poster.png.asset.json";
+import posterAsset from "@/assets/smyd-500-tournament-flyer-nov.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -79,7 +79,7 @@ function Dashboard() {
         >
           <img
             src={posterAsset.url}
-            alt="SMYD $500 Tournament each month — 16 players drawn for Pro members, $500 prize pool. First tournament Oct. 30, drawing October 28th."
+            alt="SMYD $500 Tournament each month — 16 players drawn for Pro members, $500 prize pool. Tournament Nov. 30, drawing Nov. 28."
             className="block w-full"
           />
         </Link>
