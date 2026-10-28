@@ -24,7 +24,7 @@ function Shipping() {
     <AppShell>
       <div className="space-y-6 px-5 py-6 animate-fade-in-up">
         <Button asChild variant="ghost" size="sm" className="px-0">
-          <Link to="/apparel"><ArrowLeft />Apparel</Link>
+          <Link to="/"><ArrowLeft />Lobby</Link>
         </Button>
         <header>
           <Truck className="mb-3 size-7 text-primary" />
