@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
-import posterAsset from "@/assets/smyd-500-tournament-poster.png.asset.json";
+import posterAsset from "@/assets/smyd-500-tournament-flyer-nov.png.asset.json";
 import { trackApplovinEvent } from "@/lib/applovin";
 
 const TITLE = "GranBoard Tournaments — SMYD";
@@ -148,7 +148,7 @@ function TournamentPage() {
         <section className="overflow-hidden rounded-2xl ring-1 ring-primary/40">
           <img
             src={posterAsset.url}
-            alt="SMYD $500 Tournament each month — 16 players drawn for Pro members, $500 prize pool. First tournament Oct. 30, drawing October 28th."
+            alt="SMYD $500 Tournament each month — 16 players drawn for Pro members, $500 prize pool. Tournament Nov. 30, drawing Nov. 28."
             className="block w-full"
             loading="lazy"
           />
