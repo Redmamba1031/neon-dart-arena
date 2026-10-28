@@ -33,8 +33,8 @@ const Email = ({ name, verifyUrl }: Props) => (
           Verify my account
         </Button>
         <Text style={text}>
-          Until you're verified you can still browse the lobby, leaderboard
-          and apparel shop — paid play unlocks as soon as verification passes.
+          Until you're verified you can still browse the lobby and
+          leaderboard — paid play unlocks as soon as verification passes.
         </Text>
         <Text style={footer}>
           You're receiving this because you created a SMYD account and
