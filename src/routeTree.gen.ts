@@ -33,6 +33,7 @@ import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TournamentsRouteImport } from './routes/tournaments'
 import { Route as VerifyIdentityRouteImport } from './routes/verify-identity'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -171,6 +172,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TournamentsRoute = TournamentsRouteImport.update({
+  id: '/tournaments',
+  path: '/tournaments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerifyIdentityRoute = VerifyIdentityRouteImport.update({
   id: '/verify-identity',
   path: '/verify-identity',
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/tournaments': typeof TournamentsRoute
   '/verify-identity': typeof VerifyIdentityRoute
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -324,6 +331,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/tournaments': typeof TournamentsRoute
   '/verify-identity': typeof VerifyIdentityRoute
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -367,6 +375,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/tournaments': typeof TournamentsRoute
   '/verify-identity': typeof VerifyIdentityRoute
   '/wallet': typeof WalletRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -411,6 +420,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/terms'
+    | '/tournaments'
     | '/verify-identity'
     | '/wallet'
     | '/.mcp/list-tools'
@@ -453,6 +463,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/terms'
+    | '/tournaments'
     | '/verify-identity'
     | '/wallet'
     | '/.mcp/list-tools'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/terms'
+    | '/tournaments'
     | '/verify-identity'
     | '/wallet'
     | '/.mcp/list-tools'
@@ -538,6 +550,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
+  TournamentsRoute: typeof TournamentsRoute
   VerifyIdentityRoute: typeof VerifyIdentityRoute
   WalletRoute: typeof WalletRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
@@ -726,6 +739,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tournaments': {
+      id: '/tournaments'
+      path: '/tournaments'
+      fullPath: '/tournaments'
+      preLoaderRoute: typeof TournamentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verify-identity': {
       id: '/verify-identity'
       path: '/verify-identity'
@@ -866,6 +886,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
+  TournamentsRoute: TournamentsRoute,
   VerifyIdentityRoute: VerifyIdentityRoute,
   WalletRoute: WalletRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
