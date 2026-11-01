@@ -85,6 +85,48 @@ export type Database = {
           },
         ]
       }
+      champ_entries: {
+        Row: {
+          amount_cents: number
+          cap: string
+          created_at: string
+          environment: string
+          id: string
+          payment_intent: string | null
+          refunded_at: string | null
+          starts_at: string
+          status: string
+          stripe_session_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents?: number
+          cap: string
+          created_at?: string
+          environment?: string
+          id?: string
+          payment_intent?: string | null
+          refunded_at?: string | null
+          starts_at: string
+          status?: string
+          stripe_session_id: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          cap?: string
+          created_at?: string
+          environment?: string
+          id?: string
+          payment_intent?: string | null
+          refunded_at?: string | null
+          starts_at?: string
+          status?: string
+          stripe_session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coin_packs: {
         Row: {
           active: boolean
@@ -639,6 +681,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          cricket_mpr: number | null
           date_of_birth: string | null
           display_name: string | null
           id: string
@@ -648,6 +691,7 @@ export type Database = {
           location_source: string | null
           location_updated_at: string | null
           losses: number
+          mpr_verified: boolean
           rating: number
           region_code: string | null
           region_name: string | null
@@ -663,6 +707,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          cricket_mpr?: number | null
           date_of_birth?: string | null
           display_name?: string | null
           id: string
@@ -672,6 +717,7 @@ export type Database = {
           location_source?: string | null
           location_updated_at?: string | null
           losses?: number
+          mpr_verified?: boolean
           rating?: number
           region_code?: string | null
           region_name?: string | null
@@ -687,6 +733,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          cricket_mpr?: number | null
           date_of_birth?: string | null
           display_name?: string | null
           id?: string
@@ -696,6 +743,7 @@ export type Database = {
           location_source?: string | null
           location_updated_at?: string | null
           losses?: number
+          mpr_verified?: boolean
           rating?: number
           region_code?: string | null
           region_name?: string | null
@@ -1273,6 +1321,10 @@ export type Database = {
         Args: { _user_id: string; _verified: boolean }
         Returns: undefined
       }
+      admin_set_mpr_verified: {
+        Args: { _user_id: string; _verified: boolean }
+        Returns: undefined
+      }
       admin_set_role: {
         Args: { _grant: boolean; _role: string; _user_id: string }
         Returns: undefined
@@ -1282,6 +1334,20 @@ export type Database = {
       cancel_tournament: {
         Args: { _tournament_id: string }
         Returns: undefined
+      }
+      champ_board: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          avatar_url: string
+          cap: string
+          country: string
+          cricket_mpr: number
+          display_name: string
+          mpr_verified: boolean
+          starts_at: string
+          user_id: string
+          username: string
+        }[]
       }
       complete_leg: {
         Args: { _leg_id: string; _winner_id: string }
@@ -1445,6 +1511,7 @@ export type Database = {
         Args: { _date_of_birth: string; _legal_name: string }
         Returns: undefined
       }
+      set_my_mpr: { Args: { _mpr: number }; Returns: undefined }
       set_my_signup_source: { Args: { _source: string }; Returns: undefined }
       settle_match: {
         Args: { _match_id: string; _winner_id: string }
