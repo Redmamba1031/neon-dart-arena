@@ -72,6 +72,14 @@ function Dashboard() {
       </section>
 
       <section className="px-5 mb-6">
+        <Link to="/tournaments" className="block rounded-2xl bg-surface p-5 ring-1 ring-primary/50 transition-transform active:scale-[0.98]">
+          <p className="text-xs font-bold uppercase tracking-widest text-primary">SMYD Champ</p>
+          <p className="mt-1 text-lg font-black">Cricket Tournaments every 30 min</p>
+          <p className="mt-1 text-xs text-muted-foreground">16 MPR cap divisions · $25 entry · $19 to the prize pool · GranBoard</p>
+        </Link>
+      </section>
+
+      <section className="px-5 mb-6">
         <Link
           to="/monthly-tournament"
           onClick={() => trackEvent("dashboard_view", "/")}

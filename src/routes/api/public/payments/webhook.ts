@@ -32,8 +32,21 @@ async function handleJerseyOrder(session: any) {
   });
 }
 
+async function handleChampEntry(session: any, env: StripeEnv) {
+  if (session.payment_status !== "paid") return;
+  const m = session.metadata ?? {};
+  if (!m.userId || !m.cap || !m.starts_at) { console.error("champ session missing metadata", session.id); return; }
+  const { error } = await (getSupabase().from("champ_entries") as any).upsert({
+    cap: m.cap, starts_at: m.starts_at, user_id: m.userId, stripe_session_id: session.id,
+    payment_intent: session.payment_intent ?? null, amount_cents: session.amount_total ?? 2500,
+    status: "paid", environment: env,
+  }, { onConflict: "stripe_session_id", ignoreDuplicates: true });
+  if (error) console.error("champ entry insert failed", session.id, error);
+}
+
 async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   if (session.metadata?.kind === "jersey") return handleJerseyOrder(session);
+  if (session.metadata?.kind === "champ") return handleChampEntry(session, env);
   if (session.metadata?.kind !== "coin_pack") {
     console.log("Skipping non-coin-pack session", session.id, session.metadata?.kind);
     return;
