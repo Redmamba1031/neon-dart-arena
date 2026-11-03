@@ -10,7 +10,7 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createChampCheckout, closeUnderfilledBrackets } from "@/lib/champ.functions";
 import {
   CHAMP_CAPS, CHAMP_CUTOFF_MS, CHAMP_MIN_PLAYERS, CHAMP_POOL_CENTS,
-  capEligibility, capLabel, payoutSplit, upcomingSlots,
+  capEligibility, capLabel, completeTeams, payoutSplit, upcomingSlots,
 } from "@/lib/champ";
 import { useIsStaff, useMyProfile } from "@/lib/api";
 import { trackApplovinEvent } from "@/lib/applovin";
@@ -33,6 +33,7 @@ export const Route = createFileRoute("/tournaments")({
 type Entry = {
   cap: string; starts_at: string; user_id: string; username: string | null; display_name: string | null;
   avatar_url: string | null; country: string | null; cricket_mpr: number | null; mpr_verified: boolean;
+  format: string; partner_id: string | null;
 };
 
 const usd = (c: number) => `$${(c / 100).toFixed(2)}`;
@@ -51,6 +52,9 @@ function TournamentsPage() {
   const [filter, setFilter] = useState<string>("all");
   const [roster, setRoster] = useState<{ cap: string; t: number } | null>(null);
   const [pay, setPay] = useState<{ cap: string; t: number } | null>(null);
+  const [format, setFormat] = useState<"singles" | "doubles">("singles");
+  const [partner, setPartner] = useState("");
+  const [payReady, setPayReady] = useState(false);
   const [done, setDone] = useState(false);
 
   useEffect(() => {
@@ -76,7 +80,7 @@ function TournamentsPage() {
 
   const byKey = useMemo(() => {
     const m = new Map<string, Entry[]>();
-    for (const e of board.data ?? []) {
+    for (const e of (board.data ?? []).filter((x) => (x.format ?? "singles") === format)) {
       const k = `${e.cap}|${new Date(e.starts_at).getTime()}`;
       m.set(k, [...(m.get(k) ?? []), e]);
     }
@@ -89,12 +93,12 @@ function TournamentsPage() {
   const fetchClientSecret = async () => {
     const r = await createChampCheckout({
       data: {
-        cap: pay!.cap, startsAt: pay!.t,
+        cap: pay!.cap, startsAt: pay!.t, format, partnerUsername: format === "doubles" ? partner.trim() : undefined,
         returnUrl: `${window.location.origin}/tournaments?entered=1`,
         environment: getStripeEnvironment(),
       },
     });
-    if ("error" in r) { toast.error(r.error); setPay(null); throw new Error(r.error); }
+    if ("error" in r) { toast.error(r.error); setPayReady(false); throw new Error(r.error); }
     return r.clientSecret;
   };
 
@@ -128,6 +132,18 @@ function TournamentsPage() {
 
         <MprCard mpr={myMpr} verified={!!me?.mpr_verified} signedIn={!!me} onSaved={() => qc.invalidateQueries()} />
 
+        <div className="grid grid-cols-2 gap-2 rounded-xl bg-surface p-1 ring-1 ring-border">
+          {(["singles", "doubles"] as const).map((f) => (
+            <button key={f} onClick={() => setFormat(f)}
+              className={`rounded-lg py-2 text-sm font-bold ${format === f ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+              {f === "singles" ? "Singles" : "Doubles (2v2)"}
+            </button>
+          ))}
+        </div>
+        {format === "doubles" && (
+          <p className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">Doubles: each teammate pays their own $25 and names the other. Your two MPRs added together must be at or below the cap. A team counts once both partners have paid. Minimum {CHAMP_MIN_PLAYERS} full teams, or everyone is refunded to their card.</p>
+        )}
+
         <div className="flex gap-2 overflow-x-auto pb-1">
           {["all", ...CHAMP_CAPS].map((c) => (
             <button key={c} onClick={() => setFilter(c)}
@@ -147,19 +163,21 @@ function TournamentsPage() {
               {caps.map((cap) => {
                 const list = byKey.get(`${cap}|${t}`) ?? [];
                 const mine = list.some((e) => e.user_id === me?.id);
-                const why = me ? capEligibility(cap, myMpr, !!me.mpr_verified) : "Sign in to enter";
+                const why = !me ? "Sign in to enter" : format === "singles" ? capEligibility(cap, myMpr, !!me.mpr_verified) : null;
+                const teams = format === "doubles" ? completeTeams(list).length : 0;
+                const count = format === "doubles" ? `${teams} teams${list.length - teams * 2 ? ` (+${list.length - teams * 2} pending partner)` : ""}` : `${list.length} registered`;
                 return (
                   <div key={cap} className="flex items-center gap-3 px-4 py-2.5">
                     <div className="w-20 text-sm font-bold">{capLabel(cap)}</div>
                     <button onClick={() => setRoster({ cap, t })} className="flex flex-1 items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
-                      <Users className="h-3.5 w-3.5" /> {list.length} registered · {usd(list.length * CHAMP_POOL_CENTS)} pool
+                      <Users className="h-3.5 w-3.5" /> {count} · {usd((format === "doubles" ? teams * 2 : list.length) * CHAMP_POOL_CENTS)} pool
                     </button>
                     {mine ? (
                       <span className="text-xs font-semibold text-primary">Entered</span>
                     ) : !me ? (
                       <Link to="/login" className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground">Sign in</Link>
                     ) : (
-                      <button disabled={!!why} title={why ?? ""} onClick={() => { trackApplovinEvent("begin_checkout"); setPay({ cap, t }); }}
+                      <button disabled={!!why} title={why ?? ""} onClick={() => { trackApplovinEvent("begin_checkout"); setPay({ cap, t }); setPayReady(format === "singles"); }}
                         className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground disabled:opacity-40">
                         Enter $25
                       </button>
@@ -188,7 +206,7 @@ function TournamentsPage() {
               {rosterList.map((e) => (
                 <li key={e.user_id} className="flex items-center gap-3 rounded-lg bg-muted/40 px-3 py-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-bold">{(e.username ?? "?").slice(0, 2).toUpperCase()}</div>
-                  <div className="flex-1 text-sm font-semibold">{e.display_name || e.username || "Player"} <span className="text-xs text-muted-foreground">{e.country ?? ""}</span></div>
+                  <div className="flex-1 text-sm font-semibold">{e.display_name || e.username || "Player"} <span className="text-xs text-muted-foreground">{e.country ?? ""}</span>{format === "doubles" && <div className="text-xs font-normal text-muted-foreground">{e.partner_id && rosterList.some((x) => x.user_id === e.partner_id && x.partner_id === e.user_id) ? `Team with ${(() => { const m = rosterList.find((x) => x.user_id === e.partner_id); return m?.display_name || m?.username || "partner"; })()}` : "Pending partner"}</div>}</div>
                   <div className="text-right text-xs"><div className="font-bold">{e.cricket_mpr != null ? Number(e.cricket_mpr).toFixed(2) : "—"} MPR</div><div className={e.mpr_verified ? "text-primary" : "text-muted-foreground"}>{e.mpr_verified ? "Verified" : "Unverified"}</div></div>
                 </li>
               ))}
@@ -199,10 +217,20 @@ function TournamentsPage() {
 
       {pay && (
         <Modal onClose={() => setPay(null)} title={`Enter ${capLabel(pay.cap)} · ${fmtTime(pay.t)}`}>
-          <p className="mb-3 text-xs text-muted-foreground">$25.00 entry · $19.00 to the prize pool · $6.00 SMYD fee. Refunded to your card automatically if fewer than 3 players register.</p>
-          <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
+          <p className="mb-3 text-xs text-muted-foreground">$25.00 entry per player · $19.00 to the prize pool · $6.00 SMYD fee. Refunded to your card automatically if the bracket doesn't reach {CHAMP_MIN_PLAYERS} {format === "doubles" ? "full teams" : "players"}{format === "doubles" ? " or your partner doesn't pay in time" : ""}.</p>
+          {format === "doubles" && !payReady ? (
+            <div className="space-y-2">
+              <label className="text-xs font-semibold">Partner's SMYD username</label>
+              <input value={partner} onChange={(e) => setPartner(e.target.value)} placeholder="username"
+                className="w-full rounded-lg bg-muted/40 px-3 py-2 text-sm ring-1 ring-border" />
+              <button disabled={partner.trim().length < 2} onClick={() => setPayReady(true)}
+                className="w-full rounded-lg bg-primary py-2 text-sm font-bold text-primary-foreground disabled:opacity-40">Continue to pay $25</button>
+            </div>
+          ) : payReady ? (
+            <EmbeddedCheckoutProvider key={`${format}-${partner}`} stripe={getStripe()} options={{ fetchClientSecret }}>
+              <EmbeddedCheckout />
+            </EmbeddedCheckoutProvider>
+          ) : null}
         </Modal>
       )}
     </AppShell>
