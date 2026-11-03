@@ -91,7 +91,9 @@ export type Database = {
           cap: string
           created_at: string
           environment: string
+          format: string
           id: string
+          partner_id: string | null
           payment_intent: string | null
           refunded_at: string | null
           starts_at: string
@@ -104,7 +106,9 @@ export type Database = {
           cap: string
           created_at?: string
           environment?: string
+          format?: string
           id?: string
+          partner_id?: string | null
           payment_intent?: string | null
           refunded_at?: string | null
           starts_at: string
@@ -117,7 +121,9 @@ export type Database = {
           cap?: string
           created_at?: string
           environment?: string
+          format?: string
           id?: string
+          partner_id?: string | null
           payment_intent?: string | null
           refunded_at?: string | null
           starts_at?: string
@@ -1343,7 +1349,9 @@ export type Database = {
           country: string
           cricket_mpr: number
           display_name: string
+          format: string
           mpr_verified: boolean
+          partner_id: string
           starts_at: string
           user_id: string
           username: string
