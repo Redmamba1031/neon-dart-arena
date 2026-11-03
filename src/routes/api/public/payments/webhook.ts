@@ -40,6 +40,7 @@ async function handleChampEntry(session: any, env: StripeEnv) {
     cap: m.cap, starts_at: m.starts_at, user_id: m.userId, stripe_session_id: session.id,
     payment_intent: session.payment_intent ?? null, amount_cents: session.amount_total ?? 2500,
     status: "paid", environment: env,
+    format: m.format === "doubles" ? "doubles" : "singles", partner_id: m.partner_id || null,
   }, { onConflict: "stripe_session_id", ignoreDuplicates: true });
   if (error) console.error("champ entry insert failed", session.id, error);
 }

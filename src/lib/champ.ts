@@ -43,3 +43,32 @@ export function payoutSplit(players: number): number[] {
   out[0] += pool - out.reduce((a, b) => a + b, 0);
   return out;
 }
+
+export type ChampFormat = "singles" | "doubles";
+
+/** Doubles: both MPRs verified and their sum at or below the cap. */
+export function teamCapEligibility(cap: string, a: { mpr: number | null; verified: boolean }, b: { mpr: number | null; verified: boolean }): string | null {
+  if (cap === "open") return null;
+  if (!a.verified || a.mpr == null || !b.verified || b.mpr == null) return "Both teammates need a verified Cricket MPR for capped doubles";
+  const sum = a.mpr + b.mpr;
+  if (sum > Number(cap) + 1e-9) return `Team MPR ${sum.toFixed(2)} is above the ${cap} cap`;
+  return null;
+}
+
+/** Complete doubles teams: pairs where both players paid and named each other. */
+export function completeTeams<T extends { user_id: string; partner_id: string | null }>(list: T[]): [T, T][] {
+  const byId = new Map(list.map((e) => [e.user_id, e]));
+  const seen = new Set<string>();
+  const out: [T, T][] = [];
+  for (const e of list) {
+    if (seen.has(e.user_id) || !e.partner_id) continue;
+    const p = byId.get(e.partner_id);
+    if (p && p.partner_id === e.user_id) { out.push([e, p]); seen.add(e.user_id); seen.add(p.user_id); }
+  }
+  return out;
+}
+
+/** Payout split for doubles: same scale by team count, $38 per team to the pool. */
+export function doublesPayoutSplit(teams: number): number[] {
+  return payoutSplit(teams).map((c) => c * 2);
+}

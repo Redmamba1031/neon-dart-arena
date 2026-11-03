@@ -1,13 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib/stripe.server";
-import { CHAMP_CAPS, CHAMP_CUTOFF_MS, CHAMP_MIN_PLAYERS, capEligibility, capLabel, isValidSlot } from "@/lib/champ";
+import { CHAMP_CAPS, CHAMP_CUTOFF_MS, CHAMP_MIN_PLAYERS, capEligibility, capLabel, completeTeams, isValidSlot, teamCapEligibility } from "@/lib/champ";
 
 const ALLOWED_COUNTRIES = ["US", "GB", "IE", "SE"];
 
 export const createChampCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { cap: string; startsAt: number; returnUrl: string; environment: StripeEnv }) => {
+  .inputValidator((d: { cap: string; startsAt: number; returnUrl: string; environment: StripeEnv; format?: "singles" | "doubles"; partnerUsername?: string }) => {
+    if (d.format && d.format !== "singles" && d.format !== "doubles") throw new Error("Invalid format");
+    if (d.format === "doubles" && !/^[A-Za-z0-9_.-]{2,32}$/.test(d.partnerUsername ?? "")) throw new Error("Enter your partner's username");
     if (d.environment !== "sandbox" && d.environment !== "live") throw new Error("Invalid environment");
     if (!(CHAMP_CAPS as readonly string[]).includes(d.cap)) throw new Error("Invalid division");
     if (!Number.isFinite(d.startsAt)) throw new Error("Invalid time");
@@ -26,11 +28,29 @@ export const createChampCheckout = createServerFn({ method: "POST" })
     }
     const { data: ban } = await (supabaseAdmin as any).from("player_bans").select("user_id").eq("user_id", userId).maybeSingle();
     if (ban) return { error: "Your account can't enter tournaments." };
-    const why = capEligibility(data.cap, p.cricket_mpr == null ? null : Number(p.cricket_mpr), !!p.mpr_verified);
-    if (why) return { error: why };
+    const format = data.format ?? "singles";
     const startsIso = new Date(data.startsAt).toISOString();
+    let partnerId: string | null = null;
+    if (format === "singles") {
+      const why = capEligibility(data.cap, p.cricket_mpr == null ? null : Number(p.cricket_mpr), !!p.mpr_verified);
+      if (why) return { error: why };
+    } else {
+      const { data: mate } = await (supabaseAdmin as any).from("profiles")
+        .select("id, age_verified, cricket_mpr, mpr_verified").ilike("username", data.partnerUsername!).maybeSingle();
+      if (!mate) return { error: "No player found with that username." };
+      if (mate.id === userId) return { error: "Pick a partner other than yourself." };
+      if (!mate.age_verified) return { error: "Your partner must verify their age & ID first." };
+      const why = teamCapEligibility(data.cap,
+        { mpr: p.cricket_mpr == null ? null : Number(p.cricket_mpr), verified: !!p.mpr_verified },
+        { mpr: mate.cricket_mpr == null ? null : Number(mate.cricket_mpr), verified: !!mate.mpr_verified });
+      if (why) return { error: why };
+      const { data: mateEntry } = await (supabaseAdmin as any).from("champ_entries").select("partner_id")
+        .eq("user_id", mate.id).eq("cap", data.cap).eq("starts_at", startsIso).eq("format", "doubles").eq("status", "paid").maybeSingle();
+      if (mateEntry && mateEntry.partner_id !== userId) return { error: "That player is already on another team in this bracket." };
+      partnerId = mate.id;
+    }
     const { data: dup } = await (supabaseAdmin as any).from("champ_entries").select("id")
-      .eq("user_id", userId).eq("cap", data.cap).eq("starts_at", startsIso).eq("status", "paid").maybeSingle();
+      .eq("user_id", userId).eq("cap", data.cap).eq("starts_at", startsIso).eq("format", format).eq("status", "paid").maybeSingle();
     if (dup) return { error: "You're already registered for this bracket." };
     try {
       const stripe = createStripeClient(data.environment);
@@ -42,8 +62,8 @@ export const createChampCheckout = createServerFn({ method: "POST" })
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
         ...(claims?.email && { customer_email: claims.email }),
-        payment_intent_data: { description: `SMYD Champ Cricket · ${capLabel(data.cap)} · ${startsIso}` },
-        metadata: { kind: "champ", userId, cap: data.cap, starts_at: startsIso },
+        payment_intent_data: { description: `SMYD Champ Cricket ${format === "doubles" ? "Doubles" : "Singles"} · ${capLabel(data.cap)} · ${startsIso}` },
+        metadata: { kind: "champ", userId, cap: data.cap, starts_at: startsIso, format, partner_id: partnerId ?? "" },
       });
       return { clientSecret: session.client_secret ?? "" };
     } catch (e) {
@@ -56,17 +76,22 @@ export const closeUnderfilledBrackets = createServerFn({ method: "POST" }).handl
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const db = supabaseAdmin as any;
   const cutoffIso = new Date(Date.now() + CHAMP_CUTOFF_MS).toISOString();
-  const { data: rows } = await db.from("champ_entries").select("id, cap, starts_at, payment_intent, environment")
+  const { data: rows } = await db.from("champ_entries").select("id, cap, starts_at, payment_intent, environment, format, partner_id, user_id")
     .eq("status", "paid").lte("starts_at", cutoffIso).gte("starts_at", new Date(Date.now() - 7 * 864e5).toISOString());
   const groups = new Map<string, any[]>();
   for (const r of rows ?? []) {
-    const k = `${r.cap}|${r.starts_at}`;
+    const k = `${r.format}|${r.cap}|${r.starts_at}`;
     groups.set(k, [...(groups.get(k) ?? []), r]);
   }
   let refunded = 0;
   for (const list of groups.values()) {
-    if (list.length >= CHAMP_MIN_PLAYERS) continue;
-    for (const e of list) {
+    let toRefund = list;
+    if (list[0].format === "doubles") {
+      const teams = completeTeams(list);
+      const inTeam = new Set(teams.flat().map((e: any) => e.user_id));
+      toRefund = teams.length >= CHAMP_MIN_PLAYERS ? list.filter((e) => !inTeam.has(e.user_id)) : list;
+    } else if (list.length >= CHAMP_MIN_PLAYERS) continue;
+    for (const e of toRefund) {
       const { data: claimed } = await db.from("champ_entries").update({ status: "refunding" })
         .eq("id", e.id).eq("status", "paid").select("id").maybeSingle();
       if (!claimed) continue;
